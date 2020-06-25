@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="project-starter">
+	<schema id="org.github.Latesil.project-starter" path="/org/github/Latesil/project-starter/">
+	</schema>
+</schemalist>
