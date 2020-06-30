@@ -32,6 +32,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     template_btn_box = Gtk.Template.Child()
     lang_revealer = Gtk.Template.Child()
     template_revealer = Gtk.Template.Child()
+    project_name_entry = Gtk.Template.Child()
+    project_name_revealer = Gtk.Template.Child()
+    project_id_entry = Gtk.Template.Child()
+    project_id_revealer = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -81,4 +85,19 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         else:
             self.template_revealer.set_reveal_child(True)
 
+    @Gtk.Template.Callback()
+    def on_project_name_entry_focus_in_event(self, e, w):
+        self.project_name_revealer.set_reveal_child(True)
+
+    @Gtk.Template.Callback()
+    def on_project_name_entry_focus_out_event(self, e, w):
+        self.project_name_revealer.set_reveal_child(False)
+
+    @Gtk.Template.Callback()
+    def on_project_id_entry_focus_in_event(self, e, w):
+        self.project_id_revealer.set_reveal_child(True)
+
+    @Gtk.Template.Callback()
+    def on_project_id_entry_focus_out_event(self, e, w):
+        self.project_id_revealer.set_reveal_child(False)
         
