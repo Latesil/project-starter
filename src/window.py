@@ -41,6 +41,9 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         super().__init__(**kwargs)
 
         self.main_path = ""
+        self.switch_btn.props.sensitive = False
+        self.project_name_ready = False
+        self.project_id_ready = False
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -89,12 +92,16 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
-        self.check_entry(e, self.check_project_name)
+        if self.check_entry(e, self.check_project_name):
+            self.project_name_ready = True
+            self.ready_check()
 
 
     @Gtk.Template.Callback()
     def on_project_id_entry_changed(self, e):
-        self.check_entry(e, self.check_project_id)
+        if self.check_entry(e, self.check_project_id):
+            self.project_id_ready = True
+            self.ready_check()
 
 
     ##########################################################################
@@ -103,7 +110,12 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         text = e.props.text
         e.props.secondary_icon_name = ''
         if text:
-            e.props.secondary_icon_name = 'dialog-warning-symbolic' if not func(text) else ''
+            if not func(text):
+                e.props.secondary_icon_name = 'dialog-warning-symbolic'
+                return False
+            else:
+                e.props.secondary_icon_name = ''
+                return True
 
     def check_project_name(self, text):
         if text:
@@ -112,4 +124,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def check_project_id(self, text):
         if text:
             return True if re.match('[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
+
+    def ready_check(self):
+        self.switch_btn.props.sensitive = True if self.project_name_ready and self.project_id_ready else False
+
         
