@@ -86,6 +86,7 @@
                                     <property name="can_focus">True</property>
                                     <property name="tooltip_text" translatable="yes">Unique name that is user to your project's folder and other technical resources.
 Should be in lower case without spaces and may not start with a number</property>
+                                    <property name="secondary_icon_tooltip_text" translatable="yes">Something goes wrong</property>
                                     <signal name="changed" handler="on_project_name_entry_changed" swapped="no"/>
                                   </object>
                                   <packing>

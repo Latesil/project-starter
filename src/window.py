@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, GLib, Gio
 import os
-from os.path import expanduser
 
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
@@ -84,9 +83,12 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
-        text = e.get_text()
-        if not self.check_project_name(text):
-            print('something goeswrong')
+        text = e.props.text
+        if text:
+            e.props.secondary_icon_name = 'gtk-dialog-error' if not self.check_project_name(text) else ''
+        else:
+            e.props.secondary_icon_name = ''
+
 
     @Gtk.Template.Callback()
     def on_project_id_entry_changed(self, e):
@@ -95,7 +97,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     ##########################################################################
 
     def check_project_name(self, text):
-        #TODO regexp
+        #TODO regexp for spaces
         if text:
-            return False if text[0].isdigit() or ' ' in text else True
+            return False if text[0].isdigit() or ' ' in text or not text.islower() else True
         
