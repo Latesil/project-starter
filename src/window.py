@@ -16,8 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, GLib, Gio
-import os
-
+import re
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -83,21 +82,27 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
-        text = e.props.text
-        if text:
-            e.props.secondary_icon_name = 'gtk-dialog-error' if not self.check_project_name(text) else ''
-        else:
-            e.props.secondary_icon_name = ''
+        self.check_entry(e, self.check_project_name)
 
 
     @Gtk.Template.Callback()
     def on_project_id_entry_changed(self, e):
-        print(e.get_text())
+        self.check_entry(e, self.check_project_id)
+
 
     ##########################################################################
 
-    def check_project_name(self, text):
-        #TODO regexp for spaces
+    def check_entry(self, e, func):
+        text = e.props.text
+        e.props.secondary_icon_name = ''
         if text:
-            return False if text[0].isdigit() or ' ' in text or not text.islower() else True
+            e.props.secondary_icon_name = 'dialog-warning-symbolic' if not func(text) else ''
+
+    def check_project_name(self, text):
+        if text:
+            return False if text[0].isdigit() or re.search('\s', text) or not text.islower() else True
+
+    def check_project_id(self, text):
+        if text:
+            return True if re.match('[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
         
