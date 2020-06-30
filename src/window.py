@@ -25,17 +25,24 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     switch_btn = Gtk.Template.Child()
     second_btn = Gtk.Template.Child()
     main_view = Gtk.Template.Child()
+    choose_app_btn = Gtk.Template.Child()
+    lang_btn = Gtk.Template.Child()
+    template_btn = Gtk.Template.Child()
+    lang_btn_box = Gtk.Template.Child()
+    template_btn_box = Gtk.Template.Child()
+    lang_revealer = Gtk.Template.Child()
+    template_revealer = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    @Gtk.Template.Callback()
+    """@Gtk.Template.Callback()
     def on_switch_btn_map(self, w):
-        print(dir(self.main_view)) #page0 page1
+        pass #page0 page1
 
     @Gtk.Template.Callback()
     def on_second_btn_map(self, w):
-        pass #print('second_btn_map')
+        pass"""
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -43,5 +50,35 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_second_btn_clicked(self, w):
-        self.main_view.set_visible_child_name('page0')
+        self.close() #self.main_view.set_visible_child_name('page0')
+
+    @Gtk.Template.Callback()
+    def on_change_path_btn_clicked(self, btn):
+        pass
+
+    @Gtk.Template.Callback()
+    def on_choose_app_btn_changed(self, w):
+        app = self.choose_app_btn.get_app_info()
+        app.refresh()
+
+    @Gtk.Template.Callback()
+    def on_lang_btn_clicked(self, btn):
+        if self.template_revealer.get_reveal_child():
+            self.template_revealer.set_reveal_child(False)
+
+        if self.lang_revealer.get_reveal_child():
+            self.lang_revealer.set_reveal_child(False)
+        else:
+            self.lang_revealer.set_reveal_child(True)
+
+    @Gtk.Template.Callback()
+    def on_template_btn_clicked(self, btn):
+        if self.lang_revealer.get_reveal_child():
+            self.lang_revealer.set_reveal_child(False)
+
+        if self.template_revealer.get_reveal_child():
+            self.template_revealer.set_reveal_child(False)
+        else:
+            self.template_revealer.set_reveal_child(True)
+
         
