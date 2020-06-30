@@ -44,12 +44,18 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.switch_btn.props.sensitive = False
         self.project_name_ready = False
         self.project_id_ready = False
+        self.project_name = ""
+        self.project_id = ""
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
         self.main_path = self.path_entry.props.text
+        if self.main_path[:-1] == '/':
+            self.main_path = self.main_path[:-1]
         if self.main_path[0] == '~':
-            self.main_path = GLib.get_home_dir() + self.main_path[1:]
+            self.main_path = GLib.get_home_dir() + self.main_path[1:] + '/' + self.project_name
+        else:
+            self.main_path = self.main_path + '/' + self.project_name
         if not os.path.exists(self.main_path):
             os.makedirs(self.main_path)
         self.main_view.set_visible_child_name('page1')
@@ -86,6 +92,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
         if self.check_entry(e, self.check_project_name):
+            self.project_name = e.props.text
             self.project_name_ready = True
             self.ready_check()
 
@@ -93,6 +100,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_project_id_entry_changed(self, e):
         if self.check_entry(e, self.check_project_id):
+            self.project_id = e.props.text
             self.project_id_ready = True
             self.ready_check()
 
