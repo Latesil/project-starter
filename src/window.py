@@ -17,6 +17,7 @@
 
 from gi.repository import Gtk, GLib, Gio
 import re
+import os
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -39,14 +40,20 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.path = ""
+        self.main_path = ""
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
+        self.main_path = self.path_entry.props.text
+        if self.main_path[0] == '~':
+            self.main_path = GLib.get_home_dir() + self.main_path[1:]
+        if not os.path.exists(self.main_path):
+            os.makedirs(self.main_path)
         self.main_view.set_visible_child_name('page1')
 
     @Gtk.Template.Callback()
     def on_second_btn_clicked(self, w):
+        GLib.spawn_async(['/usr/bin/xdg-open', self.main_path])
         self.close() #self.main_view.set_visible_child_name('page0')
 
     @Gtk.Template.Callback()
