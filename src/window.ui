@@ -245,7 +245,6 @@ used to uniquely identify your application</property>
                                 <property name="tooltip_text" translatable="yes">Project path</property>
                                 <property name="text" translatable="yes">~/Projects</property>
                                 <property name="placeholder_text" translatable="yes">project path</property>
-                                <signal name="changed" handler="on_path_entry_changed" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

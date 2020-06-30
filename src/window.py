@@ -84,13 +84,6 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.template_revealer.set_reveal_child(True)
 
     @Gtk.Template.Callback()
-    def on_path_entry_changed(self, e):
-        if GLib.file_test(e.get_text(), GLib.FileTest.IS_DIR):
-            print('is dir')
-        else:
-            print('not dir')
-
-    @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
         if self.check_entry(e, self.check_project_name):
             self.project_name_ready = True
