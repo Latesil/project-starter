@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, GLib
+import os
+from os.path import expanduser
 
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
@@ -24,8 +26,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     switch_btn = Gtk.Template.Child()
     second_btn = Gtk.Template.Child()
+    change_path_btn = Gtk.Template.Child()
     main_view = Gtk.Template.Child()
-    choose_app_btn = Gtk.Template.Child()
     lang_btn = Gtk.Template.Child()
     template_btn = Gtk.Template.Child()
     lang_btn_box = Gtk.Template.Child()
@@ -33,20 +35,13 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     lang_revealer = Gtk.Template.Child()
     template_revealer = Gtk.Template.Child()
     project_name_entry = Gtk.Template.Child()
-    project_name_revealer = Gtk.Template.Child()
     project_id_entry = Gtk.Template.Child()
-    project_id_revealer = Gtk.Template.Child()
+    path_entry = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    """@Gtk.Template.Callback()
-    def on_switch_btn_map(self, w):
-        pass #page0 page1
-
-    @Gtk.Template.Callback()
-    def on_second_btn_map(self, w):
-        pass"""
+        self.path = ""
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -59,11 +54,6 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_change_path_btn_clicked(self, btn):
         pass
-
-    @Gtk.Template.Callback()
-    def on_choose_app_btn_changed(self, w):
-        app = self.choose_app_btn.get_app_info()
-        app.refresh()
 
     @Gtk.Template.Callback()
     def on_lang_btn_clicked(self, btn):
@@ -86,18 +76,26 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.template_revealer.set_reveal_child(True)
 
     @Gtk.Template.Callback()
-    def on_project_name_entry_focus_in_event(self, e, w):
-        self.project_name_revealer.set_reveal_child(True)
+    def on_path_entry_changed(self, e):
+        if GLib.file_test(e.get_text(), GLib.FileTest.IS_DIR):
+            print('is dir')
+        else:
+            print('not dir')
 
     @Gtk.Template.Callback()
-    def on_project_name_entry_focus_out_event(self, e, w):
-        self.project_name_revealer.set_reveal_child(False)
+    def on_project_name_entry_changed(self, e):
+        text = e.get_text()
+        if not self.check_project_name(text):
+            print('something goeswrong')
 
     @Gtk.Template.Callback()
-    def on_project_id_entry_focus_in_event(self, e, w):
-        self.project_id_revealer.set_reveal_child(True)
+    def on_project_id_entry_changed(self, e):
+        print(e.get_text())
 
-    @Gtk.Template.Callback()
-    def on_project_id_entry_focus_out_event(self, e, w):
-        self.project_id_revealer.set_reveal_child(False)
+    ##########################################################################
+
+    def check_project_name(self, text):
+        #TODO regexp
+        if text:
+            return False if text[0].isdigit() or ' ' in text else True
         

@@ -25,6 +25,8 @@
               <object class="GtkStack" id="main_view">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_top">30</property>
+                <property name="margin_bottom">30</property>
                 <property name="transition_type">slide-left-right</property>
                 <signal name="map" handler="on_main_view_map" swapped="no"/>
                 <child>
@@ -82,9 +84,9 @@
                                   <object class="GtkEntry" id="project_name_entry">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="tooltip_text" translatable="yes">Project name</property>
-                                    <signal name="focus-in-event" handler="on_project_name_entry_focus_in_event" swapped="no"/>
-                                    <signal name="focus-out-event" handler="on_project_name_entry_focus_out_event" swapped="no"/>
+                                    <property name="tooltip_text" translatable="yes">Unique name that is user to your project's folder and other technical resources.
+Should be in lower case without spaces and may not start with a number</property>
+                                    <signal name="changed" handler="on_project_name_entry_changed" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -108,30 +110,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkRevealer" id="project_name_revealer">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel" id="project_name_lbl">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="margin_top">10</property>
-                                <property name="margin_bottom">10</property>
-                                <property name="label" translatable="yes">Unique name that is user to your project's folder and other technical resources.
-Should be in lower case without spaces and may not start with a number</property>
-                                <property name="justify">center</property>
-                                <attributes>
-                                  <attribute name="weight" value="medium"/>
-                                  <attribute name="scale" value="0.80000000000000004"/>
-                                </attributes>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -186,9 +165,9 @@ Should be in lower case without spaces and may not start with a number</property
                                   <object class="GtkEntry" id="project_id_entry">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="tooltip_text" translatable="yes">Project ID</property>
-                                    <signal name="focus-in-event" handler="on_project_id_entry_focus_in_event" swapped="no"/>
-                                    <signal name="focus-out-event" handler="on_project_id_entry_focus_out_event" swapped="no"/>
+                                    <property name="tooltip_text" translatable="yes">The Project ID is a reverse domain-name identifier 
+used to uniquely identify your application</property>
+                                    <signal name="changed" handler="on_project_id_entry_changed" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -212,30 +191,7 @@ Should be in lower case without spaces and may not start with a number</property
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkRevealer" id="project_id_revealer">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel" id="project_id_lbl">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="margin_top">10</property>
-                                <property name="margin_bottom">10</property>
-                                <property name="label" translatable="yes">The Project ID is a reverse domain-name identifier 
-used to uniquely identify your application</property>
-                                <property name="justify">center</property>
-                                <attributes>
-                                  <attribute name="weight" value="medium"/>
-                                  <attribute name="scale" value="0.80000000000000004"/>
-                                </attributes>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -287,6 +243,7 @@ used to uniquely identify your application</property>
                                 <property name="tooltip_text" translatable="yes">Project path</property>
                                 <property name="text" translatable="yes">~/Projects</property>
                                 <property name="placeholder_text" translatable="yes">project path</property>
+                                <signal name="changed" handler="on_path_entry_changed" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -296,7 +253,7 @@ used to uniquely identify your application</property>
                             </child>
                             <child>
                               <object class="GtkButton" id="change_path_btn">
-                                <property name="label" translatable="yes">Change</property>
+                                <property name="label" translatable="yes">Browse</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -510,18 +467,7 @@ used to uniquely identify your application</property>
                       <placeholder/>
                     </child>
                     <child>
-                      <object class="GtkAppChooserButton" id="choose_app_btn">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="content_type">inode/directory</property>
-                        <property name="show_dialog_item">True</property>
-                        <signal name="changed" handler="on_choose_app_btn_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">8</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>
