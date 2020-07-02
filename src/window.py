@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GLib, Gio
+from gi.repository import Gtk, GLib, Gio, Gdk
 import re
 import os
 
@@ -67,27 +67,23 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_change_path_btn_clicked(self, btn):
-        pass
+        if not Gtk.show_uri_on_window(None, 'file:///home/late/Pictures/1.png', Gdk.CURRENT_TIME):
+            print('Error')
+
 
     @Gtk.Template.Callback()
     def on_lang_btn_clicked(self, btn):
-        if self.template_revealer.get_reveal_child():
-            self.template_revealer.set_reveal_child(False)
+        if self.template_revealer.props.reveal_child:
+            self.template_revealer.props.reveal_child = False
 
-        if self.lang_revealer.get_reveal_child():
-            self.lang_revealer.set_reveal_child(False)
-        else:
-            self.lang_revealer.set_reveal_child(True)
+        self.lang_revealer.props.reveal_child = not self.lang_revealer.props.reveal_child
 
     @Gtk.Template.Callback()
     def on_template_btn_clicked(self, btn):
-        if self.lang_revealer.get_reveal_child():
-            self.lang_revealer.set_reveal_child(False)
+        if self.lang_revealer.props.reveal_child:
+            self.lang_revealer.props.reveal_child = False
 
-        if self.template_revealer.get_reveal_child():
-            self.template_revealer.set_reveal_child(False)
-        else:
-            self.template_revealer.set_reveal_child(True)
+        self.template_revealer.props.reveal_child = not self.template_revealer.props.reveal_child
 
     @Gtk.Template.Callback()
     def on_project_name_entry_changed(self, e):
@@ -103,6 +99,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.project_id = e.props.text
             self.project_id_ready = True
             self.ready_check()
+
+    @Gtk.Template.Callback()
+    def on_git_enable_btn_toggled(self, b):
+        print('on_git_enable_btn_toggled')
 
 
     ##########################################################################
