@@ -72,7 +72,14 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_change_path_btn_clicked(self, btn):
-        #browse
+        dialog = Gtk.FileChooserDialog(_("Choose a folder"), None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        response = dialog.run()
+
+        #if user click ok
+        if response == Gtk.ResponseType.OK:
+            self.path_entry.props.text = dialog.get_filename()
+        dialog.destroy()
 
 
     @Gtk.Template.Callback()
