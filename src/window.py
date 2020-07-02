@@ -36,6 +36,11 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     project_name_entry = Gtk.Template.Child()
     project_id_entry = Gtk.Template.Child()
     path_entry = Gtk.Template.Child()
+    python_btn = Gtk.Template.Child()
+    rust_btn = Gtk.Template.Child()
+    c_btn = Gtk.Template.Child()
+    gui_gtk_btn = Gtk.Template.Child()
+    cli_gtk_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -67,8 +72,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_change_path_btn_clicked(self, btn):
-        if not Gtk.show_uri_on_window(None, 'file:///home/late/Pictures/1.png', Gdk.CURRENT_TIME):
-            print('Error')
+        #browse
 
 
     @Gtk.Template.Callback()
@@ -104,8 +108,37 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def on_git_enable_btn_toggled(self, b):
         print('on_git_enable_btn_toggled')
 
+    @Gtk.Template.Callback()
+    def on_python_btn_toggled(self, b):
+        self.button_toggled(b, 'lang')
+
+    @Gtk.Template.Callback()
+    def on_rust_btn_toggled(self, b):
+        self.button_toggled(b, 'lang')
+
+    @Gtk.Template.Callback()
+    def on_c_btn_toggled(self, b):
+        self.button_toggled(b, 'lang')
+
+    @Gtk.Template.Callback()
+    def on_gui_gtk_btn_toggled(self, b):
+        self.button_toggled(b, 'template')
+
+    @Gtk.Template.Callback()
+    def on_cli_gtk_btn_toggled(self, b):
+        self.button_toggled(b, 'template')
+
+
 
     ##########################################################################
+
+    def button_toggled(self, b, category):
+        if category == 'lang':
+            self.lang_btn.set_label(b.get_label())
+        elif category == 'template':
+            self.template_btn.set_label(b.get_label())
+        else:
+            print('there is no such category')
 
     def check_entry(self, e, func):
         text = e.props.text

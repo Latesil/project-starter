@@ -395,13 +395,14 @@ used to uniquely identify your application</property>
                                 <property name="can_focus">False</property>
                                 <property name="layout_style">start</property>
                                 <child>
-                                  <object class="GtkToggleButton" id="python_btn">
+                                  <object class="GtkRadioButton" id="python_btn">
                                     <property name="label" translatable="yes">Python</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
+                                    <property name="receives_default">False</property>
                                     <property name="active">True</property>
-                                    <property name="draw_indicator">True</property>
+                                    <property name="draw_indicator">False</property>
+                                    <signal name="toggled" handler="on_python_btn_toggled" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">True</property>
@@ -410,11 +411,14 @@ used to uniquely identify your application</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkToggleButton" id="rust_btn">
+                                  <object class="GtkRadioButton" id="rust_btn">
                                     <property name="label" translatable="yes">Rust</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="draw_indicator">False</property>
+                                    <property name="group">python_btn</property>
+                                    <signal name="toggled" handler="on_rust_btn_toggled" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">True</property>
@@ -423,11 +427,15 @@ used to uniquely identify your application</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkToggleButton">
-                                    <property name="label" translatable="yes">Vala</property>
+                                  <object class="GtkRadioButton" id="c_btn">
+                                    <property name="label" translatable="yes">C</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="active">True</property>
+                                    <property name="draw_indicator">False</property>
+                                    <property name="group">python_btn</property>
+                                    <signal name="toggled" handler="on_c_btn_toggled" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">True</property>
@@ -482,12 +490,14 @@ used to uniquely identify your application</property>
                             <property name="can_focus">False</property>
                             <property name="layout_style">end</property>
                             <child>
-                              <object class="GtkToggleButton">
+                              <object class="GtkRadioButton" id="gui_gtk_btn">
                                 <property name="label" translatable="yes">GTK GUI Application</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="receives_default">True</property>
+                                <property name="receives_default">False</property>
                                 <property name="active">True</property>
+                                <property name="draw_indicator">False</property>
+                                <signal name="toggled" handler="on_gui_gtk_btn_toggled" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">True</property>
@@ -496,11 +506,15 @@ used to uniquely identify your application</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkToggleButton">
-                                <property name="label" translatable="yes">CLI Application</property>
+                              <object class="GtkRadioButton" id="cli_gtk_btn">
+                                <property name="label" translatable="yes">CLI GTK Application</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="receives_default">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">False</property>
+                                <property name="group">gui_gtk_btn</property>
+                                <signal name="toggled" handler="on_cli_gtk_btn_toggled" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">True</property>
