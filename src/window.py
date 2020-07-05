@@ -53,6 +53,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.project_name = ""
         self.project_id = ""
         self.is_git = True
+        self.language = self.lang_btn.get_label()
+        self.template = self.template_btn.get_label()
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -63,9 +65,17 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.main_path = GLib.get_home_dir() + self.main_path[1:] + '/' + self.project_name
         else:
             self.main_path = self.main_path + '/' + self.project_name
-        if not os.path.exists(self.main_path):
-            os.makedirs(self.main_path)
-        self.main_view.set_visible_child_name('page1')
+        #if not os.path.exists(self.main_path):
+        #    os.makedirs(self.main_path)
+
+        print('Language: ', self.language)
+        print('Template: ', self.template)
+        print('Project name: ', self.project_name)
+        print('Project ID: ', self.project_id)
+        print('Is Git: ', self.is_git)
+        print('Main Path: ', self.main_path)
+
+        #self.main_view.set_visible_child_name('page1')
 
     @Gtk.Template.Callback()
     def on_second_btn_clicked(self, w):
@@ -148,8 +158,12 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def button_toggled(self, b, category):
         if category == 'lang':
             self.lang_btn.set_label(b.get_label())
+            self.language = self.lang_btn.get_label()
+            self.lang_revealer.props.reveal_child = False
         elif category == 'template':
             self.template_btn.set_label(b.get_label())
+            self.template = self.template_btn.get_label()
+            self.template_revealer.props.reveal_child = False
         else:
             print('there is no such category')
 
