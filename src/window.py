@@ -41,6 +41,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     c_btn = Gtk.Template.Child()
     gui_gtk_btn = Gtk.Template.Child()
     cli_gtk_btn = Gtk.Template.Child()
+    test_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -51,6 +52,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.project_id_ready = False
         self.project_name = ""
         self.project_id = ""
+        self.is_git = True
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -76,7 +78,6 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         response = dialog.run()
 
-        #if user click ok
         if response == Gtk.ResponseType.OK:
             self.path_entry.props.text = dialog.get_filename()
         dialog.destroy()
@@ -113,7 +114,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_git_enable_btn_toggled(self, b):
-        print('on_git_enable_btn_toggled')
+        if not b.props.active:
+            self.is_git = False
 
     @Gtk.Template.Callback()
     def on_python_btn_toggled(self, b):
@@ -134,6 +136,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_cli_gtk_btn_toggled(self, b):
         self.button_toggled(b, 'template')
+
+    @Gtk.Template.Callback()
+    def on_test_btn_clicked(self, b):
+        GLib.spawn_async(['/usr/bin/xdg-open', self.main_path])
 
 
 
