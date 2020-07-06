@@ -30,7 +30,7 @@ project_starter_sources = [
   'main.py',
   'window.py',
   'python_template.py',
-  'license_template.py',
+  'gpl.py',
 ]
 
 install_data(project_starter_sources, install_dir: moduledir)

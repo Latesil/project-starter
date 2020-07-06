@@ -17,7 +17,6 @@
 
 import sys
 import os
-from .license_template import Gpl
 
 class PythonTemplate():
 
@@ -33,6 +32,7 @@ class PythonTemplate():
         if self.is_gui:
             self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
             self.populate_data_folder(self.project_id, self.project_name)
+            self.populate_po_dir(self.project_id, self.project_name)
 
     def create_basic_gui_structure(self, p_id, p_name, path):
         os.makedirs(path + '/build_aux/meson')
@@ -42,6 +42,7 @@ class PythonTemplate():
 
         with open(path + '/' + "COPYING", 'a') as file_license:
             if self.license == 'GPL 3':
+                from .gpl import Gpl
                 license = Gpl('3')
             file_license.write(license.get_text())
 
@@ -85,7 +86,7 @@ class PythonTemplate():
             file_main_json.write("    ],\n")
             file_main_json.write("}\n")
 
-        with open(path + '/build_aux/meson' + '/' + 'postinstall.py', 'a') as file_postinstall:
+        with open(path + '/build_aux/meson/postinstall.py', 'a') as file_postinstall:
             file_postinstall.write("#!/usr/bin/env python3\n")
             file_postinstall.write("\n")
             file_postinstall.write("from os import environ, path\n")
@@ -110,7 +111,7 @@ class PythonTemplate():
     def populate_data_folder(self, p_id, p_name):
         p_id_reverse = p_id.replace('.', '/')
 
-        with open(self.path + '/data' + '/' + 'meson.build', 'a') as file_meson_build:
+        with open(self.path + '/data/meson.build', 'a') as file_meson_build:
             file_meson_build.write("desktop_file = i18n.merge_file(\n")
             file_meson_build.write("  input: '%s.desktop.in',\n" % p_id)
             file_meson_build.write("  output: '%s.desktop',\n" % p_id)
@@ -142,7 +143,7 @@ class PythonTemplate():
             file_meson_build.write("  )\n")
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
-            file_meson_build.write("install_data('%s.gschema.xml',\n", % p_id)
+            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_id)
             file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
@@ -154,8 +155,8 @@ class PythonTemplate():
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
 
-        with open(self.path + '/data' + '/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
-            file_app_data.write("<?xml version="1.0" encoding=\"UTF-8\"?>\n")
+        with open(self.path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
+            file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_app_data.write("<component type=\"desktop\">\n")
             file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
             file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
@@ -166,7 +167,7 @@ class PythonTemplate():
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-        with open(self.path + '/data' + '/' + p_id + '.desktop.in', 'a') as file_desktop:
+        with open(self.path + '/data/' + p_id + '.desktop.in', 'a') as file_desktop:
             file_desktop.write("[Desktop Entry]\n")
             file_desktop.write("Name=%s\n" % p_name)
             file_desktop.write("Exec=%s" % p_name)
@@ -176,10 +177,29 @@ class PythonTemplate():
             file_desktop.write("Categories=GTK;\n")
             file_desktop.write("StartupNotify=true\n")
 
-        with open(self.path + '/data' + '/' + p_id + '.gschema.xml', 'a') as file_gschema:
-            file_gschema.write("<?xml version="1.0" encoding=\"UTF-8\"?>\n")
+        with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
+            file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
             file_gschema.write("\t<schema id=\"%s\" path=\"%s\">" % (p_id, p_id_reverse))
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")
+
+    def populate_po_dir(self, p_id, p_name):
+        #TODO maybe there is another way to create empty file?
+        with open(self.path + '/po/LINGUAS', 'a') as file_linguas:
+            file_linguas.close()
+
+        with open(self.path + '/po/meson.build', 'a') as file_meson_build:
+            file_meson_build.write("i18n.gettext('%s', preset: 'glib')\n" % p_name)
+            file_meson_build.write("\n")
+
+        with open(self.path + '/po/POTFILES', 'a') as file_potfiles:
+            file_potfiles.write("data/%s.desktop.in\n" % p_id)
+            file_potfiles.write("data/%s.appdata.xml.in\n" % p_id)
+            file_potfiles.write("data/%s.gschema.xml.in\n" % p_id)
+            file_potfiles.write("src/window.ui\n")
+            file_potfiles.write("src/main.py\n")
+            file_potfiles.write("src/window.py\n")
+            file_potfiles.write("\n")
+

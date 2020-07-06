@@ -513,7 +513,7 @@ used to uniquely identify your application</property>
                             </child>
                             <child>
                               <object class="GtkRadioButton" id="cli_gtk_btn">
-                                <property name="label" translatable="yes">CLI GTK Application</property>
+                                <property name="label" translatable="yes">GTK CLI Application</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>

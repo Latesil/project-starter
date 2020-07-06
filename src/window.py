@@ -59,8 +59,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.template = self.template_btn.get_label()
         self.license = self.license_combo_box.get_active_text()
 
-        self.gui = ['GUI GTK Application']
-        self.cli = ['CLI GTK Application']
+        self.gui = ['GTK GUI Application']
+        self.cli = ['GTK CLI Application']
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
