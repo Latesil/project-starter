@@ -147,6 +147,7 @@ class PythonTemplate():
     def populate_data_folder(self, p_id, p_name):
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
         p_full_name = p_id + '.' + p_name
+        p_path = p_id.replace('.', '/')
 
         with open(self.path + '/data/meson.build', 'a') as file_meson_build:
             file_meson_build.write("desktop_file = i18n.merge_file(\n")
@@ -217,7 +218,7 @@ class PythonTemplate():
         with open(self.path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s\">" % (p_full_name, p_id_reverse))
+            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">" % (p_full_name, p_path))
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")
@@ -246,6 +247,7 @@ class PythonTemplate():
         class_name = "".join(w.capitalize() for w in p_name.split('-'))
         p_name_underscore = p_name.replace('-', '_')
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
+        p_id_reverse_short = p_id.replace('.', '/')
 
         #TODO maybe there is another way to create an empty file?
         with open(self.path + '/src/__init__.py', 'a') as file_py_init:
@@ -367,7 +369,7 @@ class PythonTemplate():
         with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
             file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gresource.write("<gresources>\n")
-            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse)
+            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
             file_gresource.write("    <file>window.ui</file>\n")
             file_gresource.write("  </gresource>\n")
             file_gresource.write("</gresources>\n")
