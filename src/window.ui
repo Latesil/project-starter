@@ -61,7 +61,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="margin_end">5</property>
-                                    <property name="label" translatable="yes">Project Name:</property>
+                                    <property name="label" translatable="yes">Project Name</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -143,7 +143,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="margin_end">5</property>
-                                    <property name="label" translatable="yes">Project ID:</property>
+                                    <property name="label" translatable="yes">Project ID</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -226,7 +226,7 @@ used to uniquely identify your application</property>
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="margin_end">5</property>
-                                    <property name="label" translatable="yes">Path:</property>
+                                    <property name="label" translatable="yes">Path</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -350,6 +350,9 @@ used to uniquely identify your application</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Change language</property>
                             <signal name="clicked" handler="on_lang_btn_clicked" swapped="no"/>
+                            <style>
+                              <class name="flat"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -365,6 +368,9 @@ used to uniquely identify your application</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Change template</property>
                             <signal name="clicked" handler="on_template_btn_clicked" swapped="no"/>
+                            <style>
+                              <class name="flat"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -535,7 +541,48 @@ used to uniquely identify your application</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkLabel" id="license_lbl">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">License</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="license_combo_box">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="active_id">1</property>
+                            <items>
+                              <item id="1" translatable="yes">GPL 3</item>
+                              <item id="2" translatable="yes">GPL 2</item>
+                            </items>
+                            <signal name="changed" handler="on_license_combo_box_changed" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
+                      </packing>
                     </child>
                     <child>
                       <object class="GtkButton" id="test_btn">

@@ -18,6 +18,7 @@
 from gi.repository import Gtk, GLib, Gio, Gdk
 import re
 import os
+from .python_template import PythonTemplate
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -42,6 +43,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     gui_gtk_btn = Gtk.Template.Child()
     cli_gtk_btn = Gtk.Template.Child()
     test_btn = Gtk.Template.Child()
+    license_combo_box = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -55,6 +57,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.is_git = True
         self.language = self.lang_btn.get_label()
         self.template = self.template_btn.get_label()
+        self.license = self.license_combo_box.get_active_text()
+
+        self.gui = ['GUI GTK Application']
+        self.cli = ['CLI GTK Application']
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -65,27 +71,28 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.main_path = GLib.get_home_dir() + self.main_path[1:] + '/' + self.project_name
         else:
             self.main_path = self.main_path + '/' + self.project_name
-        #if not os.path.exists(self.main_path):
-        #    os.makedirs(self.main_path)
+        if not os.path.exists(self.main_path):
+            os.makedirs(self.main_path)
 
-        print('Language: ', self.language)
-        print('Template: ', self.template)
-        print('Project name: ', self.project_name)
-        print('Project ID: ', self.project_id)
-        print('Is Git: ', self.is_git)
-        print('Main Path: ', self.main_path)
+        is_gui = self.check_gui(self.template)
 
-        #self.main_view.set_visible_child_name('page1')
+        if self.language == 'Python':
+            self.complete_template = PythonTemplate(is_gui, self.project_id, self.project_name,
+                                                    self.main_path, self.is_git, self.license)
+        self.complete_template.start()
+
+        self.main_view.set_visible_child_name('page1')
 
     @Gtk.Template.Callback()
     def on_second_btn_clicked(self, w):
         GLib.spawn_async(['/usr/bin/xdg-open', self.main_path])
-        self.close() #self.main_view.set_visible_child_name('page0')
+        self.close()
 
     @Gtk.Template.Callback()
     def on_change_path_btn_clicked(self, btn):
-        dialog = Gtk.FileChooserDialog(_("Choose a folder"), None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        dialog = Gtk.FileChooserDialog(_("Choose a folder"), None, Gtk.FileChooserAction.SELECT_FOLDER,
+                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
@@ -148,6 +155,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.button_toggled(b, 'template')
 
     @Gtk.Template.Callback()
+    def on_license_combo_box_changed(self, cb):
+        print(cb.get_active_text())
+
+    @Gtk.Template.Callback()
     def on_test_btn_clicked(self, b):
         GLib.spawn_async(['/usr/bin/xdg-open', self.main_path])
 
@@ -189,4 +200,6 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def ready_check(self):
         self.switch_btn.props.sensitive = True if self.project_name_ready and self.project_id_ready else False
 
+    def check_gui(self, t):
+        return t in self.gui
         

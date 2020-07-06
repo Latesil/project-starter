@@ -29,6 +29,8 @@ project_starter_sources = [
   '__init__.py',
   'main.py',
   'window.py',
+  'python_template.py',
+  'license_template.py',
 ]
 
 install_data(project_starter_sources, install_dir: moduledir)
