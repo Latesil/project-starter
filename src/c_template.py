@@ -56,6 +56,7 @@ class CTemplate():
 
     def create_basic_gui_structure(self, p_id, p_name, path):
         p_full_name = p_id + '.' + p_name
+        p_id_underscore = p_id.replace('.', '_').lower()
 
         os.makedirs(path + '/build-aux/meson')
         os.makedirs(path + '/' + 'data')
@@ -91,7 +92,7 @@ class CTemplate():
             file_postinstall.write("\n")
 
         with open(path + '/' + "meson.build", 'a') as file_meson_build:
-            file_meson_build.write("project('%s',\n" % p_name)
+            file_meson_build.write("project('%s', 'c',\n" % p_name)
             file_meson_build.write("          version: '0.1.0',\n")
             file_meson_build.write("    meson_version: '>= 0.50.0',\n")
             file_meson_build.write("  default_options: [ 'warning_level=2',\n")
@@ -103,15 +104,16 @@ class CTemplate():
             file_meson_build.write("\n")
             file_meson_build.write("config_h = configuration_data()\n")
             file_meson_build.write("config_h.set_quoted('PACKAGE_VERSION', meson.project_version())\n")
-            file_meson_build.write("config_h.set_quoted('GETTEXT_PACKAGE', 'c-gui-example')\n")
+            file_meson_build.write("config_h.set_quoted('GETTEXT_PACKAGE', '%s')\n" % p_name)
             file_meson_build.write("config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))\n")
             file_meson_build.write("configure_file(\n")
-            file_meson_build.write("  output: 'c_gui_example-config.h',\n")
+            file_meson_build.write("  output: '%s-config.h',\n" % p_id_underscore)
             file_meson_build.write("  configuration: config_h,\n")
+            file_meson_build.write(")\n")
             file_meson_build.write("\n")
             file_meson_build.write("add_project_arguments([\n")
             file_meson_build.write("  '-I' + meson.build_root(),\n")
-            file_meson_build.write(", language: 'c')\n")]
+            file_meson_build.write("], language: 'c')\n")
             file_meson_build.write("\n")
             file_meson_build.write("subdir('data')\n")
             file_meson_build.write("subdir('src')\n")
@@ -137,6 +139,7 @@ class CTemplate():
             file_main_json.write("        \"/lib/pkgconfig\",\n")
             file_main_json.write("        \"/man\",\n")
             file_main_json.write("        \"/share/doc\",\n")
+            file_main_json.write("        \"/share/gtk-doc\",\n")
             file_main_json.write("        \"/share/man\",\n")
             file_main_json.write("        \"/share/pkgconfig\",\n")
             file_main_json.write("        \"*.la\",\n")
@@ -235,7 +238,7 @@ class CTemplate():
             file_gschema.write("\n")
 
     def populate_po_dir(self, p_id, p_name):
-        p_id_underscore = p_id.replace('.', '_')
+        p_id_underscore = p_id.replace('.', '_').lower()
 
         #TODO maybe there is another way to create an empty file?
         with open(self.path + '/po/LINGUAS', 'a') as file_linguas:
@@ -255,7 +258,7 @@ class CTemplate():
             file_potfiles.write("\n")
 
     def populate_src_dir(self, p_id, p_name):
-        p_id_underscore = p_id.replace('.', '_')
+        p_id_underscore = p_id.replace('.', '_').lower()
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
         p_id_reverse_short = p_id.replace('.', '/')
         window_name = "".join(w.capitalize() for w in p_name.split('-'))
@@ -264,6 +267,7 @@ class CTemplate():
             file_main_c.write("/* main.c\n")
             file_main_c.write(" *\n")
             file_main_c.write(" * Copyright 2020\n")
+            file_main_c.write("\n")
             file_main_c.write(self.gpl_text)
             file_main_c.write("\n")
             file_main_c.write("#include <glib/gi18n.h>\n")
@@ -286,7 +290,7 @@ class CTemplate():
             file_main_c.write("	/* Get the current window or create one if necessary. */\n")
             file_main_c.write("	window = gtk_application_get_active_window (app);\n")
             file_main_c.write("	if (window == NULL)\n")
-            file_main_c.write("		window = g_object_new (C_GUI_EXAMPLE_TYPE_WINDOW,\n")
+            file_main_c.write("		window = g_object_new (%s_TYPE_WINDOW,\n" % p_id_underscore.upper())
             file_main_c.write("		                       \"application\", app,\n")
             file_main_c.write("		                       \"default-width\", 600,\n")
             file_main_c.write("		                       \"default-height\", 300,\n")
@@ -354,18 +358,18 @@ class CTemplate():
             file_meson_build.write("\n")
             file_meson_build.write("gnome = import('gnome')\n")
             file_meson_build.write("\n")
-            file_meson_build.write("%s_sources += gnome.compile_resources('%s-resources',\n" % (p_id_underscore, p_id_underscore)
+            file_meson_build.write("%s_sources += gnome.compile_resources('%s-resources',\n" % (p_id_underscore, p_id_underscore))
             file_meson_build.write("  '%s.gresource.xml',\n" % p_id_underscore)
             file_meson_build.write("  c_name: '%s'\n" % p_id_underscore)
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
-            file_meson_build.write("executable('%s', %s_sources,\n" % (p_name, p_id_underscore)
+            file_meson_build.write("executable('%s', %s_sources,\n" % (p_name, p_id_underscore))
             file_meson_build.write("  dependencies: %s_deps,\n" % p_id_underscore)
             file_meson_build.write("  install: true,\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
 
-        with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
+        with open(self.path + '/src/' + p_id_underscore + '.gresource.xml', 'a') as file_gresource:
             file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gresource.write("<gresources>\n")
             file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
@@ -400,8 +404,8 @@ class CTemplate():
             file_window_c.write("  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);\n")
             file_window_c.write("\n")
             file_window_c.write("  gtk_widget_class_set_template_from_resource (widget_class, \"/%s/%s-window.ui\");\n" % (p_id_reverse_short, p_id_underscore))
-            file_window_c.write("  gtk_widget_class_bind_template_child (widget_class, %sWindow, header_bar);\n" % p_id_underscore)
-            file_window_c.write("  gtk_widget_class_bind_template_child (widget_class, %sWindow, label);\n" % p_id_underscore)
+            file_window_c.write("  gtk_widget_class_bind_template_child (widget_class, %sWindow, header_bar);\n" % window_name)
+            file_window_c.write("  gtk_widget_class_bind_template_child (widget_class, %sWindow, label);\n" % window_name)
             file_window_c.write("}\n")
             file_window_c.write("\n")
             file_window_c.write("static void\n")
@@ -410,12 +414,11 @@ class CTemplate():
             file_window_c.write("  gtk_widget_init_template (GTK_WIDGET (self));\n")
             file_window_c.write("}\n")
 
-        with open(self.path + '/src/window.ui', 'a') as file_window_ui:
+        with open(self.path + '/src/' + p_id_underscore + '-window.ui', 'a') as file_window_ui:
             file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_window_ui.write("\n")
             file_window_ui.write("<interface>\n")
             file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % class_name)
+            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % window_name)
             file_window_ui.write("      <property name=\"default-width\">600</property>\n")
             file_window_ui.write("    <property name=\"default-height\">300</property>\n")
             file_window_ui.write("    <child type=\"titlebar\">\n")

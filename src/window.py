@@ -83,6 +83,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             from .rust_template import RustTemplate
             self.complete_template = RustTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
+        elif self.language == 'C':
+            from .c_template import CTemplate
+            self.complete_template = CTemplate(is_gui, self.project_id, self.project_name,
+                                                    self.main_path, self.is_git, self.license)
 
         self.complete_template.start()
 

@@ -31,6 +31,7 @@ project_starter_sources = [
   'window.py',
   'python_template.py',
   'rust_template.py',
+  'c_template.py',
   'gpl.py',
 ]
 
