@@ -17,6 +17,7 @@
 
 import sys
 import os
+import stat
 
 class PythonTemplate():
 
@@ -91,8 +92,6 @@ class PythonTemplate():
             file_main_json.write("    ],\n")
             file_main_json.write("    \"modules\" : [\n")
             file_main_json.write("        {\n")
-            file_main_json.write("            \"/lib/pkgconfig\",\n")
-            file_main_json.write("            \"/man\",\n")
             file_main_json.write("            \"name\" : \"%s\",\n" % p_name)
             file_main_json.write("            \"builddir\" : true,\n")
             file_main_json.write("            \"buildsystem\" : \"meson\",\n")
@@ -127,6 +126,23 @@ class PythonTemplate():
             file_postinstall.write("    print('Compiling GSettings schemas...')\n")
             file_postinstall.write("    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n")
             file_postinstall.write("\n")
+
+        with open(path + '/' + "meson.build", 'a') as file_meson_build:
+            file_meson_build.write("project('%s',\n" % p_name)
+            file_meson_build.write("          version: '0.1.0',\n")
+            file_meson_build.write("    meson_version: '>= 0.50.0',\n")
+            file_meson_build.write("  default_options: [ 'warning_level=2',\n")
+            file_meson_build.write("                   ],\n")
+            file_meson_build.write(")\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("i18n = import('i18n')\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("subdir('data')\n")
+            file_meson_build.write("subdir('src')\n")
+            file_meson_build.write("subdir('po')\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("meson.add_install_script('build-aux/meson/postinstall.py')\n")
 
     def populate_data_folder(self, p_id, p_name):
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
@@ -295,6 +311,7 @@ class PythonTemplate():
             file_meson_build.write("conf.set('VERSION', meson.project_version())\n")
             file_meson_build.write("conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n")
             file_meson_build.write("conf.set('pkgdatadir', pkgdatadir)\n")
+            file_meson_build.write(")\n")
             file_meson_build.write("\n")
             file_meson_build.write("configure_file(\n")
             file_meson_build.write("  input: '%s.in',\n" % p_name)
@@ -309,7 +326,7 @@ class PythonTemplate():
             file_meson_build.write("  'window.py',\n")
             file_meson_build.write("]\n")
             file_meson_build.write("\n")
-            file_meson_build.write("install_data(project_starter_sources, install_dir: moduledir)\n")
+            file_meson_build.write("install_data(%s_sources, install_dir: moduledir)\n" % p_name_underscore)
             file_meson_build.write("\n")
 
         with open(self.path + '/src/' + p_name + '.in', 'a') as file_exec:
@@ -343,6 +360,9 @@ class PythonTemplate():
             file_exec.write("\n")
             file_exec.write("    from %s import main\n" % p_name_underscore)
             file_exec.write("    sys.exit(main.main(VERSION))\n")
+
+        st = os.stat(self.path + '/src/' + p_name + '.in')
+        os.chmod(self.path + '/src/' + p_name + '.in', st.st_mode | stat.S_IEXEC)
 
         with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
             file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
