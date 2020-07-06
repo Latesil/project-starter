@@ -514,7 +514,6 @@ used to uniquely identify your application</property>
                             <child>
                               <object class="GtkRadioButton" id="cli_gtk_btn">
                                 <property name="label" translatable="yes">GTK CLI Application</property>
-                                <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
                                 <property name="active">True</property>
@@ -566,7 +565,6 @@ used to uniquely identify your application</property>
                             <property name="active_id">1</property>
                             <items>
                               <item id="1" translatable="yes">GPL 3</item>
-                              <item id="2" translatable="yes">GPL 2</item>
                             </items>
                             <signal name="changed" handler="on_license_combo_box_changed" swapped="no"/>
                           </object>
