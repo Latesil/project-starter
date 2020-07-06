@@ -20,8 +20,7 @@ import os
 
 class PythonTemplate():
 
-    gpl_text = """
-# This program is free software: you can redistribute it and/or modify
+    gpl_text = """# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -49,9 +48,14 @@ class PythonTemplate():
             self.populate_data_folder(self.project_id, self.project_name)
             self.populate_po_dir(self.project_id, self.project_name)
             self.populate_src_dir(self.project_id, self.project_name)
+            if self.is_git:
+                os.chdir(self.path)
+                os.system('git init')
 
     def create_basic_gui_structure(self, p_id, p_name, path):
-        os.makedirs(path + '/build_aux/meson')
+        p_full_name = p_id + '.' + p_name
+
+        os.makedirs(path + '/build-aux/meson')
         os.makedirs(path + '/' + 'data')
         os.makedirs(path + '/' + 'po')
         os.makedirs(path + '/' + 'src')
@@ -62,9 +66,9 @@ class PythonTemplate():
                 license = Gpl('3')
             file_license.write(license.get_text())
 
-        with open(path + '/' + p_id + ".json", 'a') as file_main_json:
+        with open(path + '/' + p_full_name + ".json", 'a') as file_main_json:
             file_main_json.write("{\n")
-            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
+            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_full_name)
             file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
             file_main_json.write("    \"runtime-version\" : \"3.34\",\n")
             file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
@@ -102,7 +106,7 @@ class PythonTemplate():
             file_main_json.write("    ],\n")
             file_main_json.write("}\n")
 
-        with open(path + '/build_aux/meson/postinstall.py', 'a') as file_postinstall:
+        with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
             file_postinstall.write("#!/usr/bin/env python3\n")
             file_postinstall.write("\n")
             file_postinstall.write("from os import environ, path\n")
@@ -125,12 +129,13 @@ class PythonTemplate():
             file_postinstall.write("\n")
 
     def populate_data_folder(self, p_id, p_name):
-        p_id_reverse = p_id.replace('.', '/')
+        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
+        p_full_name = p_id + '.' + p_name
 
         with open(self.path + '/data/meson.build', 'a') as file_meson_build:
             file_meson_build.write("desktop_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.desktop.in',\n" % p_id)
-            file_meson_build.write("  output: '%s.desktop',\n" % p_id)
+            file_meson_build.write("  input: '%s.desktop.in',\n" % p_full_name)
+            file_meson_build.write("  output: '%s.desktop',\n" % p_full_name)
             file_meson_build.write("  type: 'desktop',\n")
             file_meson_build.write("  po_dir: '../po',\n")
             file_meson_build.write("  install: true,\n")
@@ -145,8 +150,8 @@ class PythonTemplate():
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
             file_meson_build.write("appstream_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_id)
-            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_id)
+            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_full_name)
+            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_full_name)
             file_meson_build.write("  po_dir: '../po',\n")
             file_meson_build.write("  install: true,\n")
             file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'appdata')\n")
@@ -159,7 +164,7 @@ class PythonTemplate():
             file_meson_build.write("  )\n")
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
-            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_id)
+            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_full_name)
             file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
@@ -171,10 +176,10 @@ class PythonTemplate():
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
 
-        with open(self.path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
+        with open(self.path + '/data/' + p_full_name + '.appdata.xml.in', 'a') as file_app_data:
             file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_app_data.write("<component type=\"desktop\">\n")
-            file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
+            file_app_data.write("\t<id>%s.desktop</id>\n" % p_full_name)
             file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
             if self.license == 'GPL 3':
                 file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
@@ -183,25 +188,27 @@ class PythonTemplate():
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-        with open(self.path + '/data/' + p_id + '.desktop.in', 'a') as file_desktop:
+        with open(self.path + '/data/' + p_full_name + '.desktop.in', 'a') as file_desktop:
             file_desktop.write("[Desktop Entry]\n")
             file_desktop.write("Name=%s\n" % p_name)
-            file_desktop.write("Exec=%s" % p_name)
+            file_desktop.write("Exec=%s\n" % p_name)
             if self.is_gui:
                 file_desktop.write("Terminal=false\n")
             file_desktop.write("Type=Application\n")
             file_desktop.write("Categories=GTK;\n")
             file_desktop.write("StartupNotify=true\n")
 
-        with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
+        with open(self.path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s\">" % (p_id, p_id_reverse))
+            file_gschema.write("\t<schema id=\"%s\" path=\"/%s\">" % (p_full_name, p_id_reverse))
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")
 
     def populate_po_dir(self, p_id, p_name):
+        p_full_name = p_id + '.' + p_name
+
         #TODO maybe there is another way to create an empty file?
         with open(self.path + '/po/LINGUAS', 'a') as file_linguas:
             file_linguas.close()
@@ -211,9 +218,9 @@ class PythonTemplate():
             file_meson_build.write("\n")
 
         with open(self.path + '/po/POTFILES', 'a') as file_potfiles:
-            file_potfiles.write("data/%s.desktop.in\n" % p_id)
-            file_potfiles.write("data/%s.appdata.xml.in\n" % p_id)
-            file_potfiles.write("data/%s.gschema.xml.in\n" % p_id)
+            file_potfiles.write("data/%s.desktop.in\n" % p_full_name)
+            file_potfiles.write("data/%s.appdata.xml.in\n" % p_full_name)
+            file_potfiles.write("data/%s.gschema.xml.in\n" % p_full_name)
             file_potfiles.write("src/window.ui\n")
             file_potfiles.write("src/main.py\n")
             file_potfiles.write("src/window.py\n")
@@ -222,7 +229,7 @@ class PythonTemplate():
     def populate_src_dir(self, p_id, p_name):
         class_name = "".join(w.capitalize() for w in p_name.split('-'))
         p_name_underscore = p_name.replace('-', '_')
-        p_id_reverse = p_id.replace('.', '/')
+        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
 
         #TODO maybe there is another way to create an empty file?
         with open(self.path + '/src/__init__.py', 'a') as file_py_init:
@@ -310,7 +317,7 @@ class PythonTemplate():
             file_exec.write("#\n")
             file_exec.write("# %s.in\n" % p_name)
             file_exec.write("#\n")
-            file_exec.write("#Copyright 2020\n")
+            file_exec.write("# Copyright 2020\n")
             file_exec.write("#\n")
             file_exec.write(self.gpl_text)
             file_exec.write("\n")
@@ -339,12 +346,12 @@ class PythonTemplate():
 
         with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
             file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_exec.write("<gresources>\n")
-            file_exec.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse)
-            file_exec.write("    <file>window.ui</file>\n")
-            file_exec.write("  </gresource>\n")
-            file_exec.write("</gresources>\n")
-            file_exec.write("\n")
+            file_gresource.write("<gresources>\n")
+            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse)
+            file_gresource.write("    <file>window.ui</file>\n")
+            file_gresource.write("  </gresource>\n")
+            file_gresource.write("</gresources>\n")
+            file_gresource.write("\n")
 
         with open(self.path + '/src/window.py', 'a') as file_py_window:
             file_py_window.write("# window.py\n")
@@ -356,7 +363,7 @@ class PythonTemplate():
             file_py_window.write("from gi.repository import Gtk\n")
             file_py_window.write("\n")
             file_py_window.write("\n")
-            file_py_window.write("@Gtk.Template(resource_path='/%s/window.ui')\n" % p_id_reverse)
+            file_py_window.write("@Gtk.Template(resource_path='/%swindow.ui')\n" % p_id_reverse)
             file_py_window.write("class %sWindow(Gtk.ApplicationWindow):\n" % class_name)
             file_py_window.write("    __gtype_name__ = '%sWindow'\n" % class_name)
             file_py_window.write("\n")
