@@ -422,3 +422,4 @@ class PythonTemplate():
             file_window_ui.write("    </child>\n")
             file_window_ui.write("    </template>\n")
             file_window_ui.write("  </interface>\n")
+    

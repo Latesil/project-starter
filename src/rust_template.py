@@ -21,20 +21,6 @@ import stat
 
 class RustTemplate():
 
-    gpl_text = """# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
         self.is_gui = is_gui
         self.project_id = project_id
@@ -54,8 +40,6 @@ class RustTemplate():
                 os.system('git init')
 
     def create_basic_gui_structure(self, p_id, p_name, path):
-        p_full_name = p_id + '.' + p_name
-
         os.makedirs(path + '/build-aux/meson')
         os.makedirs(path + '/' + 'data')
         os.makedirs(path + '/' + 'po')
@@ -67,15 +51,15 @@ class RustTemplate():
                 license = Gpl('3')
             file_license.write(license.get_text())
 
-        with open(path + '/' + p_full_name + ".json", 'a') as file_main_json:
+        with open(path + '/' + p_id + ".json", 'a') as file_main_json:
             file_main_json.write("{\n")
-            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_full_name)
+            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
             file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
             file_main_json.write("    \"runtime-version\" : \"3.34\",\n")
             file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
             file_main_json.write("    \"sdk-extensions\" : [\n")
             file_main_json.write("        \"org.freedesktop.Sdk.Extension.rust-stable\"\n")
-            file_main_json.write("    \"],\"\n")
+            file_main_json.write("    ],\n")
             file_main_json.write("    \"command\" : \"%s\",\n" % p_name)
             file_main_json.write("    \"finish-args\" : [\n")
             file_main_json.write("        \"--share=network\",\n")
@@ -87,11 +71,11 @@ class RustTemplate():
             file_main_json.write("        \"append-path\" : \"/usr/lib/sdk/rust-stable/bin\",\n")
             file_main_json.write("        \"build-args\" : [\n")
             file_main_json.write("            \"--share=network\"\n")
-            file_main_json.write("        \"],\n")
+            file_main_json.write("        ],\n")
             file_main_json.write("        \"env\" : {\n")
-            file_main_json.write("            \"CARGO_HOME\" : \"/run/build/rust-gui-example/cargo\",\n")
+            file_main_json.write("            \"CARGO_HOME\" : \"/run/build/%s/cargo\",\n" % p_name)
             file_main_json.write("            \"RUST_BACKTRACE\" : \"1\",\n")
-            file_main_json.write("            \"RUST_LOG\" : \"rust-gui-example=debug\"\n")
+            file_main_json.write("            \"RUST_LOG\" : \"%s=debug\"\n" % p_name)
             file_main_json.write("        }\n")
             file_main_json.write("    },\n")
             file_main_json.write("    \"cleanup\" : [\n")
@@ -115,9 +99,9 @@ class RustTemplate():
             file_main_json.write("                    \"type\" : \"git\",\n")
             file_main_json.write("                    \"url\" : \"file://%s\"\n" % path)
             file_main_json.write("                }\n")
-            file_main_json.write("            ],\n")
-            file_main_json.write("        },\n")
-            file_main_json.write("    ],\n")
+            file_main_json.write("            ]\n")
+            file_main_json.write("        }\n")
+            file_main_json.write("    ]\n")
             file_main_json.write("}\n")
 
         with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
@@ -179,13 +163,16 @@ class RustTemplate():
             file_cargo_shell_script.write("        cp \"$CARGO_TARGET_DIR\"/release/\"$APP_BIN\" \"$OUTPUT\"\n")
             file_cargo_shell_script.write("else\n")
             file_cargo_shell_script.write("    echo \"DEBUG MODE\"\n")
-            file_cargo_shell_script.write("    cargo build --manifest-path \\n")
+            file_cargo_shell_script.write("    cargo build --manifest-path \\\n")
             file_cargo_shell_script.write("        \"$MESON_SOURCE_ROOT\"/Cargo.toml --verbose && \\\n")
             file_cargo_shell_script.write("        cp \"$CARGO_TARGET_DIR\"/debug/\"$APP_BIN\" \"$OUTPUT\"\n")
             file_cargo_shell_script.write("fi\n")
             file_cargo_shell_script.write("\n")
 
-        with open(path + '/' + "cargo.toml", 'a') as file_cargo_toml:
+        st = os.stat(path + '/build-aux/cargo.sh')
+        os.chmod(path + '/build-aux/cargo.sh', st.st_mode | stat.S_IEXEC)
+
+        with open(path + '/' + "Cargo.toml", 'a') as file_cargo_toml:
             file_cargo_toml.write("[package]\n")
             file_cargo_toml.write("name = \"%s\"\n" % p_name)
             file_cargo_toml.write("version = \"0.1.0\"\n")
@@ -218,8 +205,8 @@ class RustTemplate():
 
         with open(self.path + '/data/meson.build', 'a') as file_meson_build:
             file_meson_build.write("desktop_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.desktop.in',\n" % p_full_name)
-            file_meson_build.write("  output: '%s.desktop',\n" % p_full_name)
+            file_meson_build.write("  input: '%s.desktop.in',\n" % p_id)
+            file_meson_build.write("  output: '%s.desktop',\n" % p_id)
             file_meson_build.write("  type: 'desktop',\n")
             file_meson_build.write("  po_dir: '../po',\n")
             file_meson_build.write("  install: true,\n")
@@ -234,8 +221,8 @@ class RustTemplate():
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
             file_meson_build.write("appstream_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_full_name)
-            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_full_name)
+            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_id)
+            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_id)
             file_meson_build.write("  po_dir: '../po',\n")
             file_meson_build.write("  install: true,\n")
             file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'appdata')\n")
@@ -248,7 +235,7 @@ class RustTemplate():
             file_meson_build.write("  )\n")
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
-            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_full_name)
+            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_id)
             file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
@@ -260,10 +247,10 @@ class RustTemplate():
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
 
-        with open(self.path + '/data/' + p_full_name + '.appdata.xml.in', 'a') as file_app_data:
+        with open(self.path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
             file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_app_data.write("<component type=\"desktop\">\n")
-            file_app_data.write("\t<id>%s.desktop</id>\n" % p_full_name)
+            file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
             file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
             if self.license == 'GPL 3':
                 file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
@@ -272,7 +259,7 @@ class RustTemplate():
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-        with open(self.path + '/data/' + p_full_name + '.desktop.in', 'a') as file_desktop:
+        with open(self.path + '/data/' + p_id + '.desktop.in', 'a') as file_desktop:
             file_desktop.write("[Desktop Entry]\n")
             file_desktop.write("Name=%s\n" % p_name)
             file_desktop.write("Exec=%s\n" % p_name)
@@ -282,10 +269,10 @@ class RustTemplate():
             file_desktop.write("Categories=GTK;\n")
             file_desktop.write("StartupNotify=true\n")
 
-        with open(self.path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
+        with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">" % (p_full_name, p_path))
+            file_gschema.write("<schemalist gettext-domain=\"%s\">\n" % p_name)
+            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">\n" % (p_id, p_path))
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")
@@ -302,9 +289,9 @@ class RustTemplate():
             file_meson_build.write("\n")
 
         with open(self.path + '/po/POTFILES', 'a') as file_potfiles:
-            file_potfiles.write("data/%s.desktop.in\n" % p_full_name)
-            file_potfiles.write("data/%s.appdata.xml.in\n" % p_full_name)
-            file_potfiles.write("data/%s.gschema.xml.in\n" % p_full_name)
+            file_potfiles.write("data/%s.desktop.in\n" % p_id)
+            file_potfiles.write("data/%s.appdata.xml.in\n" % p_id)
+            file_potfiles.write("data/%s.gschema.xml\n" % p_id)
             file_potfiles.write("src/window.ui\n")
             file_potfiles.write("\n")
 
@@ -318,42 +305,41 @@ class RustTemplate():
             file_config_rs.write("pub static VERSION: &str = @VERSION@;\n")
             file_config_rs.write("pub static LOCALEDIR: &str = @localedir@;\n")
 
-        with open(self.path + '/src/main.rs', 'a') as file_py_main:
-            file_py_main.write("use gettextrs::*;\n")
-            file_py_main.write("use gio::prelude::*;\n")
-            file_py_main.write("use gtk::prelude::*;\n")
-            file_py_main.write("#\n")
-            file_py_main.write("mod config;\n")
-            file_py_main.write("mod window;\n")
-            file_py_main.write("use crate::window::Window;\n")
-            file_py_main.write("\n")
-            file_py_main.write("fn main() {\n")
-            file_py_main.write("    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));)\n")
-            file_py_main.write("\n")
-            file_py_main.write("    setlocale(LocaleCategory::LcAll, \"\");\n")
-            file_py_main.write("    bindtextdomain(\"%s\", config::LOCALEDIR);\n" % p_name)
-            file_py_main.write("    textdomain(\"%s\");\n" % p_name)
-            file_py_main.write("\n")
-            file_py_main.write("    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/%s.gresource\")\n" % p_name)
-            file_py_main.write("        .expect(\"Could not load resources\");\n")
-            file_py_main.write("    gio::resources_register(&res);\n")
-            file_py_main.write("\n")
-            file_py_main.write("    let app = gtk::Application::new(Some(\"%s\"), Default::default()).unwrap();\n" % p_id)
-            file_py_main.write("    app.connect_activate(move |app| {\n")
-            file_py_main.write("        let window = Window::new();\n")
-            file_py_main.write("\n")
-            file_py_main.write("        window.widget.set_application(Some(app));\n")
-            file_py_main.write("        app.add_window(&window.widget);\n")
-            file_py_main.write("        window.widget.present();\n")
-            file_py_main.write("    });\n")
-            file_py_main.write("\n")
-            file_py_main.write("    let ret = app.run(&std::env::args().collect::<Vec<_>>());\n")
-            file_py_main.write("    std::process::exit(ret);\n")
-            file_py_main.write("}\n")
+        with open(self.path + '/src/main.rs', 'a') as file_rs_main:
+            file_rs_main.write("use gettextrs::*;\n")
+            file_rs_main.write("use gio::prelude::*;\n")
+            file_rs_main.write("use gtk::prelude::*;\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("mod config;\n")
+            file_rs_main.write("mod window;\n")
+            file_rs_main.write("use crate::window::Window;\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("fn main() {\n")
+            file_rs_main.write("    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("    setlocale(LocaleCategory::LcAll, \"\");\n")
+            file_rs_main.write("    bindtextdomain(\"%s\", config::LOCALEDIR);\n" % p_name)
+            file_rs_main.write("    textdomain(\"%s\");\n" % p_name)
+            file_rs_main.write("\n")
+            file_rs_main.write("    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/%s.gresource\")\n" % p_name)
+            file_rs_main.write("        .expect(\"Could not load resources\");\n")
+            file_rs_main.write("    gio::resources_register(&res);\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("    let app = gtk::Application::new(Some(\"%s\"), Default::default()).unwrap();\n" % p_id)
+            file_rs_main.write("    app.connect_activate(move |app| {\n")
+            file_rs_main.write("        let window = Window::new();\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("        window.widget.set_application(Some(app));\n")
+            file_rs_main.write("        app.add_window(&window.widget);\n")
+            file_rs_main.write("        window.widget.present();\n")
+            file_rs_main.write("    });\n")
+            file_rs_main.write("\n")
+            file_rs_main.write("    let ret = app.run(&std::env::args().collect::<Vec<_>>());\n")
+            file_rs_main.write("    std::process::exit(ret);\n")
+            file_rs_main.write("}\n")
 
         with open(self.path + '/src/meson.build', 'a') as file_meson_build:
             file_meson_build.write("pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n")
-            file_meson_build.write("moduledir = join_paths(pkgdatadir, '%s')\n" % p_name_underscore)
             file_meson_build.write("gnome = import('gnome')\n")
             file_meson_build.write("\n")
             file_meson_build.write("gnome.compile_resources('%s',\n" % p_name)
@@ -363,20 +349,10 @@ class RustTemplate():
             file_meson_build.write("  install_dir: pkgdatadir,\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
-            file_meson_build.write("desktop_utils = find_program('desktop-file-validate', required: false)\n")
-            file_meson_build.write("if desktop_utils.found()\n")
-            file_meson_build.write("  test('Validate desktop file', desktop_utils,\n")
-            file_meson_build.write("    args: [desktop_file]\n")
-            file_meson_build.write("  )\n")
-            file_meson_build.write("endif\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("python = import('python')\n")
-            file_meson_build.write("\n")
             file_meson_build.write("conf = configuration_data()\n")
-            file_meson_build.write("conf.set('PYTHON', python.find_installation('python3').path())\n")
-            file_meson_build.write("conf.set('VERSION', meson.project_version())\n")
-            file_meson_build.write("conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n")
-            file_meson_build.write("conf.set('pkgdatadir', pkgdatadir)\n")
+            file_meson_build.write("conf.set_quoted('VERSION', meson.project_version())\n")
+            file_meson_build.write("conf.set_quoted('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n")
+            file_meson_build.write("conf.set_quoted('pkgdatadir', pkgdatadir)\n")
             file_meson_build.write("\n")
             file_meson_build.write("configure_file(\n")
             file_meson_build.write("  input: 'config.rs.in',\n")
@@ -389,8 +365,9 @@ class RustTemplate():
             file_meson_build.write("  'cp',\n")
             file_meson_build.write("  join_paths(meson.build_root(), 'src', 'config.rs'),\n")
             file_meson_build.write("  join_paths(meson.source_root(), 'src', 'config.rs'),\n")
-            file_meson_build.write("  check: true\n"
+            file_meson_build.write("  check: true\n")
             file_meson_build.write(")\n")
+            file_meson_build.write("\n")
             file_meson_build.write("sources = files(\n")
             file_meson_build.write("  'config.rs',\n")
             file_meson_build.write("  'main.rs',\n")
@@ -425,7 +402,7 @@ class RustTemplate():
             file_gresource.write("</gresources>\n")
             file_gresource.write("\n")
 
-        with open(self.path + '/src/window.py', 'a') as file_py_window:
+        with open(self.path + '/src/window.rs', 'a') as file_py_window:
             file_py_window.write("use gtk::prelude::*;\n")
             file_py_window.write("\n")
             file_py_window.write("pub struct Window {\n")
@@ -445,10 +422,9 @@ class RustTemplate():
 
         with open(self.path + '/src/window.ui', 'a') as file_window_ui:
             file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_window_ui.write("\n")
             file_window_ui.write("<interface>\n")
             file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % class_name)
+            file_window_ui.write("    <object class=\"GtkApplicationWindow\" id=\"window\">\n")
             file_window_ui.write("      <property name=\"default-width\">600</property>\n")
             file_window_ui.write("    <property name=\"default-height\">300</property>\n")
             file_window_ui.write("    <child type=\"titlebar\">\n")
@@ -468,5 +444,5 @@ class RustTemplate():
             file_window_ui.write("        </attributes>\n")
             file_window_ui.write("      </object>\n")
             file_window_ui.write("    </child>\n")
-            file_window_ui.write("    </template>\n")
+            file_window_ui.write("    </object>\n")
             file_window_ui.write("  </interface>\n")

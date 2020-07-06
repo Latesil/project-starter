@@ -18,7 +18,6 @@
 from gi.repository import Gtk, GLib, Gio, Gdk
 import re
 import os
-from .python_template import PythonTemplate
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -77,8 +76,14 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         is_gui = self.check_gui(self.template)
 
         if self.language == 'Python':
+            from .python_template import PythonTemplate
             self.complete_template = PythonTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
+        elif self.language == 'Rust':
+            from .rust_template import RustTemplate
+            self.complete_template = RustTemplate(is_gui, self.project_id, self.project_name,
+                                                    self.main_path, self.is_git, self.license)
+
         self.complete_template.start()
 
         self.main_view.set_visible_child_name('page1')
