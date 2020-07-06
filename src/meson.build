@@ -33,6 +33,7 @@ project_starter_sources = [
   'rust_template.py',
   'c_template.py',
   'gpl.py',
+  'project_starter_constants.py',
 ]
 
 install_data(project_starter_sources, install_dir: moduledir)

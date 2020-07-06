@@ -55,7 +55,7 @@ class RustTemplate():
             file_main_json.write("{\n")
             file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
             file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
-            file_main_json.write("    \"runtime-version\" : \"3.34\",\n")
+            file_main_json.write("    \"runtime-version\" : \"%s\",\n" % constants['GNOME_PLATFORM_VERSION'])
             file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
             file_main_json.write("    \"sdk-extensions\" : [\n")
             file_main_json.write("        \"org.freedesktop.Sdk.Extension.rust-stable\"\n")
@@ -129,7 +129,7 @@ class RustTemplate():
         with open(path + '/' + "meson.build", 'a') as file_meson_build:
             file_meson_build.write("project('%s',\n" % p_name)
             file_meson_build.write("          version: '0.1.0',\n")
-            file_meson_build.write("    meson_version: '>= 0.50.0',\n")
+            file_meson_build.write("    meson_version: '>= %s',\n" % constants['MESON_VERSION'])
             file_meson_build.write("  default_options: [ 'warning_level=2',\n")
             file_meson_build.write("                   ],\n")
             file_meson_build.write(")\n")
