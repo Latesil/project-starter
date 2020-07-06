@@ -30,6 +30,7 @@ project_starter_sources = [
   'main.py',
   'window.py',
   'python_template.py',
+  'rust_template.py',
   'gpl.py',
 ]
 
