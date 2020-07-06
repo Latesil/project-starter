@@ -100,9 +100,9 @@ class PythonTemplate():
             file_main_json.write("                    \"type\" : \"git\",\n")
             file_main_json.write("                    \"url\" : \"file://%s\"\n" % path)
             file_main_json.write("                }\n")
-            file_main_json.write("            ],\n")
-            file_main_json.write("        },\n")
-            file_main_json.write("    ],\n")
+            file_main_json.write("            ]\n")
+            file_main_json.write("        }\n")
+            file_main_json.write("    ]\n")
             file_main_json.write("}\n")
 
         with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
