@@ -290,7 +290,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     def check_project_id(self, text):
         if text:
-            return True if re.match('[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
+            return True if re.match('[a-zA-Z]+\.[a-zA-Z]+', text) else False
 
     def check_ext_name(self, text):
         if text:
@@ -298,7 +298,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     def check_ext_uuid(self, text):
         if text:
-            return True if re.match('[a-zA-Z]+\@[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
+            return True if re.match('[a-zA-Z]+\@[a-zA-Z]+\.[a-zA-Z]+', text) else False
 
     def ready_check(self):
         self.switch_btn.props.sensitive = True if self.project_name_ready and self.project_id_ready else False
