@@ -249,7 +249,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_about_btn_clicked(self, b):
         about = AboutWindow(self)
-        #about.set_logo_icon_name(constants["APP_ID"])
+        about.set_logo_icon_name('com.github.Latesil.project-starter')
         about.run()
         about.destroy()
 

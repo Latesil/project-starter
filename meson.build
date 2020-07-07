@@ -5,6 +5,8 @@ project('project-starter',
                    ],
 )
 
+appname = 'com.github.Latesil.project-starter'
+
 i18n = import('i18n')
 
 
