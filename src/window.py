@@ -188,7 +188,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         if category == 'lang':
             self.lang_btn.set_label(b.get_label())
             self.language = self.lang_btn.get_label()
-            self.cli_gtk_btn.props.visible = False if self.language == 'Python' else True
+            self.cli_gtk_btn.props.visible = False if self.language == 'Python' or self.language == 'JS' else True
             self.lang_revealer.props.reveal_child = False
         elif category == 'template':
             self.template_btn.set_label(b.get_label())
