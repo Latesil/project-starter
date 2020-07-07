@@ -180,33 +180,6 @@ class RustTemplate():
         st = os.stat(path + '/build-aux/cargo.sh')
         os.chmod(path + '/build-aux/cargo.sh', st.st_mode | stat.S_IEXEC)
 
-        with open(path + '/' + "Cargo.toml", 'a') as file_cargo_toml:
-            file_cargo_toml.write("[package]\n")
-            file_cargo_toml.write("name = \"%s\"\n" % p_name)
-            file_cargo_toml.write("version = \"0.1.0\"\n")
-            file_cargo_toml.write("edition = \"2018\"\n")
-            if self.is_gui:
-                file_cargo_toml.write("\n")
-                file_cargo_toml.write("[dependencies.gtk]\n")
-                file_cargo_toml.write("version = \"0.8.1\"\n")
-                file_cargo_toml.write("features = [\"v3_24\"]\n")
-                file_cargo_toml.write("\n")
-                file_cargo_toml.write("[dependencies.gdk]\n")
-                file_cargo_toml.write("version = \"0.12.1\"\n")
-                file_cargo_toml.write("features = [\"v3_24\"]\n")
-                file_cargo_toml.write("\n")
-                file_cargo_toml.write("[dependencies.gio]\n")
-                file_cargo_toml.write("version = \"0.8.1\"\n")
-                file_cargo_toml.write("features = [\"v2_60\"]\n")
-                file_cargo_toml.write("\n")
-                file_cargo_toml.write("[dependencies.glib]\n")
-                file_cargo_toml.write("version = \"0.9.2\"\n")
-                file_cargo_toml.write("features = [\"v2_60\"]\n")
-                file_cargo_toml.write("\n")
-                file_cargo_toml.write("[dependencies.gettext-rs]\n")
-                file_cargo_toml.write("version = \"0.4.4\"\n")
-                file_cargo_toml.write("features = [\"gettext-system\"]\n")
-
     def populate_data_folder(self, p_id, p_name):
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
         p_full_name = p_id + '.' + p_name
@@ -272,8 +245,7 @@ class RustTemplate():
             file_desktop.write("[Desktop Entry]\n")
             file_desktop.write("Name=%s\n" % p_name)
             file_desktop.write("Exec=%s\n" % p_name)
-            if self.is_gui:
-                file_desktop.write("Terminal=false\n")
+            file_desktop.write("Terminal=false\n")
             file_desktop.write("Type=Application\n")
             file_desktop.write("Categories=GTK;\n")
             file_desktop.write("StartupNotify=true\n")

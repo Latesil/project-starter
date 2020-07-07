@@ -24,8 +24,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
 from .window import ProjectStarterWindow
-from .project_starter_constants import constants
-print(constants.)
 
 
 class Application(Gtk.Application):
