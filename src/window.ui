@@ -450,7 +450,20 @@ used to uniquely identify your application</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkRadioButton" id="js_btn">
+                                    <property name="label" translatable="yes">JS</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="draw_indicator">False</property>
+                                    <property name="group">python_btn</property>
+                                    <signal name="toggled" handler="on_js_btn_toggled" swapped="no"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">3</property>
+                                  </packing>
                                 </child>
                               </object>
                               <packing>

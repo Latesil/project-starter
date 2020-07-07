@@ -32,6 +32,7 @@ project_starter_sources = [
   'python_template.py',
   'rust_template.py',
   'c_template.py',
+  'js_template.py',
   'gpl.py',
   'project_starter_constants.py',
 ]

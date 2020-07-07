@@ -43,6 +43,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     cli_gtk_btn = Gtk.Template.Child()
     test_btn = Gtk.Template.Child()
     license_combo_box = Gtk.Template.Child()
+    js_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -86,6 +87,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         elif self.language == 'C':
             from .c_template import CTemplate
             self.complete_template = CTemplate(is_gui, self.project_id, self.project_name,
+                                                    self.main_path, self.is_git, self.license)
+        elif self.language == 'JS':
+            from .js_template import JsTemplate
+            self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
 
         self.complete_template.start()
@@ -153,6 +158,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_c_btn_toggled(self, b):
+        self.button_toggled(b, 'lang')
+
+    @Gtk.Template.Callback()
+    def on_js_btn_toggled(self, b):
         self.button_toggled(b, 'lang')
 
     @Gtk.Template.Callback()

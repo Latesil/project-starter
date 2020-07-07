@@ -22,18 +22,19 @@ from .project_starter_constants import constants
 
 class JsTemplate():
 
-        gpl_text = """# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    gpl_text = """ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 """
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
@@ -251,10 +252,10 @@ class JsTemplate():
         window_name = "".join(w.capitalize() for w in p_name.split('-'))
 
         with open(self.path + '/src/main.js', 'a') as file_js_main:
-            file_js_main.write("# main.js\n")
-            file_js_main.write("#\n")
-            file_js_main.write("# Copyright 2020\n")
-            file_js_main.write("#\n")
+            file_js_main.write("/* main.js\n")
+            file_js_main.write(" *\n")
+            file_js_main.write(" * Copyright 2020\n")
+            file_js_main.write(" *\n")
             file_js_main.write(self.gpl_text)
             file_js_main.write("\n")
             file_js_main.write("pkg.initGettext();\n")
@@ -355,10 +356,10 @@ class JsTemplate():
             file_gresource_src.write("\n")
 
         with open(self.path + '/src/window.js', 'a') as file_js_window:
-            file_js_window.write("# window.js\n")
-            file_js_window.write("#\n")
-            file_js_window.write("# Copyright 2020\n")
-            file_js_window.write("#\n")
+            file_js_window.write("/* window.js\n")
+            file_js_window.write(" *\n")
+            file_js_window.write(" * Copyright 2020\n")
+            file_js_window.write(" *\n")
             file_js_window.write(self.gpl_text)
             file_js_window.write("\n")
             file_js_window.write("const { GObject, Gtk } = imports.gi;\n")
