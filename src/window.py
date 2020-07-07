@@ -21,6 +21,7 @@ import os
 import os.path
 from os import path
 from .about_window import AboutWindow
+from .keyboard_shortcuts import KeyboardShortcutsWindow
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -55,6 +56,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     path_exists_revealer = Gtk.Template.Child()
     close_path_exists_btn = Gtk.Template.Child()
     about_btn = Gtk.Template.Child()
+    keyboard_shortcuts_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -251,6 +253,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         about.run()
         about.destroy()
 
+    @Gtk.Template.Callback()
+    def on_keyboard_shortcuts_btn_clicked(self, b):
+        k_s = KeyboardShortcutsWindow()
+        k_s.show()
 
     ##########################################################################
 

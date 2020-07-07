@@ -3,5 +3,6 @@
   <gresource prefix="/org/github/Latesil/project-starter">
     <file>window.ui</file>
     <file>aboutwindow.ui</file>
+    <file>keyboard_shortcuts.ui</file>
   </gresource>
 </gresources>

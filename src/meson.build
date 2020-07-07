@@ -34,6 +34,7 @@ project_starter_sources = [
   'c_template.py',
   'js_template.py',
   'gnome_extension_template.py',
+  'keyboard_shortcuts.py',
   'about_window.py',
   'gpl.py',
   'project_starter_constants.py',
