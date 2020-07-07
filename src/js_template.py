@@ -67,6 +67,24 @@ class JsTemplate():
             if self.license == 'GPL 3':
                 from .gpl import Gpl
                 license = Gpl('3')
+            elif self.license == 'GPL 2':
+                from .gpl import Gpl
+                license = Gpl('2')
+            elif self.license == 'AGPL 3':
+                from .agpl import Agpl
+                license = Agpl()
+            elif self.license == 'Apache 2':
+                from .apache import Apache
+                license = Apache()
+            elif self.license == 'LGPL 3':
+                from .lgpl import Lgpl
+                license = Lgpl('3')
+            elif self.license == 'LGPL 2':
+                from .lgpl import Lgpl
+                license = Lgpl('2')
+            elif self.license == 'MIT/X11':
+                from .mit import Mit
+                license = Mit()
             file_license.write(license.get_text())
 
         with open(path + '/' + p_id + ".json", 'a') as file_main_json:
