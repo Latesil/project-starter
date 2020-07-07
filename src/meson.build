@@ -33,6 +33,7 @@ project_starter_sources = [
   'rust_template.py',
   'c_template.py',
   'js_template.py',
+  'gnome_extension_template.py',
   'gpl.py',
   'project_starter_constants.py',
 ]

@@ -350,9 +350,6 @@ used to uniquely identify your application</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Change language</property>
                             <signal name="clicked" handler="on_lang_btn_clicked" swapped="no"/>
-                            <style>
-                              <class name="flat"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -368,9 +365,6 @@ used to uniquely identify your application</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Change template</property>
                             <signal name="clicked" handler="on_template_btn_clicked" swapped="no"/>
-                            <style>
-                              <class name="flat"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -541,7 +535,19 @@ used to uniquely identify your application</property>
                               </packing>
                             </child>
                             <child>
-                              <placeholder/>
+                              <object class="GtkRadioButton" id="gnome_extension_btn">
+                                <property name="label" translatable="yes">GNOME Extension</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="draw_indicator">False</property>
+                                <property name="group">gui_gtk_btn</property>
+                                <signal name="toggled" handler="on_gnome_extension_btn_toggled" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
@@ -556,42 +562,67 @@ used to uniquely identify your application</property>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkLabel" id="license_lbl">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">License</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkComboBoxText" id="license_combo_box">
+                          <object class="GtkRevealer" id="license_revealer">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="active_id">1</property>
-                            <items>
-                              <item id="1" translatable="yes">GPL 3</item>
-                              <item id="2" translatable="yes">AGPL 3</item>
-                              <item id="3" translatable="yes">Apache 2</item>
-                              <item id="4" translatable="yes">LGPL 3</item>
-                              <item id="5" translatable="yes">GPL 2</item>
-                              <item id="6" translatable="yes">LGPL 2</item>
-                            </items>
-                            <signal name="changed" handler="on_license_combo_box_changed" swapped="no"/>
+                            <property name="reveal_child">True</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkLabel" id="license_lbl">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">License</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="license_combo_box">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active_id">1</property>
+                                    <items>
+                                      <item id="1" translatable="yes">GPL 3</item>
+                                      <item id="2" translatable="yes">AGPL 3</item>
+                                      <item id="3" translatable="yes">Apache 2</item>
+                                      <item id="4" translatable="yes">LGPL 3</item>
+                                      <item id="5" translatable="yes">GPL 2</item>
+                                      <item id="6" translatable="yes">LGPL 2</item>
+                                    </items>
+                                    <signal name="changed" handler="on_license_combo_box_changed" swapped="no"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="pack_type">end</property>
-                            <property name="position">2</property>
+                            <property name="position">1</property>
                           </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -601,11 +632,137 @@ used to uniquely identify your application</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="test_btn">
-                        <property name="label" translatable="yes">test</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <signal name="clicked" handler="on_test_btn_clicked" swapped="no"/>
+                      <object class="GtkRevealer" id="gnome_ext_revealer">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="homogeneous">True</property>
+                                <child>
+                                  <object class="GtkLabel" id="gnome_ext_lbl">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="label" translatable="yes">GNOME Extension name</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkEntry" id="gnome_ext_entry">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="tooltip_text" translatable="yes">Name should be a very short (ideally descriptive) string.
+Examples are: “Click To Focus”, “Adblock”, “Shell Window Shrinker”</property>
+                                    <signal name="changed" handler="on_gnome_ext_entry_changed" swapped="no"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="homogeneous">True</property>
+                                <child>
+                                  <object class="GtkLabel" id="gnome_ext_description_lbl">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="label" translatable="yes">Description</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkEntry" id="gnome_ext_description_entry">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="tooltip_text" translatable="yes">Description is a single-sentence explanation of what your extension does.
+Examples are: “Make windows visible on click”, “Block advertisement popups”, “Animate windows shrinking on minimize”</property>
+                                    <signal name="changed" handler="on_gnome_ext_description_entry_changed" swapped="no"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="homogeneous">True</property>
+                                <child>
+                                  <object class="GtkLabel" id="gnome_ext_uuid_lbl">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="label" translatable="yes">UUID</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkEntry" id="gnome_ext_uuid_entry">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="tooltip_text" translatable="yes">UUID is a globally-unique identifier for your extension.
+This should be in the format of an email address (clicktofocus@janedoe.example.com)</property>
+                                    <property name="placeholder_text" translatable="yes">clicktofocus@janedoe.example.com</property>
+                                    <signal name="changed" handler="on_gnome_ext_uuid_entry_changed" swapped="no"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>

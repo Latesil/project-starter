@@ -18,6 +18,8 @@
 from gi.repository import Gtk, GLib, Gio, Gdk
 import re
 import os
+import os.path
+from os import path
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -41,9 +43,14 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     c_btn = Gtk.Template.Child()
     gui_gtk_btn = Gtk.Template.Child()
     cli_gtk_btn = Gtk.Template.Child()
-    test_btn = Gtk.Template.Child()
     license_combo_box = Gtk.Template.Child()
     js_btn = Gtk.Template.Child()
+    gnome_extension_btn = Gtk.Template.Child()
+    gnome_ext_revealer = Gtk.Template.Child()
+    license_revealer = Gtk.Template.Child()
+    gnome_ext_entry = Gtk.Template.Child()
+    gnome_ext_description_entry = Gtk.Template.Child()
+    gnome_ext_uuid_entry = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -52,15 +59,21 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.switch_btn.props.sensitive = False
         self.project_name_ready = False
         self.project_id_ready = False
+        self.ext_name_ready = False
+        self.ext_uuid_ready = False
+        self.ext_description_ready = False
         self.project_name = ""
         self.project_id = ""
+        self.ext_name = ""
+        self.ext_uuid = ""
+        self.ext_description = ""
         self.is_git = True
         self.language = self.lang_btn.get_label()
         self.template = self.template_btn.get_label()
         self.license = self.license_combo_box.get_active_text()
 
         self.gui = ['GTK GUI Application']
-        self.cli = ['GTK CLI Application']
+        self.cli = ['GTK CLI Application', 'GNOME Extension']
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
@@ -89,13 +102,20 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.complete_template = CTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
         elif self.language == 'JS':
-            from .js_template import JsTemplate
-            self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,
+            if self.template == 'GNOME Extension':
+                from .gnome_extension_template import GnomeExtensionTemplate
+                self.complete_template = GnomeExtensionTemplate(self.ext_name, self.ext_uuid, self.ext_description, self.is_git)
+                self.main_path = GLib.get_home_dir() + '/.local/share/gnome-shell/extensions/' + self.ext_uuid
+            else:
+                from .js_template import JsTemplate
+                self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
+        if path.exists(self.main_path):
+            pass
+        else:
+            self.complete_template.start()
 
-        self.complete_template.start()
-
-        self.main_view.set_visible_child_name('page1')
+            self.main_view.set_visible_child_name('page1')
 
     @Gtk.Template.Callback()
     def on_second_btn_clicked(self, w):
@@ -144,6 +164,25 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.ready_check()
 
     @Gtk.Template.Callback()
+    def on_gnome_ext_entry_changed(self, e):
+        if self.check_entry(e, self.check_ext_name):
+            self.ext_name = e.props.text
+            self.ext_name_ready = True
+            self.ext_ready_check()
+
+    @Gtk.Template.Callback()
+    def on_gnome_ext_uuid_entry_changed(self, e):
+        if self.check_entry(e, self.check_ext_uuid):
+            self.ext_uuid = e.props.text
+            self.ext_uuid_ready = True
+            self.ext_ready_check()
+
+    @Gtk.Template.Callback()
+    def on_gnome_ext_description_entry_changed(self, e):
+        self.ext_description = e.get_text()
+        self.ext_description_ready = True if self.ext_description else False
+
+    @Gtk.Template.Callback()
     def on_git_enable_btn_toggled(self, b):
         if not b.props.active:
             self.is_git = False
@@ -173,6 +212,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         self.button_toggled(b, 'template')
 
     @Gtk.Template.Callback()
+    def on_gnome_extension_btn_toggled(self, b):
+        self.button_toggled(b, 'template')
+
+    @Gtk.Template.Callback()
     def on_license_combo_box_changed(self, cb):
         self.license = cb.get_active_text()
 
@@ -183,11 +226,41 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             self.lang_btn.set_label(b.get_label())
             self.language = self.lang_btn.get_label()
             self.cli_gtk_btn.props.visible = False if self.language == 'Python' or self.language == 'JS' else True
+            self.gnome_extension_btn.props.visible = True if self.language == 'JS' else False
+
+            if self.lang_btn.get_label() != 'JS' and self.template_btn.get_label() == 'GNOME Extension':
+                self.template_btn.set_label('GTK GUI Application')
+                self.template = self.template_btn.get_label()
+                self.gui_gtk_btn.props.active = True
+                self.gnome_ext_revealer.props.reveal_child = False
+
+            if self.lang_btn.get_label() != 'JS' and self.template_btn.get_label() == 'GTK CLI Application':
+                self.template_btn.set_label('GTK GUI Application')
+                self.template = self.template_btn.get_label()
+
+            if self.lang_btn.get_label() != 'Python' and self.template_btn.get_label() == 'GTK CLI Application':
+                self.template_btn.set_label('GTK GUI Application')
+                self.template = self.template_btn.get_label()
+
             self.lang_revealer.props.reveal_child = False
         elif category == 'template':
             self.template_btn.set_label(b.get_label())
             self.template = self.template_btn.get_label()
             self.template_revealer.props.reveal_child = False
+            if self.template == 'GNOME Extension':
+                self.gnome_ext_revealer.props.reveal_child = True
+                self.license_revealer.props.reveal_child = False
+                self.project_name_entry.props.sensitive = False
+                self.project_id_entry.props.sensitive = False
+                self.path_entry.props.sensitive = False
+                self.change_path_btn.props.sensitive = False
+            else:
+                self.gnome_ext_revealer.props.reveal_child = False
+                self.license_revealer.props.reveal_child = True
+                self.project_name_entry.props.sensitive = True
+                self.project_id_entry.props.sensitive = True
+                self.path_entry.props.sensitive = True
+                self.change_path_btn.props.sensitive = True
         else:
             print('there is no such category')
 
@@ -210,8 +283,19 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         if text:
             return True if re.match('[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
 
+    def check_ext_name(self, text):
+        if text:
+            return False if text[0].isdigit() or re.search('\s', text) else True
+
+    def check_ext_uuid(self, text):
+        if text:
+            return True if re.match('[a-zA-Z]+\@[a-zA-Z]+\.[a-zA-Z]+\.[a-zA-Z]+', text) else False
+
     def ready_check(self):
         self.switch_btn.props.sensitive = True if self.project_name_ready and self.project_id_ready else False
+
+    def ext_ready_check(self):
+        self.switch_btn.props.sensitive = True if self.ext_name_ready and self.ext_uuid_ready and self.ext_description_ready else False
 
     def check_gui(self, t):
         return t in self.gui
