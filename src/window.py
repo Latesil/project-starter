@@ -51,6 +51,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     gnome_ext_entry = Gtk.Template.Child()
     gnome_ext_description_entry = Gtk.Template.Child()
     gnome_ext_uuid_entry = Gtk.Template.Child()
+    path_exists_revealer = Gtk.Template.Child()
+    close_path_exists_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,8 +113,11 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
                 self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,
                                                     self.main_path, self.is_git, self.license)
         if path.exists(self.main_path):
-            pass
+            self.path_exists_revealer.props.reveal_child = True
         else:
+            if self.path_exists_revealer.props.reveal_child:
+                self.path_exists_revealer.props.reveal_child = False
+
             self.complete_template.start()
 
             self.main_view.set_visible_child_name('page1')
@@ -186,6 +191,10 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def on_git_enable_btn_toggled(self, b):
         if not b.props.active:
             self.is_git = False
+
+    @Gtk.Template.Callback()
+    def on_close_path_exists_btn_clicked(self, b):
+        self.path_exists_revealer.props.reveal_child = False
 
     @Gtk.Template.Callback()
     def on_python_btn_toggled(self, b):
