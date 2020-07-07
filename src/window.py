@@ -59,6 +59,20 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        ##########################
+
+        accel = Gtk.AccelGroup()
+        accel.connect(Gdk.keyval_from_name('p'), Gdk.ModifierType.CONTROL_MASK, 0, self.python_set)
+        accel.connect(Gdk.keyval_from_name('j'), Gdk.ModifierType.CONTROL_MASK, 0, self.js_set)
+        accel.connect(Gdk.keyval_from_name('c'), Gdk.ModifierType.CONTROL_MASK, 0, self.c_set)
+        accel.connect(Gdk.keyval_from_name('r'), Gdk.ModifierType.CONTROL_MASK, 0, self.rust_set)
+        accel.connect(Gdk.keyval_from_name('g'), Gdk.ModifierType.CONTROL_MASK, 0, self.gui_set)
+        accel.connect(Gdk.keyval_from_name('t'), Gdk.ModifierType.CONTROL_MASK, 0, self.cli_set)
+        accel.connect(Gdk.keyval_from_name('e'), Gdk.ModifierType.CONTROL_MASK, 0, self.extension_set)
+        self.add_accel_group(accel)
+
+        ##########################
+
         self.main_path = ""
         self.switch_btn.props.sensitive = False
         self.project_name_ready = False
@@ -318,4 +332,152 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     def check_gui(self, t):
         return t in self.gui
+
+    ##########################
+
+    def python_set(self, *args):
+        self.language = 'Python'
+        self.lang_btn.set_label('Python')
+        self.python_btn.props.active = True
+        self.gnome_extension_btn.props.visible = False
+        self.cli_gtk_btn.props.visible = False
+
+        if self.template_btn.get_label() == 'GTK CLI Application' or self.template_btn.get_label() == 'GNOME Extension':
+            self.gnome_ext_revealer.props.reveal_child = False
+            self.license_revealer.props.reveal_child = True
+            self.project_name_entry.props.sensitive = True
+            self.project_id_entry.props.sensitive = True
+            self.path_entry.props.sensitive = True
+            self.change_path_btn.props.sensitive = True
+            self.gui_gtk_btn.props.active = True
+            self.python_btn.props.active = True
+            self.template_btn.set_label('GTK GUI Application')
+
+        if self.template_revealer.props.reveal_child:
+            self.template_revealer.props.reveal_child = False
+
+        if self.gnome_ext_revealer.props.reveal_child:
+            self.gnome_ext_revealer.props.reveal_child = False
+
+        if self.lang_revealer.props.reveal_child:
+            self.lang_revealer.props.reveal_child = False
+
+    def c_set(self, *args):
+        self.language = 'C'
+        self.lang_btn.set_label('C')
+        self.c_btn.props.active = True
+        self.gnome_extension_btn.props.visible = False
+        self.gnome_ext_revealer.props.reveal_child = False
+        self.license_revealer.props.reveal_child = True
+        self.project_name_entry.props.sensitive = True
+        self.project_id_entry.props.sensitive = True
+        self.path_entry.props.sensitive = True
+        self.change_path_btn.props.sensitive = True
+        self.cli_gtk_btn.props.visible = True
+
+        if self.template_btn.get_label() == 'GNOME Extension':
+            self.gui_gtk_btn.props.active = True
+            self.c_btn.props.active = True
+            self.template_btn.set_label('GTK GUI Application')
+
+        if self.template_revealer.props.reveal_child:
+            self.template_revealer.props.reveal_child = False
+
+        if self.gnome_ext_revealer.props.reveal_child:
+            self.gnome_ext_revealer.props.reveal_child = False
+
+        if self.lang_revealer.props.reveal_child:
+            self.lang_revealer.props.reveal_child = False
+
+    def js_set(self, *args):
+        self.language = 'JS'
+        self.lang_btn.set_label('JS')
+        self.js_btn.props.active = True
+        self.gnome_extension_btn.props.visible = True
+        self.cli_gtk_btn.props.visible = False
+
+        if self.template_btn.get_label() == 'GTK CLI Application':
+            self.cli_gtk_btn.props.visible = False
+            self.gui_gtk_btn.props.active = True
+            self.js_btn.props.active = True
+            self.template_btn.set_label('GTK GUI Application')
+
+        if self.template_revealer.props.reveal_child:
+            self.gnome_ext_revealer.props.reveal_child = False
+            self.license_revealer.props.reveal_child = True
+            self.project_name_entry.props.sensitive = True
+            self.project_id_entry.props.sensitive = True
+            self.path_entry.props.sensitive = True
+            self.change_path_btn.props.sensitive = True
+
+        if self.template_btn.get_label() == 'GNOME Extension':
+            self.gnome_ext_revealer.props.reveal_child = True
+
+        if self.lang_revealer.props.reveal_child:
+            self.lang_revealer.props.reveal_child = False
+
+    def rust_set(self, *args):
+        self.language = 'Rust'
+        self.lang_btn.set_label('Rust')
+        self.rust_btn.props.active = True
+        self.gnome_ext_revealer.props.reveal_child = False
+        self.license_revealer.props.reveal_child = True
+        self.project_name_entry.props.sensitive = True
+        self.project_id_entry.props.sensitive = True
+        self.path_entry.props.sensitive = True
+        self.change_path_btn.props.sensitive = True
+        self.cli_gtk_btn.props.visible = True
+
+        if self.template_btn.get_label() == 'GNOME Extension':
+            self.gui_gtk_btn.props.active = True
+            self.rust_btn.props.active = True
+            self.template_btn.set_label('GTK GUI Application')
+
+        if self.template_revealer.props.reveal_child:
+            self.template_revealer.props.reveal_child = False
+
+        if self.gnome_ext_revealer.props.reveal_child:
+            self.gnome_ext_revealer.props.reveal_child = False
+
+        if self.lang_revealer.props.reveal_child:
+            self.lang_revealer.props.reveal_child = False
+
+    def gui_set(self, *args):
+        if self.template_btn.get_label() == 'GTK CLI Application' or self.template_btn.get_label() == 'GNOME Extension':
+            self.gnome_ext_revealer.props.reveal_child = False
+            if self.language == 'JS':
+                self.gnome_extension_btn.props.visible = True
+            self.license_revealer.props.reveal_child = True
+            self.project_name_entry.props.sensitive = True
+            self.project_id_entry.props.sensitive = True
+            self.path_entry.props.sensitive = True
+            self.change_path_btn.props.sensitive = True
+        self.gui_gtk_btn.props.active = True
+        self.template_btn.set_label('GTK GUI Application')
+
+    def cli_set(self, *args):
+        not_cli = ['Python', 'JS']
+        if self.language in not_cli:
+            return
+        else:
+            if self.template_btn.get_label() == 'GTK GUI Application' or self.template_btn.get_label() == 'GNOME Extension':
+                self.gnome_extension_btn.props.visible = False
+                self.cli_gtk_btn.props.active = True
+                self.template_btn.set_label('GTK CLI Application')
+
+    def extension_set(self, *args):
+        if self.language != "JS":
+            self.language = 'JS'
+            self.js_btn.props.active = True
+            self.lang_btn.set_label('JS')
+        self.template_btn.set_label('GNOME Extension')
+        self.gnome_extension_btn.props.active = True
+        self.gnome_ext_revealer.props.reveal_child = True
+        self.license_revealer.props.reveal_child = False
+        self.project_name_entry.props.sensitive = False
+        self.project_id_entry.props.sensitive = False
+        self.path_entry.props.sensitive = False
+        self.change_path_btn.props.sensitive = False
+        self.cli_gtk_btn.props.visible = False
+
         
