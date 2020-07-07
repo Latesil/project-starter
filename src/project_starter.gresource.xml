@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/org/github/Latesil/project-starter">
     <file>window.ui</file>
+    <file>aboutwindow.ui</file>
   </gresource>
 </gresources>

@@ -20,6 +20,7 @@ import re
 import os
 import os.path
 from os import path
+from .about_window import AboutWindow
 
 @Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -53,6 +54,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     gnome_ext_uuid_entry = Gtk.Template.Child()
     path_exists_revealer = Gtk.Template.Child()
     close_path_exists_btn = Gtk.Template.Child()
+    about_btn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -227,6 +229,14 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_license_combo_box_changed(self, cb):
         self.license = cb.get_active_text()
+
+    @Gtk.Template.Callback()
+    def on_about_btn_clicked(self, b):
+        about = AboutWindow(self)
+        #about.set_logo_icon_name(constants["APP_ID"])
+        about.run()
+        about.destroy()
+
 
     ##########################################################################
 
