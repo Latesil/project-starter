@@ -25,6 +25,9 @@ from gi.repository import Gtk, Gio
 
 from .window import ProjectStarterWindow
 
+#locales
+locale.textdomain('com.github.Latesil.project-starter')
+
 
 class Application(Gtk.Application):
     def __init__(self):

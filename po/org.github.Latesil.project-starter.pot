@@ -1,0 +1,228 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-07 21:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/org.github.Latesil.project-starter.desktop.in:3
+msgid "project-starter"
+msgstr ""
+
+#: ../src/window.ui:29
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: ../src/window.ui:43
+msgid "About"
+msgstr ""
+
+#: ../src/window.ui:114
+msgid "Project Name"
+msgstr ""
+
+#: ../src/window.ui:139
+msgid ""
+"Unique name that is user to your project's folder and other technical "
+"resources."
+msgstr ""
+
+#: ../src/window.ui:140
+msgid "Should be in lower case without spaces and may not start with a number."
+msgstr ""
+
+#: ../src/window.ui:196
+msgid "Project ID"
+msgstr ""
+
+#: ../src/window.ui:221
+msgid ""
+"The Project ID is a reverse domain-name identifier \n"
+"used to uniquely identify your application"
+msgstr ""
+
+#: ../src/window.ui:279
+msgid "Path"
+msgstr ""
+
+#: ../src/window.ui:302
+msgid "Project path"
+msgstr ""
+
+#: ../src/window.ui:303
+msgid "~/Projects"
+msgstr ""
+
+#: ../src/window.ui:304
+msgid "project path"
+msgstr ""
+
+#: ../src/window.ui:314
+msgid "Browse"
+msgstr ""
+
+#: ../src/window.ui:318
+msgid "Change path"
+msgstr ""
+
+#: ../src/window.ui:352
+msgid "Version Control"
+msgstr ""
+
+#: ../src/window.ui:362
+msgid "Git"
+msgstr ""
+
+#: ../src/window.ui:397 ../src/window.ui:449
+msgid "Python"
+msgstr ""
+
+#: ../src/window.ui:401
+msgid "Change language"
+msgstr ""
+
+#: ../src/window.ui:412 ../src/window.ui:634
+msgid "GTK GUI Application"
+msgstr ""
+
+#: ../src/window.ui:416
+msgid "Change template"
+msgstr ""
+
+#: ../src/window.ui:465
+msgid "Rust"
+msgstr ""
+
+#: ../src/window.ui:481
+msgid "C"
+msgstr ""
+
+#: ../src/window.ui:498
+msgid "JS"
+msgstr ""
+
+#: ../src/window.ui:534
+msgid "Create Project"
+msgstr ""
+
+#: ../src/window.ui:538
+msgid "Create project"
+msgstr ""
+
+#: ../src/window.ui:571
+msgid "Sorry, that folder is already exists"
+msgstr ""
+
+#: ../src/window.ui:650
+msgid "GTK CLI Application"
+msgstr ""
+
+#: ../src/window.ui:666
+msgid "GNOME Extension"
+msgstr ""
+
+#: ../src/window.ui:709
+msgid "License"
+msgstr ""
+
+#: ../src/window.ui:726
+msgid "GPL 3"
+msgstr ""
+
+#: ../src/window.ui:727
+msgid "AGPL 3"
+msgstr ""
+
+#: ../src/window.ui:728
+msgid "Apache 2"
+msgstr ""
+
+#: ../src/window.ui:729
+msgid "LGPL 3"
+msgstr ""
+
+#: ../src/window.ui:730
+msgid "GPL 2"
+msgstr ""
+
+#: ../src/window.ui:731
+msgid "LGPL 2"
+msgstr ""
+
+#: ../src/window.ui:780
+msgid "GNOME Extension name"
+msgstr ""
+
+#: ../src/window.ui:792
+msgid ""
+"Name should be a very short (ideally descriptive) string.\n"
+"Examples are: “Click To Focus”, “Adblock”, “Shell Window Shrinker”"
+msgstr ""
+
+#: ../src/window.ui:820
+msgid "Description"
+msgstr ""
+
+#: ../src/window.ui:832
+msgid ""
+"Description is a single-sentence explanation of what your extension does.\n"
+"Examples are: “Make windows visible on click”, “Block advertisement popups”, "
+"“Animate windows shrinking on minimize”"
+msgstr ""
+
+#: ../src/window.ui:860
+msgid "UUID"
+msgstr ""
+
+#: ../src/window.ui:872
+msgid ""
+"UUID is a globally-unique identifier for your extension.\n"
+"This should be in the format of an email address (clicktofocus@janedoe."
+"example.com)"
+msgstr ""
+
+#: ../src/window.ui:874
+msgid "clicktofocus@janedoe.example.com"
+msgstr ""
+
+#: ../src/window.ui:903
+msgid "page0"
+msgstr ""
+
+#: ../src/window.ui:918
+msgid "Done!"
+msgstr ""
+
+#: ../src/window.ui:934
+msgid ""
+"Now you can open that folder\n"
+"in a prefered application."
+msgstr ""
+
+#: ../src/window.ui:946
+msgid "Open Folder"
+msgstr ""
+
+#: ../src/window.ui:962
+msgid "page1"
+msgstr ""
+
+#: ../src/window.ui:976
+msgid "Project Starter"
+msgstr ""
+
+#: ../src/window.py:150
+msgid "Choose a folder"
+msgstr ""

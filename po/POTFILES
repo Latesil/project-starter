@@ -1,7 +1,7 @@
-data/org.github.Latesil.project-starter.desktop.in
-data/org.github.Latesil.project-starter.appdata.xml.in
-data/org.github.Latesil.project-starter.gschema.xml
-src/window.ui
-src/main.py
-src/window.py
+../data/org.github.Latesil.project-starter.desktop.in
+../data/org.github.Latesil.project-starter.appdata.xml.in
+../data/org.github.Latesil.project-starter.gschema.xml
+../src/window.ui
+../src/main.py
+../src/window.py
 
