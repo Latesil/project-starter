@@ -174,13 +174,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_license_combo_box_changed(self, cb):
-        print(cb.get_active_text())
-
-    @Gtk.Template.Callback()
-    def on_test_btn_clicked(self, b):
-        GLib.spawn_async(['/usr/bin/xdg-open', self.main_path])
-
-
+        self.license = cb.get_active_text()
 
     ##########################################################################
 
