@@ -1,5 +1,5 @@
 {
-    "app-id" : "org.github.Latesil.project-starter",
+    "app-id" : "com.github.Latesil.project-starter",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "3.34",
     "sdk" : "org.gnome.Sdk",
