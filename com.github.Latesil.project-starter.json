@@ -1,11 +1,10 @@
 {
     "app-id" : "com.github.Latesil.project-starter",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "3.34",
+    "runtime-version" : "3.36",
     "sdk" : "org.gnome.Sdk",
     "command" : "project-starter",
     "finish-args" : [
-        "--share=network",
         "--share=ipc",
         "--socket=fallback-x11",
         "--socket=wayland"
