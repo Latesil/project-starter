@@ -17,7 +17,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-@Gtk.Template(resource_path = '/org/github/Latesil/project-starter/aboutwindow.ui')
+@Gtk.Template(resource_path = '/com/github/Latesil/project-starter/aboutwindow.ui')
 class AboutWindow(Gtk.AboutDialog):
 
     __gtype_name__ = "about_window"

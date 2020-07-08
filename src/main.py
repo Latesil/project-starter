@@ -31,7 +31,7 @@ locale.textdomain('com.github.Latesil.project-starter')
 
 class Application(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id='org.github.Latesil.project-starter',
+        super().__init__(application_id='com.github.Latesil.project-starter',
                          flags=Gio.ApplicationFlags.FLAGS_NONE)
 
     def do_activate(self):

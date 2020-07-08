@@ -23,7 +23,7 @@ from os import path
 from .about_window import AboutWindow
 from .keyboard_shortcuts import KeyboardShortcutsWindow
 
-@Gtk.Template(resource_path='/org/github/Latesil/project-starter/window.ui')
+@Gtk.Template(resource_path='/com/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'ProjectStarterWindow'
 

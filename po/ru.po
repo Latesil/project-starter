@@ -19,7 +19,7 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "Language: ru\n"
 
-#: ../data/org.github.Latesil.project-starter.desktop.in:3
+#: ../data/com.github.Latesil.project-starter.desktop.in:3
 msgid "project-starter"
 msgstr "project-starter"
 

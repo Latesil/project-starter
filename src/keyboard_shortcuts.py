@@ -17,7 +17,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-@Gtk.Template(resource_path = '/org/github/Latesil/project-starter/keyboard_shortcuts.ui')
+@Gtk.Template(resource_path = '/com/github/Latesil/project-starter/keyboard_shortcuts.ui')
 class KeyboardShortcutsWindow(Gtk.Dialog):
 
     __gtype_name__ = "keyboard_shortcuts_window"
