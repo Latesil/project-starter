@@ -18,6 +18,7 @@
 import sys
 import gi
 import os
+import locale
 
 gi.require_version('Gtk', '3.0')
 
