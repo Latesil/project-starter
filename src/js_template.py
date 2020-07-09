@@ -192,7 +192,7 @@ class JsTemplate():
             file_meson_build.write("  output: '%s.appdata.xml',\n" % p_id)
             file_meson_build.write("  po_dir: '../po',\n")
             file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'appdata')\n")
+            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), '%s')\n" % constants['METADATA_FOLDER'])
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
             file_meson_build.write("appstream_util = find_program('appstream-util', required: false)\n")
