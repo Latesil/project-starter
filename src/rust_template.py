@@ -254,6 +254,18 @@ class RustTemplate():
             file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
             if self.license == 'GPL 3':
                 file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
+            elif self.license == 'AGPL 3':
+                file_app_data.write("\t<project_license>AGPL-3.0-or-later</project_license>\n")
+            elif self.license == 'Apache 2':
+                file_app_data.write("\t<project_license></project_license>\n")
+            elif self.license == 'GPL 2':
+                file_app_data.write("\t<project_license></project_license>\n")
+            elif self.license == 'LGPL 2':
+                file_app_data.write("\t<project_license>LGPL-2.1-or-later</project_license>\n")
+            elif self.license == 'LGPL 3':
+                file_app_data.write("\t<project_license>LGPL-3.0-or-later</project_license>\n")
+            elif self.license == 'MIT/X11':
+                file_app_data.write("\t<project_license>MIT</project_license>\n")
             file_app_data.write("\t<description>\n")
             file_app_data.write("\t</description>\n")
             file_app_data.write("</component>\n")
@@ -267,6 +279,7 @@ class RustTemplate():
             file_desktop.write("Type=Application\n")
             file_desktop.write("Categories=GTK;\n")
             file_desktop.write("StartupNotify=true\n")
+            file_desktop.write("Icon=%s" % p_id)
 
         with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
