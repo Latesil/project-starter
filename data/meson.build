@@ -40,5 +40,5 @@ if compile_schemas.found()
   )
 endif
 
-message('start with icons')
+message('starting with icons')
 subdir('icons')

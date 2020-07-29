@@ -28,7 +28,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/late/Programs/project-starter"
+                    "path" : "/var/home/late/Documents/Prog/project-starter"
                 }
             ]
         }
