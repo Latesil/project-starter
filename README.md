@@ -1,4 +1,9 @@
+# Project Starter
+
 Simple program for starting new projects with various templates and with various languages.
+
+
+### Install
 
 To install this software you could clone that repo and use `flatpak-builder` from project folder:
 
