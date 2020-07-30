@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=project-starter
+Exec=project-starter
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true
+Icon=com.github.Latesil.project-starter

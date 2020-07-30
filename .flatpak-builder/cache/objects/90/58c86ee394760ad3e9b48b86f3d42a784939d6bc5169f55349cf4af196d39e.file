@@ -1,0 +1,9 @@
+[Application]
+name=com.github.Latesil.project-starter
+runtime=org.gnome.Platform/x86_64/3.36
+sdk=org.gnome.Sdk/x86_64/3.36
+command=project-starter
+
+[Context]
+shared=ipc;
+sockets=x11;wayland;fallback-x11;
