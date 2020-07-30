@@ -1,5 +1,9 @@
 # Project Starter
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Latesil/project-starter/master/project-starter-screenshot-1.png" style="max-width:100%;">
+</p>
+
 Simple program for starting new projects with various templates and with various languages.
 
 
