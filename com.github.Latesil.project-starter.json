@@ -28,7 +28,7 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
+                    "type" : "dir",
                     "path" : "/var/home/late/Documents/Prog/project-starter"
                 }
             ]
