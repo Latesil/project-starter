@@ -1,0 +1,39 @@
+{
+  "id" : "com.github.Latesil.project-starter",
+  "runtime" : "org.gnome.Platform",
+  "runtime-version" : "3.36",
+  "runtime-commit" : "5d72fb8feab2f53e6542063d640e35fcbabf9c28ebf29b2cacc6faf0f444cbd9",
+  "sdk" : "org.gnome.Sdk",
+  "sdk-commit" : "a9488ee655b701658c0325fcdf0a891be42a84d39c92deef400cfbc30dafd022",
+  "command" : "project-starter",
+  "modules" : [
+    {
+      "name" : "project-starter",
+      "buildsystem" : "meson",
+      "builddir" : true,
+      "sources" : [
+        {
+          "path" : "/var/home/late/Documents/Prog/project-starter",
+          "type" : "dir"
+        }
+      ]
+    }
+  ],
+  "cleanup" : [
+    "/include",
+    "/lib/pkgconfig",
+    "/man",
+    "/share/doc",
+    "/share/gtk-doc",
+    "/share/man",
+    "/share/pkgconfig",
+    "*.la",
+    "*.a"
+  ],
+  "finish-args" : [
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--filesystem=home"
+  ]
+}

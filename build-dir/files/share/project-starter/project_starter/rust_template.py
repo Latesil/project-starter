@@ -19,7 +19,6 @@ import sys
 import os
 import stat
 from .project_starter_constants import constants
-from .common_files import File
 
 class RustTemplate():
 
@@ -30,7 +29,6 @@ class RustTemplate():
         self.path = path
         self.is_git = is_git
         self.license = license
-        self.file = File()
 
     def start(self):
         self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
@@ -128,7 +126,27 @@ class RustTemplate():
                 file_main_json.write("    ]\n")
                 file_main_json.write("}\n")
 
-            self.file.create_meson_postinstall_file(path)
+            with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
+                file_postinstall.write("#!/usr/bin/env python3\n")
+                file_postinstall.write("\n")
+                file_postinstall.write("from os import environ, path\n")
+                file_postinstall.write("from subprocess import call\n")
+                file_postinstall.write("\n")
+                file_postinstall.write("prefix = environ.get('MESON_INSTALL_PREFIX', '/usr/local')\n")
+                file_postinstall.write("datadir = path.join(prefix, 'share')\n")
+                file_postinstall.write("destdir = environ.get('DESTDIR', '')\n")
+                file_postinstall.write("\n")
+                file_postinstall.write("# Package managers set this so we don't need to run\n")
+                file_postinstall.write("if not destdir:\n")
+                file_postinstall.write("    print('Updating icon cache...')\n")
+                file_postinstall.write("    call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])\n")
+                file_postinstall.write("\n")
+                file_postinstall.write("    print('Updating desktop database...')\n")
+                file_postinstall.write("    call(['update-desktop-database', '-q', path.join(datadir, 'applications')])\n")
+                file_postinstall.write("\n")
+                file_postinstall.write("    print('Compiling GSettings schemas...')\n")
+                file_postinstall.write("    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n")
+                file_postinstall.write("\n")
 
         with open(path + '/' + "meson.build", 'a') as file_meson_build:
             file_meson_build.write("project('%s',\n" % p_name)

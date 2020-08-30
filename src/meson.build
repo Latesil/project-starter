@@ -38,6 +38,7 @@ project_starter_sources = [
   'about_window.py',
   'gpl.py',
   'project_starter_constants.py',
+  'common_files.py',
 ]
 
 install_data(project_starter_sources, install_dir: moduledir)
