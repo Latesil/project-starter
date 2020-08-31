@@ -246,4 +246,28 @@ class File:
             file_meson_build.write("  )\n")
             file_meson_build.write("endif\n")
             file_meson_build.write("\n")
-            
+
+    def create_appdata_file(self, path, p_id, project_license):
+        with open(path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
+            file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            file_app_data.write("<component type=\"desktop\">\n")
+            file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
+            file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
+            if project_license == 'GPL 3':
+                file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
+            elif project_license == 'AGPL 3':
+                file_app_data.write("\t<project_license>AGPL-3.0-or-later</project_license>\n")
+            elif project_license == 'Apache 2':
+                file_app_data.write("\t<project_license></project_license>\n")
+            elif project_license == 'GPL 2':
+                file_app_data.write("\t<project_license></project_license>\n")
+            elif project_license == 'LGPL 2':
+                file_app_data.write("\t<project_license>LGPL-2.1-or-later</project_license>\n")
+            elif project_license == 'LGPL 3':
+                file_app_data.write("\t<project_license>LGPL-3.0-or-later</project_license>\n")
+            elif project_license == 'MIT/X11':
+                file_app_data.write("\t<project_license>MIT</project_license>\n")
+            file_app_data.write("\t<description>\n")
+            file_app_data.write("\t</description>\n")
+            file_app_data.write("</component>\n")
+            file_app_data.write("\n")

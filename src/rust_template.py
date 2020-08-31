@@ -113,31 +113,7 @@ class RustTemplate():
         p_path = p_id.replace('.', '/')
 
         self.file.create_data_meson_file(self.path, p_id)
-
-        with open(self.path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
-            file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_app_data.write("<component type=\"desktop\">\n")
-            file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
-            file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
-            if self.license == 'GPL 3':
-                file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
-            elif self.license == 'AGPL 3':
-                file_app_data.write("\t<project_license>AGPL-3.0-or-later</project_license>\n")
-            elif self.license == 'Apache 2':
-                file_app_data.write("\t<project_license></project_license>\n")
-            elif self.license == 'GPL 2':
-                file_app_data.write("\t<project_license></project_license>\n")
-            elif self.license == 'LGPL 2':
-                file_app_data.write("\t<project_license>LGPL-2.1-or-later</project_license>\n")
-            elif self.license == 'LGPL 3':
-                file_app_data.write("\t<project_license>LGPL-3.0-or-later</project_license>\n")
-            elif self.license == 'MIT/X11':
-                file_app_data.write("\t<project_license>MIT</project_license>\n")
-            file_app_data.write("\t<description>\n")
-            file_app_data.write("\t</description>\n")
-            file_app_data.write("</component>\n")
-            file_app_data.write("\n")
-
+        self.file.create_appdata_file(self.path, p_id, self.license)
         self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
         self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
 
