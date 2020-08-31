@@ -35,10 +35,13 @@ class CTemplate():
 
     def start(self):
         self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
+
         if self.is_gui:
             self.populate_data_folder(self.project_id, self.project_name)
             self.populate_po_dir(self.project_id, self.project_name)
+
         self.populate_src_dir(self.project_id, self.project_name)
+        
         if self.is_git:
             os.chdir(self.path)
             os.system('git init')
@@ -53,29 +56,8 @@ class CTemplate():
             os.makedirs(path + '/' + 'po')
         os.makedirs(path + '/' + 'src')
 
-        with open(path + '/' + "COPYING", 'a') as file_license:
-            if self.license == 'GPL 3':
-                from .gpl import Gpl
-                license = Gpl('3')
-            elif self.license == 'GPL 2':
-                from .gpl import Gpl
-                license = Gpl('2')
-            elif self.license == 'AGPL 3':
-                from .agpl import Agpl
-                license = Agpl()
-            elif self.license == 'Apache 2':
-                from .apache import Apache
-                license = Apache()
-            elif self.license == 'LGPL 3':
-                from .lgpl import Lgpl
-                license = Lgpl('3')
-            elif self.license == 'LGPL 2':
-                from .lgpl import Lgpl
-                license = Lgpl('2')
-            elif self.license == 'MIT/X11':
-                from .mit import Mit
-                license = Mit()
-            file_license.write(license.get_text())
+        self.file.create_copying_file(path, self.license)
+
         if self.is_gui:
             self.file.create_meson_postinstall_file(path)
 

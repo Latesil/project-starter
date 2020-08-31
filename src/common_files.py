@@ -35,6 +35,31 @@ class File:
     def get_gpl(self):
         return self.gpl
 
+    def create_copying_file(self, path, project_license):
+        with open(path + '/COPYING", 'a') as file_license:
+            if project_license == 'GPL 3':
+                from .gpl import Gpl
+                license = Gpl('3')
+            elif project_license == 'GPL 2':
+                from .gpl import Gpl
+                license = Gpl('2')
+            elif project_license == 'AGPL 3':
+                from .agpl import Agpl
+                license = Agpl()
+            elif project_license == 'Apache 2':
+                from .apache import Apache
+                license = Apache()
+            elif project_license == 'LGPL 3':
+                from .lgpl import Lgpl
+                license = Lgpl('3')
+            elif project_license == 'LGPL 2':
+                from .lgpl import Lgpl
+                license = Lgpl('2')
+            elif project_license == 'MIT/X11':
+                from .mit import Mit
+                license = Mit()
+            file_license.write(license.get_text())
+
     def create_po_meson_file(self, path, p_name):
         with open(path + '/po/meson.build', 'a') as file_meson_build:
             file_meson_build.write("i18n.gettext('%s', preset: 'glib')\n" % p_name)
