@@ -205,43 +205,15 @@ class PythonTemplate():
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-        with open(self.path + '/data/' + p_full_name + '.desktop.in', 'a') as file_desktop:
-            file_desktop.write("[Desktop Entry]\n")
-            file_desktop.write("Name=%s\n" % p_name)
-            file_desktop.write("Exec=%s\n" % p_name)
-            file_desktop.write("Terminal=false\n")
-            file_desktop.write("Type=Application\n")
-            file_desktop.write("Categories=GTK;\n")
-            file_desktop.write("StartupNotify=true\n")
-            file_desktop.write("Icon=%s" % p_id)
-
-        with open(self.path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
-            file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">" % (p_full_name, p_path))
-            file_gschema.write("\t</schema>\n")
-            file_gschema.write("</schemalist>\n")
-            file_gschema.write("\n")
+        self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
+        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path):
 
     def populate_po_dir(self, p_id, p_name):
         p_full_name = p_id + '.' + p_name
-
-        #TODO maybe there is another way to create an empty file?
-        with open(self.path + '/po/LINGUAS', 'a') as file_linguas:
-            file_linguas.close()
-
-        with open(self.path + '/po/meson.build', 'a') as file_meson_build:
-            file_meson_build.write("i18n.gettext('%s', preset: 'glib')\n" % p_name)
-            file_meson_build.write("\n")
-
-        with open(self.path + '/po/POTFILES', 'a') as file_potfiles:
-            file_potfiles.write("data/%s.desktop.in\n" % p_full_name)
-            file_potfiles.write("data/%s.appdata.xml.in\n" % p_full_name)
-            file_potfiles.write("data/%s.gschema.xml.in\n" % p_full_name)
-            file_potfiles.write("src/window.ui\n")
-            file_potfiles.write("src/main.py\n")
-            file_potfiles.write("src/window.py\n")
-            file_potfiles.write("\n")
+        files = ['window.ui', 'main.py', 'window.py']
+        self.file.create_po_linguas_file(self.path)
+        self.file.create_po_meson_file(self.path, p_name)
+        self.file.create_po_potfiles_file(self.path, p_id, files)
 
     def populate_src_dir(self, p_id, p_name):
         class_name = "".join(w.capitalize() for w in p_name.split('-'))

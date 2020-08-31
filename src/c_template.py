@@ -223,16 +223,7 @@ class CTemplate():
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-        with open(self.path + '/data/' + p_id + '.desktop.in', 'a') as file_desktop:
-            file_desktop.write("[Desktop Entry]\n")
-            file_desktop.write("Name=%s\n" % p_name)
-            file_desktop.write("Exec=%s\n" % p_name)
-            if self.is_gui:
-                file_desktop.write("Terminal=false\n")
-            file_desktop.write("Type=Application\n")
-            file_desktop.write("Categories=GTK;\n")
-            file_desktop.write("StartupNotify=true\n")
-            file_desktop.write("Icon=%s" % p_id)
+        self.file.create_desktop_file(self.path, p_full_name, p_name, p_id, gui=self.gui)
 
         with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -244,23 +235,10 @@ class CTemplate():
 
     def populate_po_dir(self, p_id, p_name):
         p_id_underscore = p_id.replace('.', '_').lower()
-
-        #TODO maybe there is another way to create an empty file?
-        with open(self.path + '/po/LINGUAS', 'a') as file_linguas:
-            file_linguas.close()
-
-        with open(self.path + '/po/meson.build', 'a') as file_meson_build:
-            file_meson_build.write("i18n.gettext('%s', preset: 'glib')\n" % p_name)
-            file_meson_build.write("\n")
-
-        with open(self.path + '/po/POTFILES', 'a') as file_potfiles:
-            file_potfiles.write("data/%s.desktop.in\n" % p_id)
-            file_potfiles.write("data/%s.appdata.xml.in\n" % p_id)
-            file_potfiles.write("data/%s.gschema.xml\n" % p_id)
-            file_potfiles.write("src/%s-window.ui\n" % p_id_underscore)
-            file_potfiles.write("src/main.c\n")
-            file_potfiles.write("src/%s-window.c\n" % p_id_underscore)
-            file_potfiles.write("\n")
+        files = [p_id_underscore + '-window.ui', 'main.c', p_id_underscore + '-window.c']
+        self.file.create_po_linguas_file(self.path)
+        self.file.create_po_meson_file(self.path, p_name)
+        self.file.create_po_potfiles_file(self.path, p_id, files)
 
     def populate_src_dir(self, p_id, p_name):
         p_id_underscore = p_id.replace('.', '_').lower()
