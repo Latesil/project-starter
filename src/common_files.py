@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .project_starter_constants import constants
+
 class File:
 
     def __init__(self):
@@ -36,7 +38,7 @@ class File:
         return self.gpl
 
     def create_copying_file(self, path, project_license):
-        with open(path + '/COPYING", 'a') as file_license:
+        with open(path + '/COPYING', 'a') as file_license:
             if project_license == 'GPL 3':
                 from .gpl import Gpl
                 license = Gpl('3')
@@ -59,6 +61,79 @@ class File:
                 from .mit import Mit
                 license = Mit()
             file_license.write(license.get_text())
+
+    def create_manifest_file(self, path, p_full_name, p_name, lang):
+        #TODO rewrite: move lang specific code to appropriate templates
+        with open(path + '/' + p_full_name + ".json", 'a') as file_main_json:
+            file_main_json.write("{\n")
+
+            if lang == 'python':
+                file_main_json.write("    \"app-id\" : \"%s\",\n" % p_full_name)
+            else:
+                file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
+
+            file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
+            file_main_json.write("    \"runtime-version\" : \"%s\",\n" % constants['GNOME_PLATFORM_VERSION'])
+            file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
+
+            if lang == 'rust':
+                file_main_json.write("    \"sdk-extensions\" : [\n")
+                file_main_json.write("        \"org.freedesktop.Sdk.Extension.rust-stable\"\n")
+                file_main_json.write("    ],\n")
+
+            if lang == 'js':
+                file_main_json.write("    \"command\" : \"%s\",\n" % p_id)
+            else:
+                file_main_json.write("    \"command\" : \"%s\",\n" % p_name)
+
+            file_main_json.write("    \"finish-args\" : [\n")
+            file_main_json.write("        \"--share=network\",\n")
+            file_main_json.write("        \"--share=ipc\",\n")
+            file_main_json.write("        \"--socket=fallback-x11\",\n")
+            file_main_json.write("        \"--socket=wayland\"\n")
+            file_main_json.write("    ],\n")
+
+            if lang == 'rust':
+                file_main_json.write("    \"build-options\" : {\n")
+                file_main_json.write("        \"append-path\" : \"/usr/lib/sdk/rust-stable/bin\",\n")
+                file_main_json.write("        \"build-args\" : [\n")
+                file_main_json.write("            \"--share=network\"\n")
+                file_main_json.write("        ],\n")
+                file_main_json.write("        \"env\" : {\n")
+                file_main_json.write("            \"CARGO_HOME\" : \"/run/build/%s/cargo\",\n" % p_name)
+                file_main_json.write("            \"RUST_BACKTRACE\" : \"1\",\n")
+                file_main_json.write("            \"RUST_LOG\" : \"%s=debug\"\n" % p_name)
+                file_main_json.write("        }\n")
+                file_main_json.write("    },\n")
+
+            file_main_json.write("    \"cleanup\" : [\n")
+            file_main_json.write("        \"/include\",\n")
+            file_main_json.write("        \"/lib/pkgconfig\",\n")
+            file_main_json.write("        \"/man\",\n")
+            file_main_json.write("        \"/share/doc\",\n")
+
+            if lang == 'js' or lang == 'c':
+                file_main_json.write("        \"/share/gtk-doc\",\n")
+
+            file_main_json.write("        \"/share/man\",\n")
+            file_main_json.write("        \"/share/pkgconfig\",\n")
+            file_main_json.write("        \"*.la\",\n")
+            file_main_json.write("        \"*.a\"\n")
+            file_main_json.write("    ],\n")
+            file_main_json.write("    \"modules\" : [\n")
+            file_main_json.write("        {\n")
+            file_main_json.write("            \"name\" : \"%s\",\n" % p_name)
+            file_main_json.write("            \"builddir\" : true,\n")
+            file_main_json.write("            \"buildsystem\" : \"meson\",\n")
+            file_main_json.write("            \"sources\" : [\n")
+            file_main_json.write("                {\n")
+            file_main_json.write("                    \"type\" : \"git\",\n")
+            file_main_json.write("                    \"url\" : \"file://%s\"\n" % path)
+            file_main_json.write("                }\n")
+            file_main_json.write("            ]\n")
+            file_main_json.write("        }\n")
+            file_main_json.write("    ]\n")
+            file_main_json.write("}\n")
 
     def create_po_meson_file(self, path, p_name):
         with open(path + '/po/meson.build', 'a') as file_meson_build:
@@ -126,3 +201,49 @@ class File:
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")
+
+    def create_data_meson_file(self, path, p_full_name):
+        with open(path + '/data/meson.build', 'a') as file_meson_build:
+            file_meson_build.write("desktop_file = i18n.merge_file(\n")
+            file_meson_build.write("  input: '%s.desktop.in',\n" % p_full_name)
+            file_meson_build.write("  output: '%s.desktop',\n" % p_full_name)
+            file_meson_build.write("  type: 'desktop',\n")
+            file_meson_build.write("  po_dir: '../po',\n")
+            file_meson_build.write("  install: true,\n")
+            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'applications')\n")
+            file_meson_build.write(")\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("desktop_utils = find_program('desktop-file-validate', required: false)\n")
+            file_meson_build.write("if desktop_utils.found()\n")
+            file_meson_build.write("  test('Validate desktop file', desktop_utils,\n")
+            file_meson_build.write("    args: [desktop_file]\n")
+            file_meson_build.write("  )\n")
+            file_meson_build.write("endif\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("appstream_file = i18n.merge_file(\n")
+            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_full_name)
+            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_full_name)
+            file_meson_build.write("  po_dir: '../po',\n")
+            file_meson_build.write("  install: true,\n")
+            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), '%s')\n" % constants['METADATA_FOLDER'])
+            file_meson_build.write(")\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("appstream_util = find_program('appstream-util', required: false)\n")
+            file_meson_build.write("if appstream_util.found()\n")
+            file_meson_build.write("  test('Validate appstream file', appstream_util,\n")
+            file_meson_build.write("    args: ['validate', appstream_file]\n")
+            file_meson_build.write("  )\n")
+            file_meson_build.write("endif\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_full_name)
+            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n")
+            file_meson_build.write(")\n")
+            file_meson_build.write("\n")
+            file_meson_build.write("compile_schemas = find_program('glib-compile-schemas', required: false)\n")
+            file_meson_build.write("if compile_schemas.found()\n")
+            file_meson_build.write("  test('Validate schema file', compile_schemas,\n")
+            file_meson_build.write("    args: ['--strict', '--dry-run', meson.current_source_dir()]\n")
+            file_meson_build.write("  )\n")
+            file_meson_build.write("endif\n")
+            file_meson_build.write("\n")
+            
