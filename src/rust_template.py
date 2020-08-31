@@ -54,7 +54,7 @@ class RustTemplate():
         self.file.create_copying_file(path, self.license)
 
         if self.is_gui
-            self.file.create_manifest_file(path, p_full_name, p_name, self.lang)
+            self.file.create_manifest_file(path, p_id, p_name, self.lang)
             self.file.create_meson_postinstall_file(path)
 
         with open(path + '/' + "meson.build", 'a') as file_meson_build:
@@ -242,14 +242,7 @@ class RustTemplate():
             file_meson_build.write(")\n")
 
         if self.is_gui:
-            with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
-                file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-                file_gresource.write("<gresources>\n")
-                file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
-                file_gresource.write("    <file>window.ui</file>\n")
-                file_gresource.write("  </gresource>\n")
-                file_gresource.write("</gresources>\n")
-                file_gresource.write("\n")
+            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
 
             with open(self.path + '/src/window.rs', 'a') as file_py_window:
                 file_py_window.write("use gtk::prelude::*;\n")

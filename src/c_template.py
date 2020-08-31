@@ -96,7 +96,7 @@ class CTemplate():
                 file_meson_build.write("meson.add_install_script('build-aux/meson/postinstall.py')\n")
 
         if self.is_gui:
-            self.file.create_manifest_file(path, p_full_name, p_name, self.lang)
+            self.file.create_manifest_file(path, p_id, p_name, self.lang)
 
     def populate_data_folder(self, p_id, p_name):
         p_path = p_id.replace('.', '/')
@@ -272,14 +272,7 @@ class CTemplate():
             file_meson_build.write("\n")
 
         if self.is_gui:
-            with open(self.path + '/src/' + p_id_underscore + '.gresource.xml', 'a') as file_gresource:
-                file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-                file_gresource.write("<gresources>\n")
-                file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
-                file_gresource.write("    <file>%s-window.ui</file>\n" % p_id_underscore)
-                file_gresource.write("  </gresource>\n")
-                file_gresource.write("</gresources>\n")
-                file_gresource.write("\n")
+            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
 
         if self.is_gui:
             with open(self.path + '/src/' + p_id_underscore + '-window.c', 'a') as file_window_c:
@@ -318,32 +311,7 @@ class CTemplate():
                 file_window_c.write("  gtk_widget_init_template (GTK_WIDGET (self));\n")
                 file_window_c.write("}\n")
 
-            with open(self.path + '/src/' + p_id_underscore + '-window.ui', 'a') as file_window_ui:
-                file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-                file_window_ui.write("<interface>\n")
-                file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-                file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % window_name)
-                file_window_ui.write("      <property name=\"default-width\">600</property>\n")
-                file_window_ui.write("    <property name=\"default-height\">300</property>\n")
-                file_window_ui.write("    <child type=\"titlebar\">\n")
-                file_window_ui.write("      <object class=\"GtkHeaderBar\" id=\"header_bar\">\n")
-                file_window_ui.write("        <property name=\"visible\">True</property>\n")
-                file_window_ui.write("        <property name=\"show-close-button\">True</property>\n")
-                file_window_ui.write("        <property name=\"title\">Hello, World!</property>\n")
-                file_window_ui.write("      </object>\n")
-                file_window_ui.write("    </child>\n")
-                file_window_ui.write("    <child>\n")
-                file_window_ui.write("      <object class=\"GtkLabel\" id=\"label\">\n")
-                file_window_ui.write("        <property name=\"label\">Hello, World!</property>\n")
-                file_window_ui.write("        <property name=\"visible\">True</property>\n")
-                file_window_ui.write("        <attributes>\n")
-                file_window_ui.write("          <attribute name=\"weight\" value=\"bold\"/>\n")
-                file_window_ui.write("          <attribute name=\"scale\" value=\"2\"/>\n")
-                file_window_ui.write("        </attributes>\n")
-                file_window_ui.write("      </object>\n")
-                file_window_ui.write("    </child>\n")
-                file_window_ui.write("    </template>\n")
-                file_window_ui.write("  </interface>\n")
+            self.file.create_window_ui_file(self, path, window_name)
 
             with open(self.path + '/src/' + p_id_underscore + '-window.h', 'a') as file_window_h:
                 file_window_h.write("/* c_gui_example-window.h\n")

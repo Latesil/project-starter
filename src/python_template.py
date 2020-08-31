@@ -213,14 +213,7 @@ class PythonTemplate():
         st = os.stat(self.path + '/src/' + p_name + '.in')
         os.chmod(self.path + '/src/' + p_name + '.in', st.st_mode | stat.S_IEXEC)
 
-        with open(self.path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
-            file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gresource.write("<gresources>\n")
-            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
-            file_gresource.write("    <file>window.ui</file>\n")
-            file_gresource.write("  </gresource>\n")
-            file_gresource.write("</gresources>\n")
-            file_gresource.write("\n")
+        self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
 
         with open(self.path + '/src/window.py', 'a') as file_py_window:
             file_py_window.write("# window.py\n")
@@ -242,31 +235,5 @@ class PythonTemplate():
             file_py_window.write("        super().__init__(**kwargs)\n")
             file_py_window.write("\n")
 
-        with open(self.path + '/src/window.ui', 'a') as file_window_ui:
-            file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_window_ui.write("\n")
-            file_window_ui.write("<interface>\n")
-            file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % class_name)
-            file_window_ui.write("      <property name=\"default-width\">600</property>\n")
-            file_window_ui.write("    <property name=\"default-height\">300</property>\n")
-            file_window_ui.write("    <child type=\"titlebar\">\n")
-            file_window_ui.write("      <object class=\"GtkHeaderBar\" id=\"header_bar\">\n")
-            file_window_ui.write("        <property name=\"visible\">True</property>\n")
-            file_window_ui.write("        <property name=\"show-close-button\">True</property>\n")
-            file_window_ui.write("        <property name=\"title\">Hello, World!</property>\n")
-            file_window_ui.write("      </object>\n")
-            file_window_ui.write("    </child>\n")
-            file_window_ui.write("    <child>\n")
-            file_window_ui.write("      <object class=\"GtkLabel\" id=\"label\">\n")
-            file_window_ui.write("        <property name=\"label\">Hello, World!</property>\n")
-            file_window_ui.write("        <property name=\"visible\">True</property>\n")
-            file_window_ui.write("        <attributes>\n")
-            file_window_ui.write("          <attribute name=\"weight\" value=\"bold\"/>\n")
-            file_window_ui.write("          <attribute name=\"scale\" value=\"2\"/>\n")
-            file_window_ui.write("        </attributes>\n")
-            file_window_ui.write("      </object>\n")
-            file_window_ui.write("    </child>\n")
-            file_window_ui.write("    </template>\n")
-            file_window_ui.write("  </interface>\n")
+        self.file.create_window_ui_file(self, path, class_name)
     

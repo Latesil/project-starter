@@ -62,16 +62,11 @@ class File:
                 license = Mit()
             file_license.write(license.get_text())
 
-    def create_manifest_file(self, path, p_full_name, p_name, lang):
+    def create_manifest_file(self, path, p_id, p_name, lang):
         #TODO rewrite: move lang specific code to appropriate templates
         with open(path + '/' + p_full_name + ".json", 'a') as file_main_json:
             file_main_json.write("{\n")
-
-            if lang == 'python':
-                file_main_json.write("    \"app-id\" : \"%s\",\n" % p_full_name)
-            else:
-                file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
-
+            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
             file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
             file_main_json.write("    \"runtime-version\" : \"%s\",\n" % constants['GNOME_PLATFORM_VERSION'])
             file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
@@ -271,3 +266,42 @@ class File:
             file_app_data.write("\t</description>\n")
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
+
+    def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short):
+        with open(path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
+            file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            file_gresource.write("<gresources>\n")
+            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
+            file_gresource.write("    <file>window.ui</file>\n")
+            file_gresource.write("  </gresource>\n")
+            file_gresource.write("</gresources>\n")
+            file_gresource.write("\n")
+
+    def create_window_ui_file(self, path, window_name):
+        with open(path + '/src/window.ui', 'a') as file_window_ui:
+            file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            file_window_ui.write("\n")
+            file_window_ui.write("<interface>\n")
+            file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
+            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % window_name)
+            file_window_ui.write("      <property name=\"default-width\">600</property>\n")
+            file_window_ui.write("    <property name=\"default-height\">300</property>\n")
+            file_window_ui.write("    <child type=\"titlebar\">\n")
+            file_window_ui.write("      <object class=\"GtkHeaderBar\" id=\"header_bar\">\n")
+            file_window_ui.write("        <property name=\"visible\">True</property>\n")
+            file_window_ui.write("        <property name=\"show-close-button\">True</property>\n")
+            file_window_ui.write("        <property name=\"title\">Hello, World!</property>\n")
+            file_window_ui.write("      </object>\n")
+            file_window_ui.write("    </child>\n")
+            file_window_ui.write("    <child>\n")
+            file_window_ui.write("      <object class=\"GtkLabel\" id=\"label\">\n")
+            file_window_ui.write("        <property name=\"label\">Hello, World!</property>\n")
+            file_window_ui.write("        <property name=\"visible\">True</property>\n")
+            file_window_ui.write("        <attributes>\n")
+            file_window_ui.write("          <attribute name=\"weight\" value=\"bold\"/>\n")
+            file_window_ui.write("          <attribute name=\"scale\" value=\"2\"/>\n")
+            file_window_ui.write("        </attributes>\n")
+            file_window_ui.write("      </object>\n")
+            file_window_ui.write("    </child>\n")
+            file_window_ui.write("    </template>\n")
+            file_window_ui.write("  </interface>\n")
