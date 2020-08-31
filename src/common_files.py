@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .project_starter_constants import constants
+from .helpers import *
 
 class File:
 
@@ -177,7 +178,7 @@ class File:
             file_postinstall.write("\n")
 
     def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
-        with open(path + '/data/' + p_full_name + '.desktop.in', 'a') as file_desktop:
+        with open(path + p_full_name + '.desktop.in', 'a') as file_desktop:
             file_desktop.write("[Desktop Entry]\n")
             file_desktop.write("Name=%s\n" % p_name)
             file_desktop.write("Exec=%s\n" % p_name)
@@ -189,16 +190,17 @@ class File:
             file_desktop.write("Icon=%s" % p_id)
 
     def create_gschema_file(self, path, p_full_name, p_name, p_path):
-        with open(path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
-            file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gschema.write("<schemalist gettext-domain=\"%s\">\n" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">\n" % (p_full_name, p_path))
-            file_gschema.write("\t</schema>\n")
-            file_gschema.write("</schemalist>\n")
-            file_gschema.write("\n")
+        text = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<schemalist gettext-domain=\"{p_name}\">
+    <schema id=\"{p_full_name}\" path=\"/{p_path}/\">
+    </schema>
+</schemalist>
+
+"""
+        create_file(path, p_full_name + '.gschema.xml', text)
 
     def create_data_meson_file(self, path, p_full_name):
-        with open(path + '/data/meson.build', 'a') as file_meson_build:
+        with open(path + 'meson.build', 'a') as file_meson_build:
             file_meson_build.write("desktop_file = i18n.merge_file(\n")
             file_meson_build.write("  input: '%s.desktop.in',\n" % p_full_name)
             file_meson_build.write("  output: '%s.desktop',\n" % p_full_name)
@@ -243,7 +245,7 @@ class File:
             file_meson_build.write("\n")
 
     def create_appdata_file(self, path, p_id, project_license):
-        with open(path + '/data/' + p_id + '.appdata.xml.in', 'a') as file_app_data:
+        with open(path + p_id + '.appdata.xml.in', 'a') as file_app_data:
             file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_app_data.write("<component type=\"desktop\">\n")
             file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)

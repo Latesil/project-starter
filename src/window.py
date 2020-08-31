@@ -111,6 +111,8 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         is_gui = self.check_gui(self.template)
         self.project_full_path = self.main_path + self.project_name
 
+        # Create template class on main button click and call start() function
+
         if self.language == 'Python':
             from .python_template import PythonTemplate
             self.complete_template = PythonTemplate(is_gui, self.project_id, self.project_name,

@@ -39,6 +39,8 @@ project_starter_sources = [
   'gpl.py',
   'project_starter_constants.py',
   'common_files.py',
+  'template.py',
+  'helpers.py',
 ]
 
 install_data(project_starter_sources, install_dir: moduledir)

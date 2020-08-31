@@ -18,10 +18,12 @@
 import sys
 import os
 import stat
+from gi.repository import GLib
 from .project_starter_constants import constants
 from .common_files import File
+from .template import Template
 
-class PythonTemplate():
+class PythonTemplate(Template):
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
         self.is_gui = is_gui
@@ -34,6 +36,16 @@ class PythonTemplate():
         self.file = File()
         self.gpl_text = self.file.get_gpl()
 
+        ########################################################################
+
+        self.project_full_name = self.project_id + '.' + self.project_name
+        self.project_path = self.project_id.replace('.', '/')
+        self.project_id_reverse = self.project_path + '/' + self.project_name + '/'
+        self.class_name = "".join(w.capitalize() for w in self.project_name.split('-'))
+        self.project_name_underscore = self.project_name.replace('-', '_')
+
+        ########################################################################
+
     def start(self):
         if self.is_gui:
             self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
@@ -44,8 +56,7 @@ class PythonTemplate():
                 os.chdir(self.path)
                 os.system('git init')
 
-    def create_basic_gui_structure(self, p_id, p_name, path):
-        p_full_name = p_id + '.' + p_name
+    def create_basic_gui_structure(self, project_id, project_name, path):
 
         os.makedirs(path + '/build-aux/meson')
         os.makedirs(path + '/data')
@@ -53,11 +64,11 @@ class PythonTemplate():
         os.makedirs(path + '/src')
 
         self.file.create_copying_file(path, self.license)
-        self.file.create_manifest_file(path, p_full_name, p_name, self.lang)
+        self.file.create_manifest_file(path, self.project_full_name, self.project_name, self.lang)
         self.file.create_meson_postinstall_file(path)
 
         with open(path + '/' + "meson.build", 'a') as file_meson_build:
-            file_meson_build.write("project('%s',\n" % p_name)
+            file_meson_build.write("project('%s',\n" % self.project_name)
             file_meson_build.write("          version: '0.1.0',\n")
             file_meson_build.write("    meson_version: '>= %s',\n" % constants['MESON_VERSION'])
             file_meson_build.write("  default_options: [ 'warning_level=2',\n")
@@ -73,29 +84,20 @@ class PythonTemplate():
             file_meson_build.write("\n")
             file_meson_build.write("meson.add_install_script('build-aux/meson/postinstall.py')\n")
 
-    def populate_data_folder(self, p_id, p_name):
-        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
-        p_full_name = p_id + '.' + p_name
-        p_path = p_id.replace('.', '/')
+    def populate_data_folder(self, project_id, project_name):
+        path = self.path + '/data/'
+        self.file.create_data_meson_file(path, self.project_full_name)
+        self.file.create_appdata_file(path, self.project_full_name, self.license)
+        self.file.create_desktop_file(path, self.project_full_name, self.project_name, self.project_id)
+        self.file.create_gschema_file(path, self.project_full_name, self.project_name, self.project_path)
 
-        self.file.create_data_meson_file(self.path, p_full_name)
-        self.file.create_appdata_file(self.path, p_full_name, self.license)
-        self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
-        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
-
-    def populate_po_dir(self, p_id, p_name):
-        p_full_name = p_id + '.' + p_name
+    def populate_po_dir(self, project_id, project_name):
         files = ['window.ui', 'main.py', 'window.py']
         self.file.create_po_linguas_file(self.path)
-        self.file.create_po_meson_file(self.path, p_name)
-        self.file.create_po_potfiles_file(self.path, p_id, files)
+        self.file.create_po_meson_file(self.path, self.project_name)
+        self.file.create_po_potfiles_file(self.path, self.project_id, files)
 
-    def populate_src_dir(self, p_id, p_name):
-        class_name = "".join(w.capitalize() for w in p_name.split('-'))
-        p_name_underscore = p_name.replace('-', '_')
-        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
-        p_id_reverse_short = p_id.replace('.', '/')
-
+    def populate_src_dir(self, project_id, project_name):
         #TODO maybe there is another way to create an empty file?
         with open(self.path + '/src/__init__.py', 'a') as file_py_init:
             file_py_init.close()
@@ -114,18 +116,18 @@ class PythonTemplate():
             file_py_main.write("\n")
             file_py_main.write("from gi.repository import Gtk, Gio\n")
             file_py_main.write("\n")
-            file_py_main.write("from .window import %sWindow\n" % class_name)
+            file_py_main.write("from .window import %sWindow\n" % self.class_name)
             file_py_main.write("\n")
             file_py_main.write("\n")
             file_py_main.write("class Application(Gtk.Application):\n")
             file_py_main.write("    def __init__(self):\n")
-            file_py_main.write("        super().__init__(application_id='%s',\n" % p_id)
+            file_py_main.write("        super().__init__(application_id='%s',\n" % self.project_id)
             file_py_main.write("                         flags=Gio.ApplicationFlags.FLAGS_NONE)\n")
             file_py_main.write("\n")
             file_py_main.write("    def do_activate(self):\n")
             file_py_main.write("        win = self.props.active_window\n")
             file_py_main.write("        if not win:\n")
-            file_py_main.write("            win = %sWindow(application=self)\n" % class_name)
+            file_py_main.write("            win = %sWindow(application=self)\n" % self.class_name)
             file_py_main.write("        win.present()\n")
             file_py_main.write("\n")
             file_py_main.write("\n")
@@ -136,11 +138,11 @@ class PythonTemplate():
 
         with open(self.path + '/src/meson.build', 'a') as file_meson_build:
             file_meson_build.write("pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n")
-            file_meson_build.write("moduledir = join_paths(pkgdatadir, '%s')\n" % p_name_underscore)
+            file_meson_build.write("moduledir = join_paths(pkgdatadir, '%s')\n" % self.project_name_underscore)
             file_meson_build.write("gnome = import('gnome')\n")
             file_meson_build.write("\n")
-            file_meson_build.write("gnome.compile_resources('%s',\n" % p_name)
-            file_meson_build.write("  '%s.gresource.xml',\n" % p_name_underscore)
+            file_meson_build.write("gnome.compile_resources('%s',\n" % self.project_name)
+            file_meson_build.write("  '%s.gresource.xml',\n" % self.project_name_underscore)
             file_meson_build.write("  gresource_bundle: true,\n")
             file_meson_build.write("  install: true,\n")
             file_meson_build.write("  install_dir: pkgdatadir,\n")
@@ -162,26 +164,26 @@ class PythonTemplate():
             file_meson_build.write("conf.set('pkgdatadir', pkgdatadir)\n")
             file_meson_build.write("\n")
             file_meson_build.write("configure_file(\n")
-            file_meson_build.write("  input: '%s.in',\n" % p_name)
-            file_meson_build.write("  output: '%s',\n" % p_name)
+            file_meson_build.write("  input: '%s.in',\n" % self.project_name)
+            file_meson_build.write("  output: '%s',\n" % self.project_name)
             file_meson_build.write("  configuration: conf,\n")
             file_meson_build.write("  install: true,\n")
             file_meson_build.write("  install_dir: get_option('bindir')\n")
             file_meson_build.write(")\n")
             file_meson_build.write("\n")
-            file_meson_build.write("%s_sources = [\n" % p_name_underscore)
+            file_meson_build.write("%s_sources = [\n" % self.project_name_underscore)
             file_meson_build.write("  '__init__.py',\n")
             file_meson_build.write("  'main.py',\n")
             file_meson_build.write("  'window.py',\n")
             file_meson_build.write("]\n")
             file_meson_build.write("\n")
-            file_meson_build.write("install_data(%s_sources, install_dir: moduledir)\n" % p_name_underscore)
+            file_meson_build.write("install_data(%s_sources, install_dir: moduledir)\n" % self.project_name_underscore)
             file_meson_build.write("\n")
 
-        with open(self.path + '/src/' + p_name + '.in', 'a') as file_exec:
+        with open(self.path + '/src/' + self.project_name + '.in', 'a') as file_exec:
             file_exec.write("#!@PYTHON@\n")
             file_exec.write("#\n")
-            file_exec.write("# %s.in\n" % p_name)
+            file_exec.write("# %s.in\n" % self.project_name)
             file_exec.write("#\n")
             file_exec.write("# Copyright 2020\n")
             file_exec.write("#\n")
@@ -198,23 +200,23 @@ class PythonTemplate():
             file_exec.write("\n")
             file_exec.write("sys.path.insert(1, pkgdatadir)\n")
             file_exec.write("signal.signal(signal.SIGINT, signal.SIG_DFL)\n")
-            file_exec.write("gettext.install('%s', localedir)\n" % p_name)
+            file_exec.write("gettext.install('%s', localedir)\n" % self.project_name)
             file_exec.write("\n")
             file_exec.write("if __name__ == '__main__':\n")
             file_exec.write("    import gi\n")
             file_exec.write("\n")
             file_exec.write("    from gi.repository import Gio\n")
-            file_exec.write("    resource = Gio.Resource.load(os.path.join(pkgdatadir, '%s.gresource'))\n" % p_name)
+            file_exec.write("    resource = Gio.Resource.load(os.path.join(pkgdatadir, '%s.gresource'))\n" % self.project_name)
             file_exec.write("    resource._register()\n")
             file_exec.write("\n")
-            file_exec.write("    from %s import main\n" % p_name_underscore)
+            file_exec.write("    from %s import main\n" % self.project_name_underscore)
             file_exec.write("    sys.exit(main.main(VERSION))\n")
 
-        st = os.stat(self.path + '/src/' + p_name + '.in')
-        os.chmod(self.path + '/src/' + p_name + '.in', st.st_mode | stat.S_IEXEC)
+        st = os.stat(self.path + '/src/' + self.project_name + '.in')
+        os.chmod(self.path + '/src/' + self.project_name + '.in', st.st_mode | stat.S_IEXEC)
 
         files = ['window.ui']
-        self.file.create_gresource_file(self.path, p_name_underscore, p_id_reverse, files)
+        self.file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
 
         with open(self.path + '/src/window.py', 'a') as file_py_window:
             file_py_window.write("# window.py\n")
@@ -226,9 +228,9 @@ class PythonTemplate():
             file_py_window.write("from gi.repository import Gtk\n")
             file_py_window.write("\n")
             file_py_window.write("\n")
-            file_py_window.write("@Gtk.Template(resource_path='/%swindow.ui')\n" % p_id_reverse)
-            file_py_window.write("class %sWindow(Gtk.ApplicationWindow):\n" % class_name)
-            file_py_window.write("    __gtype_name__ = '%sWindow'\n" % class_name)
+            file_py_window.write("@Gtk.Template(resource_path='/%swindow.ui')\n" % self.project_id_reverse)
+            file_py_window.write("class %sWindow(Gtk.ApplicationWindow):\n" % self.class_name)
+            file_py_window.write("    __gtype_name__ = '%sWindow'\n" % self.class_name)
             file_py_window.write("\n")
             file_py_window.write("    label = Gtk.Template.Child()\n")
             file_py_window.write("\n")
@@ -236,5 +238,5 @@ class PythonTemplate():
             file_py_window.write("        super().__init__(**kwargs)\n")
             file_py_window.write("\n")
 
-        self.file.create_window_ui_file(self.path, class_name)
+        self.file.create_window_ui_file(self.path, self.class_name)
     
