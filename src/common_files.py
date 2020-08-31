@@ -64,7 +64,7 @@ class File:
 
     def create_manifest_file(self, path, p_id, p_name, lang):
         #TODO rewrite: move lang specific code to appropriate templates
-        with open(path + '/' + p_full_name + ".json", 'a') as file_main_json:
+        with open(path + '/' + p_id + ".json", 'a') as file_main_json:
             file_main_json.write("{\n")
             file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
             file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
@@ -267,12 +267,13 @@ class File:
             file_app_data.write("</component>\n")
             file_app_data.write("\n")
 
-    def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short):
+    def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short, files):
         with open(path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
             file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             file_gresource.write("<gresources>\n")
             file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
-            file_gresource.write("    <file>window.ui</file>\n")
+            for f in files:
+                file_gresource.write("    <file>%s</file>\n" % f)
             file_gresource.write("  </gresource>\n")
             file_gresource.write("</gresources>\n")
             file_gresource.write("\n")
@@ -305,3 +306,7 @@ class File:
             file_window_ui.write("    </child>\n")
             file_window_ui.write("    </template>\n")
             file_window_ui.write("  </interface>\n")
+
+    def test(self, path):
+        with open(path + '/test', 'a') as file_license:
+            file_license.write(self.gpl)

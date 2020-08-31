@@ -213,7 +213,8 @@ class PythonTemplate():
         st = os.stat(self.path + '/src/' + p_name + '.in')
         os.chmod(self.path + '/src/' + p_name + '.in', st.st_mode | stat.S_IEXEC)
 
-        self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
+        files = ['window.ui']
+        self.file.create_gresource_file(self.path, p_name_underscore, p_id_reverse, files)
 
         with open(self.path + '/src/window.py', 'a') as file_py_window:
             file_py_window.write("# window.py\n")
@@ -235,5 +236,5 @@ class PythonTemplate():
             file_py_window.write("        super().__init__(**kwargs)\n")
             file_py_window.write("\n")
 
-        self.file.create_window_ui_file(self, path, class_name)
+        self.file.create_window_ui_file(self.path, class_name)
     

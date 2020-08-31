@@ -272,7 +272,8 @@ class CTemplate():
             file_meson_build.write("\n")
 
         if self.is_gui:
-            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
+            files = ['window.ui']
+            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse, files)
 
         if self.is_gui:
             with open(self.path + '/src/' + p_id_underscore + '-window.c', 'a') as file_window_c:

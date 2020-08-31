@@ -242,7 +242,8 @@ class RustTemplate():
             file_meson_build.write(")\n")
 
         if self.is_gui:
-            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
+            files = ['window.ui']
+            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse, files)
 
             with open(self.path + '/src/window.rs', 'a') as file_py_window:
                 file_py_window.write("use gtk::prelude::*;\n")

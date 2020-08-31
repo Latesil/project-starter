@@ -168,7 +168,8 @@ class JsTemplate():
             file_meson_build.write("  install_dir: get_option('bindir')\n")
             file_meson_build.write(")\n")
 
-        self.file.create_gresource_file(path, p_name_underscore, p_id_reverse)
+        files = ['window.js', 'main.js']
+        self.file.create_gresource_file(self.path, p_id, p_id_reverse, files)
 
         with open(self.path + '/src/' + p_id + '.in', 'a') as file_in:
             file_in.write("#!@GJS@\n")
@@ -183,16 +184,6 @@ class JsTemplate():
 
         st = os.stat(self.path + '/src/' + p_id + '.in')
         os.chmod(self.path + '/src/' + p_id + '.in', st.st_mode | stat.S_IEXEC)
-
-        with open(self.path + '/src/' + p_id + '.src.gresource.xml', 'a') as file_gresource_src:
-            file_gresource_src.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gresource_src.write("<gresources>\n")
-            file_gresource_src.write("  <gresource prefix=\"/%s/js\">\n" % p_id_reverse_short)
-            file_gresource_src.write("    <file>window.js</file>\n")
-            file_gresource_src.write("    <file>main.js</file>\n")
-            file_gresource_src.write("  </gresource>\n")
-            file_gresource_src.write("</gresources>\n")
-            file_gresource_src.write("\n")
 
         with open(self.path + '/src/window.js', 'a') as file_js_window:
             file_js_window.write("/* window.js\n")
@@ -214,4 +205,4 @@ class JsTemplate():
             file_js_window.write("});\n")
             file_js_window.write("\n")
 
-        self.file.create_window_ui_file(self, path, window_name)
+        self.file.create_window_ui_file(self.path, window_name)
