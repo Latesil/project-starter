@@ -254,14 +254,7 @@ class RustTemplate():
             file_app_data.write("\n")
 
         self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
-
-        with open(self.path + '/data/' + p_id + '.gschema.xml', 'a') as file_gschema:
-            file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gschema.write("<schemalist gettext-domain=\"%s\">\n" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">\n" % (p_id, p_path))
-            file_gschema.write("\t</schema>\n")
-            file_gschema.write("</schemalist>\n")
-            file_gschema.write("\n")
+        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
 
     def populate_po_dir(self, p_id, p_name):
         p_full_name = p_id + '.' + p_name

@@ -96,8 +96,8 @@ class File:
     def create_gschema_file(self, path, p_full_name, p_name, p_path):
         with open(path + '/data/' + p_full_name + '.gschema.xml', 'a') as file_gschema:
             file_gschema.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gschema.write("<schemalist gettext-domain=\"%s\">" % p_name)
-            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">" % (p_full_name, p_path))
+            file_gschema.write("<schemalist gettext-domain=\"%s\">\n" % p_name)
+            file_gschema.write("\t<schema id=\"%s\" path=\"/%s/\">\n" % (p_full_name, p_path))
             file_gschema.write("\t</schema>\n")
             file_gschema.write("</schemalist>\n")
             file_gschema.write("\n")

@@ -206,7 +206,7 @@ class PythonTemplate():
             file_app_data.write("\n")
 
         self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
-        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path):
+        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
 
     def populate_po_dir(self, p_id, p_name):
         p_full_name = p_id + '.' + p_name

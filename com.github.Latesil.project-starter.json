@@ -29,7 +29,7 @@
             "sources" : [
                 {
                     "type" : "dir",
-                    "path" : "/var/home/late/Documents/Prog/project-starter"
+                    "path" : "."
                 }
             ]
         }
