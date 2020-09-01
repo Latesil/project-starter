@@ -248,40 +248,46 @@ class File:
         create_file(path, 'meson.build', text)
 
     def create_appdata_file(self, path, p_id, project_license):
-        with open(path + p_id + '.appdata.xml.in', 'a') as file_app_data:
-            file_app_data.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_app_data.write("<component type=\"desktop\">\n")
-            file_app_data.write("\t<id>%s.desktop</id>\n" % p_id)
-            file_app_data.write("\t<metadata_license>CC0-1.0</metadata_license>\n")
-            if project_license == 'GPL 3':
-                file_app_data.write("\t<project_license>GPL-3.0-or-later</project_license>\n")
-            elif project_license == 'AGPL 3':
-                file_app_data.write("\t<project_license>AGPL-3.0-or-later</project_license>\n")
-            elif project_license == 'Apache 2':
-                file_app_data.write("\t<project_license></project_license>\n")
-            elif project_license == 'GPL 2':
-                file_app_data.write("\t<project_license></project_license>\n")
-            elif project_license == 'LGPL 2':
-                file_app_data.write("\t<project_license>LGPL-2.1-or-later</project_license>\n")
-            elif project_license == 'LGPL 3':
-                file_app_data.write("\t<project_license>LGPL-3.0-or-later</project_license>\n")
-            elif project_license == 'MIT/X11':
-                file_app_data.write("\t<project_license>MIT</project_license>\n")
-            file_app_data.write("\t<description>\n")
-            file_app_data.write("\t</description>\n")
-            file_app_data.write("</component>\n")
-            file_app_data.write("\n")
+        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+                f"""<component type="desktop">\n""",
+                f"""  <id>{p_id}.desktop</id>\n""",
+                f"""  <metadata_license>CC0-1.0</metadata_license>\n""",)
+
+        if project_license == "GPL 3":
+            text += (f"""  <project_license>GPL-3.0-or-later</project_license>\n""")
+        elif project_license == "AGPL 3":
+            text += (f"""  <project_license>AGPL-3.0-or-later</project_license>\n"""")
+        elif project_license == "Apache 2":
+            text += (f"""  <project_license></project_license>\n""")
+        elif project_license == "GPL 2":
+            text += (f"""  <project_license></project_license>\n""")
+        elif project_license == "LGPL 2":
+            text += (f"""  <project_license>LGPL-2.1-or-later</project_license>\n""")
+        elif project_license == "LGPL 3":
+            text += (f"""  <project_license>LGPL-3.0-or-later</project_license>\n""")
+        elif project_license == "MIT/X11":
+            text += (f"""  <project_license>MIT</project_license>\n""")
+
+        text += (f"""  <description>\n""",
+                f"""  </description>\n""",
+                f"""</component>\n""",
+                f"""\n""",)
+
+        create_file(path, p_id + '.appdata.xml.in', text)
 
     def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short, files):
-        with open(path + '/src/' + p_name_underscore + '.gresource.xml', 'a') as file_gresource:
-            file_gresource.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_gresource.write("<gresources>\n")
-            file_gresource.write("  <gresource prefix=\"/%s\">\n" % p_id_reverse_short)
-            for f in files:
-                file_gresource.write("    <file>%s</file>\n" % f)
-            file_gresource.write("  </gresource>\n")
-            file_gresource.write("</gresources>\n")
-            file_gresource.write("\n")
+        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+                f"""<gresources>\n""",
+                f"""  <gresource prefix="/{p_id_reverse_short}">\n""",)
+        
+        for f in files:
+            text += ("    <file>%s</file>\n" % f,)
+            
+        text += (f"""  </gresource>\n""",
+                f"""</gresources>\n""",
+                f"""\n""",)
+
+        create_file(path + '/src/', p_name_underscore + '.gresource.xml', text)
 
     def create_window_ui_file(self, path, window_name):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
