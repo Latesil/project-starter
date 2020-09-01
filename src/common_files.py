@@ -62,80 +62,56 @@ class File:
             license = Mit()
         create_file(path, 'COPYING', license.get_text())
 
-    def create_manifest_file(self, path, p_id, p_name, lang, ext=False):
+    def create_manifest_file(self, path, p_id, p_name, command, lang, ext, build_options):
         #TODO rewrite: move lang specific code to appropriate templates
-        with open(path + '/' + p_id + ".json", 'a') as file_main_json:
-            file_main_json.write("{\n")
-            file_main_json.write("    \"app-id\" : \"%s\",\n" % p_id)
-            file_main_json.write("    \"runtime\" : \"org.gnome.Platform\",\n")
-            file_main_json.write("    \"runtime-version\" : \"%s\",\n" % constants['GNOME_PLATFORM_VERSION'])
-            file_main_json.write("    \"sdk\" : \"org.gnome.Sdk\",\n")
+        text = (f"""app-id: {p_id}""",
+                f"""runtime: org.gnome.Platform""",
+                f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'""",
+                f"""sdk: org.gnome.Sdk""",)
+        if ext:
+            text += ext
 
-            if lang == 'rust':
-                file_main_json.write("    \"sdk-extensions\" : [\n")
-                file_main_json.write("        \"org.freedesktop.Sdk.Extension.rust-stable\"\n")
-                file_main_json.write("    ],\n")
+        text += (f"""command: {command}""",
+                f"""finish-args:""",
+                f"""  - --share=network""",
+                f"""  - --share=ipc""",
+                f"""  - --socket=fallback-x11""",
+                f"""  - --socket=wayland""",)
 
-            if lang == 'js':
-                file_main_json.write("    \"command\" : \"%s\",\n" % p_id)
-            else:
-                file_main_json.write("    \"command\" : \"%s\",\n" % p_name)
+        if build_options:
+            text += build_options
 
-            file_main_json.write("    \"finish-args\" : [\n")
-            file_main_json.write("        \"--share=network\",\n")
-            file_main_json.write("        \"--share=ipc\",\n")
-            file_main_json.write("        \"--socket=fallback-x11\",\n")
-            file_main_json.write("        \"--socket=wayland\"\n")
-            file_main_json.write("    ],\n")
+        text += (f"""cleanup:""",
+                f"""  - /include""",
+                f"""  - /lib/pkgconfig""",
+                f"""  - /man""",
+                f"""  - /share/doc""",)
 
-            if lang == 'rust':
-                file_main_json.write("    \"build-options\" : {\n")
-                file_main_json.write("        \"append-path\" : \"/usr/lib/sdk/rust-stable/bin\",\n")
-                file_main_json.write("        \"build-args\" : [\n")
-                file_main_json.write("            \"--share=network\"\n")
-                file_main_json.write("        ],\n")
-                file_main_json.write("        \"env\" : {\n")
-                file_main_json.write("            \"CARGO_HOME\" : \"/run/build/%s/cargo\",\n" % p_name)
-                file_main_json.write("            \"RUST_BACKTRACE\" : \"1\",\n")
-                file_main_json.write("            \"RUST_LOG\" : \"%s=debug\"\n" % p_name)
-                file_main_json.write("        }\n")
-                file_main_json.write("    },\n")
+        if lang == 'js' or lang == 'c':
+            text += (f"""  - /share/gtk-doc""",)
 
-            file_main_json.write("    \"cleanup\" : [\n")
-            file_main_json.write("        \"/include\",\n")
-            file_main_json.write("        \"/lib/pkgconfig\",\n")
-            file_main_json.write("        \"/man\",\n")
-            file_main_json.write("        \"/share/doc\",\n")
+        text += (f"""  - /share/man""",
+                f"""  - /share/pkgconfig""",
+                f"""  - '*.la'""",
+                f"""  - '*.a'""",
+                f"""modules:""",
+                f"""  - name:""",
+                f"""    builddir: true""",
+                f"""    buildsystem: meson""",
+                f"""    sources:""",
+                f"""      - type: dir""",
+                f"""      - .""",)
 
-            if lang == 'js' or lang == 'c':
-                file_main_json.write("        \"/share/gtk-doc\",\n")
-
-            file_main_json.write("        \"/share/man\",\n")
-            file_main_json.write("        \"/share/pkgconfig\",\n")
-            file_main_json.write("        \"*.la\",\n")
-            file_main_json.write("        \"*.a\"\n")
-            file_main_json.write("    ],\n")
-            file_main_json.write("    \"modules\" : [\n")
-            file_main_json.write("        {\n")
-            file_main_json.write("            \"name\" : \"%s\",\n" % p_name)
-            file_main_json.write("            \"builddir\" : true,\n")
-            file_main_json.write("            \"buildsystem\" : \"meson\",\n")
-            file_main_json.write("            \"sources\" : [\n")
-            file_main_json.write("                {\n")
-            file_main_json.write("                    \"type\" : \"git\",\n")
-            file_main_json.write("                    \"url\" : \"file://%s\"\n" % path)
-            file_main_json.write("                }\n")
-            file_main_json.write("            ]\n")
-            file_main_json.write("        }\n")
-            file_main_json.write("    ]\n")
-            file_main_json.write("}\n")
+        create_file(path + '/', p_id + ".yaml", text)
 
     def create_po_meson_file(self, path, p_name):
         text = (f"i18n.gettext('{p_name}', preset: 'glib')\n",)
+
         create_file(path, 'meson.build', text)
 
     def create_po_linguas_file(self, path):
         text = ()
+
         create_file(path, 'LINGUAS', text, empty=True)
 
     def create_po_potfiles_file(self, path, p_id, files):
@@ -148,9 +124,10 @@ class File:
                 f"data/{p_id}.gschema.xml\n",)
 
         for f in files:
-            text += ("src/%s\n" % f,)
+            text += (f"src/{f}\n",)
 
-        text += ("\n",)
+        text += (f"\n",)
+
         create_file(path, 'POTFILES', text)
 
     def create_meson_postinstall_file(self, path):
@@ -281,7 +258,7 @@ class File:
                 f"""  <gresource prefix="/{p_id_reverse_short}">\n""",)
         
         for f in files:
-            text += ("    <file>%s</file>\n" % f,)
+            text += (f"    <file>{f}</file>\n",)
             
         text += (f"""  </gresource>\n""",
                 f"""</gresources>\n""",

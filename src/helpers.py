@@ -27,10 +27,10 @@ def create_folders(folders):
         if not os.path.exists(dir):
             os.mkdir(dir)
         else:
-            print('Folder with name {f} already exists!')
+            print(f'Folder with name {f} already exists!')
 
 def create_file(path, filename, text, empty=False):
-    with open(path  + filename, 'a') as f:
+    with open(path + filename, 'a') as f:
         if not empty:
             f.writelines(text)
         else:
