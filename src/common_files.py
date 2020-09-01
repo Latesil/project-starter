@@ -132,27 +132,27 @@ class File:
             file_main_json.write("}\n")
 
     def create_po_meson_file(self, path, p_name):
-        with open(path + '/po/meson.build', 'a') as file_meson_build:
-            file_meson_build.write("i18n.gettext('%s', preset: 'glib')\n" % p_name)
-            file_meson_build.write("\n")
+        text = (f"i18n.gettext('{p_name}', preset: 'glib')\n",)
+        create_file(path, 'meson.build', text)
 
     def create_po_linguas_file(self, path):
-        #TODO maybe there is another way to create an empty file?
-        with open(path + '/po/LINGUAS', 'a') as file_linguas:
-            file_linguas.close()
+        text = () # TODO find another solution
+        create_file(path, 'LINGUAS', text, empty=True)
 
     def create_po_potfiles_file(self, path, p_id, files):
         if not isinstance(files, list):
-            print('Cannot create POTFILES. Argument is invalid')
+            print('Cannot create POTFILES. Argument is invalid (must be list)')
             return
 
-        with open(path + '/po/POTFILES', 'a') as file_potfiles:
-            file_potfiles.write("data/%s.desktop.in\n" % p_id)
-            file_potfiles.write("data/%s.appdata.xml.in\n" % p_id)
-            file_potfiles.write("data/%s.gschema.xml\n" % p_id)
-            for f in files:
-                file_potfiles.write("src/%s\n" % f)
-            file_potfiles.write("\n")
+        text = (f"data/{p_id}.desktop.in\n",
+                f"data/{p_id}.appdata.xml.in\n",
+                f"data/{p_id}.gschema.xml\n",)
+
+        for f in files:
+            text += ("src/%s\n" % f,)
+
+        text += ("\n",)
+        create_file(path, 'POTFILES', text)
 
     def create_meson_postinstall_file(self, path):
         with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
@@ -178,25 +178,26 @@ class File:
             file_postinstall.write("\n")
 
     def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
-        with open(path + p_full_name + '.desktop.in', 'a') as file_desktop:
-            file_desktop.write("[Desktop Entry]\n")
-            file_desktop.write("Name=%s\n" % p_name)
-            file_desktop.write("Exec=%s\n" % p_name)
-            if gui:
-                file_desktop.write("Terminal=false\n")
-            file_desktop.write("Type=Application\n")
-            file_desktop.write("Categories=GTK;\n")
-            file_desktop.write("StartupNotify=true\n")
-            file_desktop.write("Icon=%s" % p_id)
+        text = (f"[Desktop Entry]\n",
+                f"Name={p_name}\n",
+                f"Exec={p_name}\n",)
+
+        if gui:
+            text += (f"Terminal=false\n",)
+
+        text += (f"Type=Application\n",
+                 f"Categories=GTK;\n",
+                 f"StartupNotify=true\n",
+                 f"Icon={p_id}\n",)
+
+        create_file(path, p_full_name + '.desktop.in', text)
 
     def create_gschema_file(self, path, p_full_name, p_name, p_path):
-        text = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<schemalist gettext-domain=\"{p_name}\">
-    <schema id=\"{p_full_name}\" path=\"/{p_path}/\">
-    </schema>
-</schemalist>
-
-"""
+        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+                f"""<schemalist gettext-domain="{p_name}">\n""",
+                f"""    <schema id="{p_full_name}" path="/{p_path}/">\n""",
+                f"""    </schema>\n""",
+                f"""</schemalist>\n""",)
         create_file(path, p_full_name + '.gschema.xml', text)
 
     def create_data_meson_file(self, path, p_full_name):
@@ -309,6 +310,3 @@ class File:
             file_window_ui.write("    </template>\n")
             file_window_ui.write("  </interface>\n")
 
-    def test(self, path):
-        with open(path + '/test', 'a') as file_license:
-            file_license.write(self.gpl)

@@ -93,9 +93,10 @@ class PythonTemplate(Template):
 
     def populate_po_dir(self, project_id, project_name):
         files = ['window.ui', 'main.py', 'window.py']
-        self.file.create_po_linguas_file(self.path)
-        self.file.create_po_meson_file(self.path, self.project_name)
-        self.file.create_po_potfiles_file(self.path, self.project_id, files)
+        path = self.path + '/po/'
+        self.file.create_po_linguas_file(path)
+        self.file.create_po_meson_file(path, self.project_name)
+        self.file.create_po_potfiles_file(path, self.project_id, files)
 
     def populate_src_dir(self, project_id, project_name):
         #TODO maybe there is another way to create an empty file?

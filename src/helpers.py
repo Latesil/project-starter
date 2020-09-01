@@ -19,7 +19,7 @@ import os
 
 def create_folders(folders):
     if len(folders) == 0:
-        print('Cannot create folder without name')
+        print('Folder creation error: empty list')
         return
     
     for f in folders:
@@ -29,6 +29,10 @@ def create_folders(folders):
         else:
             print('Folder with name {f} already exists!')
 
-def create_file(path, filename, text):
+def create_file(path, filename, text, empty=False):
     with open(path  + filename, 'a') as f:
-        f.write(text)
+        if not empty:
+            f.writelines(text)
+        else:
+            # TODO maybe there is another way to create an empty file?
+            f.close()
