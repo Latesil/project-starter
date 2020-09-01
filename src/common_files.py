@@ -62,7 +62,7 @@ class File:
             license = Mit()
         create_file(path, 'COPYING', license.get_text())
 
-    def create_manifest_file(self, path, p_id, p_name, lang):
+    def create_manifest_file(self, path, p_id, p_name, lang, ext=False):
         #TODO rewrite: move lang specific code to appropriate templates
         with open(path + '/' + p_id + ".json", 'a') as file_main_json:
             file_main_json.write("{\n")
@@ -254,19 +254,19 @@ class File:
                 f"""  <metadata_license>CC0-1.0</metadata_license>\n""",)
 
         if project_license == "GPL 3":
-            text += (f"""  <project_license>GPL-3.0-or-later</project_license>\n""")
+            text += (f"""  <project_license>GPL-3.0-or-later</project_license>\n""",)
         elif project_license == "AGPL 3":
-            text += (f"""  <project_license>AGPL-3.0-or-later</project_license>\n"""")
+            text += (f"""  <project_license>AGPL-3.0-or-later</project_license>\n""",)
         elif project_license == "Apache 2":
-            text += (f"""  <project_license></project_license>\n""")
+            text += (f"""  <project_license></project_license>\n""",)
         elif project_license == "GPL 2":
-            text += (f"""  <project_license></project_license>\n""")
+            text += (f"""  <project_license></project_license>\n""",)
         elif project_license == "LGPL 2":
-            text += (f"""  <project_license>LGPL-2.1-or-later</project_license>\n""")
+            text += (f"""  <project_license>LGPL-2.1-or-later</project_license>\n""",)
         elif project_license == "LGPL 3":
-            text += (f"""  <project_license>LGPL-3.0-or-later</project_license>\n""")
+            text += (f"""  <project_license>LGPL-3.0-or-later</project_license>\n""",)
         elif project_license == "MIT/X11":
-            text += (f"""  <project_license>MIT</project_license>\n""")
+            text += (f"""  <project_license>MIT</project_license>\n""",)
 
         text += (f"""  <description>\n""",
                 f"""  </description>\n""",
