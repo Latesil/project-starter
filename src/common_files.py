@@ -62,45 +62,45 @@ class File:
             license = Mit()
         create_file(path, 'COPYING', license.get_text())
 
-    def create_manifest_file(self, path, p_id, p_name, command, lang, ext, build_options):
-        #TODO rewrite: move lang specific code to appropriate templates
-        text = (f"""app-id: {p_id}""",
-                f"""runtime: org.gnome.Platform""",
-                f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'""",
-                f"""sdk: org.gnome.Sdk""",)
-        if ext:
-            text += ext
+    def create_manifest_file(self, path, p_id, p_name, command, lang, sdk_extension=None, build_options=None):
+        text = (f"""app-id: {p_id}\n""",
+                f"""runtime: org.gnome.Platform\n""",
+                f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'\n""",
+                f"""sdk: org.gnome.Sdk\n""",)
 
-        text += (f"""command: {command}""",
-                f"""finish-args:""",
-                f"""  - --share=network""",
-                f"""  - --share=ipc""",
-                f"""  - --socket=fallback-x11""",
-                f"""  - --socket=wayland""",)
+        if sdk_extension:
+            text += sdk_extension
+
+        text += (f"""command: {command}\n""",
+                f"""finish-args:\n""",
+                f"""  - --share=network\n""",
+                f"""  - --share=ipc\n""",
+                f"""  - --socket=fallback-x11\n""",
+                f"""  - --socket=wayland\n""",)
 
         if build_options:
             text += build_options
 
-        text += (f"""cleanup:""",
-                f"""  - /include""",
-                f"""  - /lib/pkgconfig""",
-                f"""  - /man""",
-                f"""  - /share/doc""",)
+        text += (f"""cleanup:\n""",
+                f"""  - /include\n""",
+                f"""  - /lib/pkgconfig\n""",
+                f"""  - /man\n""",
+                f"""  - /share/doc\n""",)
 
         if lang == 'js' or lang == 'c':
-            text += (f"""  - /share/gtk-doc""",)
+            text += (f"""  - /share/gtk-doc\n""",)
 
-        text += (f"""  - /share/man""",
-                f"""  - /share/pkgconfig""",
-                f"""  - '*.la'""",
-                f"""  - '*.a'""",
-                f"""modules:""",
-                f"""  - name:""",
-                f"""    builddir: true""",
-                f"""    buildsystem: meson""",
-                f"""    sources:""",
-                f"""      - type: dir""",
-                f"""      - .""",)
+        text += (f"""  - /share/man\n""",
+                f"""  - /share/pkgconfig\n""",
+                f"""  - '*.la'\n""",
+                f"""  - '*.a'\n""",
+                f"""modules:\n""",
+                f"""  - name:\n""",
+                f"""    builddir: true\n""",
+                f"""    buildsystem: meson\n""",
+                f"""    sources:\n""",
+                f"""      - type: dir\n""",
+                f"""      - .\n""",)
 
         create_file(path + '/', p_id + ".yaml", text)
 
