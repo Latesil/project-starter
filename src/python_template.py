@@ -63,6 +63,8 @@ class PythonTemplate(Template):
         os.makedirs(path + '/po')
         os.makedirs(path + '/src')
 
+        path = self.path + '/'
+
         self.file.create_copying_file(path, self.license)
         self.file.create_manifest_file(path, self.project_full_name, self.project_name, self.lang)
         self.file.create_meson_postinstall_file(path)

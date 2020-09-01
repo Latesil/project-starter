@@ -39,29 +39,28 @@ class File:
         return self.gpl
 
     def create_copying_file(self, path, project_license):
-        with open(path + '/COPYING', 'a') as file_license:
-            if project_license == 'GPL 3':
-                from .gpl import Gpl
-                license = Gpl('3')
-            elif project_license == 'GPL 2':
-                from .gpl import Gpl
-                license = Gpl('2')
-            elif project_license == 'AGPL 3':
-                from .agpl import Agpl
-                license = Agpl()
-            elif project_license == 'Apache 2':
-                from .apache import Apache
-                license = Apache()
-            elif project_license == 'LGPL 3':
-                from .lgpl import Lgpl
-                license = Lgpl('3')
-            elif project_license == 'LGPL 2':
-                from .lgpl import Lgpl
-                license = Lgpl('2')
-            elif project_license == 'MIT/X11':
-                from .mit import Mit
-                license = Mit()
-            file_license.write(license.get_text())
+        if project_license == 'GPL 3':
+            from .gpl import Gpl
+            license = Gpl('3')
+        elif project_license == 'GPL 2':
+            from .gpl import Gpl
+            license = Gpl('2')
+        elif project_license == 'AGPL 3':
+            from .agpl import Agpl
+            license = Agpl()
+        elif project_license == 'Apache 2':
+            from .apache import Apache
+            license = Apache()
+        elif project_license == 'LGPL 3':
+            from .lgpl import Lgpl
+            license = Lgpl('3')
+        elif project_license == 'LGPL 2':
+            from .lgpl import Lgpl
+            license = Lgpl('2')
+        elif project_license == 'MIT/X11':
+            from .mit import Mit
+            license = Mit()
+        create_file(path, 'COPYING', license.get_text())
 
     def create_manifest_file(self, path, p_id, p_name, lang):
         #TODO rewrite: move lang specific code to appropriate templates
@@ -136,7 +135,7 @@ class File:
         create_file(path, 'meson.build', text)
 
     def create_po_linguas_file(self, path):
-        text = () # TODO find another solution
+        text = ()
         create_file(path, 'LINGUAS', text, empty=True)
 
     def create_po_potfiles_file(self, path, p_id, files):
@@ -155,27 +154,28 @@ class File:
         create_file(path, 'POTFILES', text)
 
     def create_meson_postinstall_file(self, path):
-        with open(path + '/build-aux/meson/postinstall.py', 'a') as file_postinstall:
-            file_postinstall.write("#!/usr/bin/env python3\n")
-            file_postinstall.write("\n")
-            file_postinstall.write("from os import environ, path\n")
-            file_postinstall.write("from subprocess import call\n")
-            file_postinstall.write("\n")
-            file_postinstall.write("prefix = environ.get('MESON_INSTALL_PREFIX', '/usr/local')\n")
-            file_postinstall.write("datadir = path.join(prefix, 'share')\n")
-            file_postinstall.write("destdir = environ.get('DESTDIR', '')\n")
-            file_postinstall.write("\n")
-            file_postinstall.write("# Package managers set this so we don't need to run\n")
-            file_postinstall.write("if not destdir:\n")
-            file_postinstall.write("    print('Updating icon cache...')\n")
-            file_postinstall.write("    call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])\n")
-            file_postinstall.write("\n")
-            file_postinstall.write("    print('Updating desktop database...')\n")
-            file_postinstall.write("    call(['update-desktop-database', '-q', path.join(datadir, 'applications')])\n")
-            file_postinstall.write("\n")
-            file_postinstall.write("    print('Compiling GSettings schemas...')\n")
-            file_postinstall.write("    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n")
-            file_postinstall.write("\n")
+        text = (f"#!/usr/bin/env python3\n",
+                f"\n",
+                f"from os import environ, path\n",
+                f"from subprocess import call\n",
+                f"\n",
+                f"prefix = environ.get('MESON_INSTALL_PREFIX', '/usr/local')\n",
+                f"datadir = path.join(prefix, 'share')\n",
+                f"destdir = environ.get('DESTDIR', '')\n",
+                f"\n",
+                f"# Package managers set this so we don't need to run\n",
+                f"if not destdir:\n",
+                f"    print('Updating icon cache...')\n",
+                f"    call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])\n",
+                f"\n",
+                f"    print('Updating desktop database...')\n",
+                f"    call(['update-desktop-database', '-q', path.join(datadir, 'applications')])\n",
+                f"\n",
+                f"    print('Compiling GSettings schemas...')\n",
+                f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
+                f"\n",)
+
+        create_file(path + '/build-aux/meson/', 'postinstall.py', text)
 
     def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
         text = (f"[Desktop Entry]\n",
@@ -198,52 +198,54 @@ class File:
                 f"""    <schema id="{p_full_name}" path="/{p_path}/">\n""",
                 f"""    </schema>\n""",
                 f"""</schemalist>\n""",)
+
         create_file(path, p_full_name + '.gschema.xml', text)
 
     def create_data_meson_file(self, path, p_full_name):
-        with open(path + 'meson.build', 'a') as file_meson_build:
-            file_meson_build.write("desktop_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.desktop.in',\n" % p_full_name)
-            file_meson_build.write("  output: '%s.desktop',\n" % p_full_name)
-            file_meson_build.write("  type: 'desktop',\n")
-            file_meson_build.write("  po_dir: '../po',\n")
-            file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'applications')\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("desktop_utils = find_program('desktop-file-validate', required: false)\n")
-            file_meson_build.write("if desktop_utils.found()\n")
-            file_meson_build.write("  test('Validate desktop file', desktop_utils,\n")
-            file_meson_build.write("    args: [desktop_file]\n")
-            file_meson_build.write("  )\n")
-            file_meson_build.write("endif\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("appstream_file = i18n.merge_file(\n")
-            file_meson_build.write("  input: '%s.appdata.xml.in',\n" % p_full_name)
-            file_meson_build.write("  output: '%s.appdata.xml',\n" % p_full_name)
-            file_meson_build.write("  po_dir: '../po',\n")
-            file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), '%s')\n" % constants['METADATA_FOLDER'])
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("appstream_util = find_program('appstream-util', required: false)\n")
-            file_meson_build.write("if appstream_util.found()\n")
-            file_meson_build.write("  test('Validate appstream file', appstream_util,\n")
-            file_meson_build.write("    args: ['validate', appstream_file]\n")
-            file_meson_build.write("  )\n")
-            file_meson_build.write("endif\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("install_data('%s.gschema.xml',\n" % p_full_name)
-            file_meson_build.write("  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("compile_schemas = find_program('glib-compile-schemas', required: false)\n")
-            file_meson_build.write("if compile_schemas.found()\n")
-            file_meson_build.write("  test('Validate schema file', compile_schemas,\n")
-            file_meson_build.write("    args: ['--strict', '--dry-run', meson.current_source_dir()]\n")
-            file_meson_build.write("  )\n")
-            file_meson_build.write("endif\n")
-            file_meson_build.write("\n")
+        text = (f"desktop_file = i18n.merge_file(\n",
+                f"  input: '{p_full_name}.desktop.in',\n",
+                f"  output: '{p_full_name}.desktop',\n",
+                f"  type: 'desktop',\n",
+                f"  po_dir: '../po',\n",
+                f"  install: true,\n",
+                f"  install_dir: join_paths(get_option('datadir'), 'applications')\n",
+                f")\n",
+                f"\n",
+                f"desktop_utils = find_program('desktop-file-validate', required: false)\n",
+                f"if desktop_utils.found()\n",
+                f"  test('Validate desktop file', desktop_utils,\n",
+                f"    args: [desktop_file]\n",
+                f"  )\n",
+                f"endif\n",
+                f"\n",
+                f"appstream_file = i18n.merge_file(\n",
+                f"  input: '{p_full_name}.appdata.xml.in',\n",
+                f"  output: '{p_full_name}.appdata.xml',\n",
+                f"  po_dir: '../po',\n",
+                f"  install: true,\n",
+                f"  install_dir: join_paths(get_option('datadir'), '{constants['METADATA_FOLDER']}')\n",
+                f")\n",
+                f"\n",
+                f"appstream_util = find_program('appstream-util', required: false)\n",
+                f"if appstream_util.found()\n",
+                f"  test('Validate appstream file', appstream_util,\n",
+                f"    args: ['validate', appstream_file]\n",
+                f"  )\n",
+                f"endif\n",
+                f"\n",
+                f"install_data('{p_full_name}.gschema.xml',\n",
+                f"  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n",
+                f")\n",
+                f"\n",
+                f"compile_schemas = find_program('glib-compile-schemas', required: false)\n",
+                f"if compile_schemas.found()\n",
+                f"  test('Validate schema file', compile_schemas,\n",
+                f"    args: ['--strict', '--dry-run', meson.current_source_dir()]\n",
+                f"  )\n",
+                f"endif\n",
+                f"\n",)
+
+        create_file(path, 'meson.build', text)
 
     def create_appdata_file(self, path, p_id, project_license):
         with open(path + p_id + '.appdata.xml.in', 'a') as file_app_data:
@@ -282,31 +284,32 @@ class File:
             file_gresource.write("\n")
 
     def create_window_ui_file(self, path, window_name):
-        with open(path + '/src/window.ui', 'a') as file_window_ui:
-            file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            file_window_ui.write("\n")
-            file_window_ui.write("<interface>\n")
-            file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-            file_window_ui.write("    <template class=\"%sWindow\" parent=\"GtkApplicationWindow\">\n" % window_name)
-            file_window_ui.write("      <property name=\"default-width\">600</property>\n")
-            file_window_ui.write("    <property name=\"default-height\">300</property>\n")
-            file_window_ui.write("    <child type=\"titlebar\">\n")
-            file_window_ui.write("      <object class=\"GtkHeaderBar\" id=\"header_bar\">\n")
-            file_window_ui.write("        <property name=\"visible\">True</property>\n")
-            file_window_ui.write("        <property name=\"show-close-button\">True</property>\n")
-            file_window_ui.write("        <property name=\"title\">Hello, World!</property>\n")
-            file_window_ui.write("      </object>\n")
-            file_window_ui.write("    </child>\n")
-            file_window_ui.write("    <child>\n")
-            file_window_ui.write("      <object class=\"GtkLabel\" id=\"label\">\n")
-            file_window_ui.write("        <property name=\"label\">Hello, World!</property>\n")
-            file_window_ui.write("        <property name=\"visible\">True</property>\n")
-            file_window_ui.write("        <attributes>\n")
-            file_window_ui.write("          <attribute name=\"weight\" value=\"bold\"/>\n")
-            file_window_ui.write("          <attribute name=\"scale\" value=\"2\"/>\n")
-            file_window_ui.write("        </attributes>\n")
-            file_window_ui.write("      </object>\n")
-            file_window_ui.write("    </child>\n")
-            file_window_ui.write("    </template>\n")
-            file_window_ui.write("  </interface>\n")
+        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+                f"""\n""",
+                f"""<interface>\n""",
+                f"""  <requires lib="gtk+" version="3.24"/>\n""",
+                f"""    <template class="{window_name}Window" parent="GtkApplicationWindow">\n""",
+                f"""      <property name="default-width">600</property>\n""",
+                f"""    <property name="default-height">300</property>\n""",
+                f"""    <child type="titlebar">\n""",
+                f"""      <object class="GtkHeaderBar" id="header_bar">\n""",
+                f"""        <property name="visible">True</property>\n""",
+                f"""        <property name="show-close-button">True</property>\n""",
+                f"""        <property name="title">Hello, World!</property>\n""",
+                f"""      </object>\n""",
+                f"""    </child>\n""",
+                f"""    <child>\n""",
+                f"""      <object class="GtkLabel" id="label">\n""",
+                f"""        <property name="label">Hello, World!</property>\n""",
+                f"""        <property name="visible">True</property>\n""",
+                f"""        <attributes>\n""",
+                f"""          <attribute name="weight" value="bold"/>\n""",
+                f"""          <attribute name="scale" value="2"/>\n""",
+                f"""        </attributes>\n""",
+                f"""      </object>\n""",
+                f"""    </child>\n""",
+                f"""    </template>\n""",
+                f"""  </interface>\n""",)
+
+        create_file(path + '/src/', 'window.ui', text)
 
