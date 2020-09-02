@@ -22,6 +22,7 @@ from gi.repository import GLib
 from .project_starter_constants import constants
 from .common_files import File
 from .template import Template
+from .helpers import *
 
 class PythonTemplate(Template):
 
@@ -66,25 +67,26 @@ class PythonTemplate(Template):
         path = self.path + '/'
 
         self.file.create_copying_file(path, self.license)
-        self.file.create_manifest_file(path, self.project_full_name, self.project_name, self.lang)
+        self.file.create_manifest_file(path, self.project_full_name, self.project_name, self.project_name, self.lang)
         self.file.create_meson_postinstall_file(path)
 
-        with open(path + '/' + "meson.build", 'a') as file_meson_build:
-            file_meson_build.write("project('%s',\n" % self.project_name)
-            file_meson_build.write("          version: '0.1.0',\n")
-            file_meson_build.write("    meson_version: '>= %s',\n" % constants['MESON_VERSION'])
-            file_meson_build.write("  default_options: [ 'warning_level=2',\n")
-            file_meson_build.write("                   ],\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("i18n = import('i18n')\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("subdir('data')\n")
-            file_meson_build.write("subdir('src')\n")
-            file_meson_build.write("subdir('po')\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("meson.add_install_script('build-aux/meson/postinstall.py')\n")
+        text = (f"project('{self.project_name}',\n",
+                f"          version: '0.1.0',\n",
+                f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
+                f"  default_options: [ 'warning_level=2',\n",
+                f"                   ],\n",
+                f")\n",
+                f"\n",
+                f"i18n = import('i18n')\n",
+                f"\n",
+                f"\n",
+                f"subdir('data')\n",
+                f"subdir('src')\n",
+                f"subdir('po')",
+                f"\n",
+                f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
+
+        create_file(path, 'meson.build', text)
 
     def populate_data_folder(self, project_id, project_name):
         path = self.path + '/data/'
@@ -101,119 +103,121 @@ class PythonTemplate(Template):
         self.file.create_po_potfiles_file(path, self.project_id, files)
 
     def populate_src_dir(self, project_id, project_name):
-        #TODO maybe there is another way to create an empty file?
-        with open(self.path + '/src/__init__.py', 'a') as file_py_init:
-            file_py_init.close()
+        text = ()
 
-        with open(self.path + '/src/main.py', 'a') as file_py_main:
-            file_py_main.write("# main.py\n")
-            file_py_main.write("#\n")
-            file_py_main.write("# Copyright 2020\n")
-            file_py_main.write("#\n")
-            file_py_main.write(self.gpl_text)
-            file_py_main.write("\n")
-            file_py_main.write("import sys\n")
-            file_py_main.write("import gi\n")
-            file_py_main.write("\n")
-            file_py_main.write("gi.require_version('Gtk', '3.0')\n")
-            file_py_main.write("\n")
-            file_py_main.write("from gi.repository import Gtk, Gio\n")
-            file_py_main.write("\n")
-            file_py_main.write("from .window import %sWindow\n" % self.class_name)
-            file_py_main.write("\n")
-            file_py_main.write("\n")
-            file_py_main.write("class Application(Gtk.Application):\n")
-            file_py_main.write("    def __init__(self):\n")
-            file_py_main.write("        super().__init__(application_id='%s',\n" % self.project_id)
-            file_py_main.write("                         flags=Gio.ApplicationFlags.FLAGS_NONE)\n")
-            file_py_main.write("\n")
-            file_py_main.write("    def do_activate(self):\n")
-            file_py_main.write("        win = self.props.active_window\n")
-            file_py_main.write("        if not win:\n")
-            file_py_main.write("            win = %sWindow(application=self)\n" % self.class_name)
-            file_py_main.write("        win.present()\n")
-            file_py_main.write("\n")
-            file_py_main.write("\n")
-            file_py_main.write("def main(version):\n")
-            file_py_main.write("    app = Application()\n")
-            file_py_main.write("    return app.run(sys.argv)\n")
-            file_py_main.write("\n")
+        create_file(path + '/src/', '__init__.py', text, empty=True)
 
-        with open(self.path + '/src/meson.build', 'a') as file_meson_build:
-            file_meson_build.write("pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n")
-            file_meson_build.write("moduledir = join_paths(pkgdatadir, '%s')\n" % self.project_name_underscore)
-            file_meson_build.write("gnome = import('gnome')\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("gnome.compile_resources('%s',\n" % self.project_name)
-            file_meson_build.write("  '%s.gresource.xml',\n" % self.project_name_underscore)
-            file_meson_build.write("  gresource_bundle: true,\n")
-            file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: pkgdatadir,\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("desktop_utils = find_program('desktop-file-validate', required: false)\n")
-            file_meson_build.write("if desktop_utils.found()\n")
-            file_meson_build.write("  test('Validate desktop file', desktop_utils,\n")
-            file_meson_build.write("    args: [desktop_file]\n")
-            file_meson_build.write("  )\n")
-            file_meson_build.write("endif\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("python = import('python')\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("conf = configuration_data()\n")
-            file_meson_build.write("conf.set('PYTHON', python.find_installation('python3').path())\n")
-            file_meson_build.write("conf.set('VERSION', meson.project_version())\n")
-            file_meson_build.write("conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n")
-            file_meson_build.write("conf.set('pkgdatadir', pkgdatadir)\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("configure_file(\n")
-            file_meson_build.write("  input: '%s.in',\n" % self.project_name)
-            file_meson_build.write("  output: '%s',\n" % self.project_name)
-            file_meson_build.write("  configuration: conf,\n")
-            file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: get_option('bindir')\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("%s_sources = [\n" % self.project_name_underscore)
-            file_meson_build.write("  '__init__.py',\n")
-            file_meson_build.write("  'main.py',\n")
-            file_meson_build.write("  'window.py',\n")
-            file_meson_build.write("]\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("install_data(%s_sources, install_dir: moduledir)\n" % self.project_name_underscore)
-            file_meson_build.write("\n")
+        text2 = (f"# main.py\n"
+                f"#\n",
+                f"# Copyright 2020\n",
+                f"#\n",
+                f"{self.gpl_text}",
+                f"\n",
+                f"import sys\n",
+                f"import gi\n",
+                f"\n",
+                f"gi.require_version('Gtk', '3.0')\n",
+                f"\n",
+                f"from gi.repository import Gtk, Gio\n",
+                f"\n",
+                f"from .window import {self.class_name}Window\n"",
+                f"\n",
+                f"\n",
+                f"class Application(Gtk.Application):\n",
+                f"    def __init__(self):\n",
+                f"        super().__init__(application_id='{self.project_id}',\n"",
+                f"                         flags=Gio.ApplicationFlags.FLAGS_NONE)\n",
+                f"\n",
+                f"    def do_activate(self):\n",
+                f"        win = self.props.active_window\n",
+                f"        if not win:\n",
+                f"            win = {self.class_name}Window(application=self)\n",
+                f"        win.present()\n",
+                f"\n",
+                f"\n",
+                f"def main(version):\n",
+                f"    app = Application()\n",
+                f"    return app.run(sys.argv)\n",
+                f"\n",)
 
-        with open(self.path + '/src/' + self.project_name + '.in', 'a') as file_exec:
-            file_exec.write("#!@PYTHON@\n")
-            file_exec.write("#\n")
-            file_exec.write("# %s.in\n" % self.project_name)
-            file_exec.write("#\n")
-            file_exec.write("# Copyright 2020\n")
-            file_exec.write("#\n")
-            file_exec.write(self.gpl_text)
-            file_exec.write("\n")
-            file_exec.write("import os\n")
-            file_exec.write("import sys\n")
-            file_exec.write("import signal\n")
-            file_exec.write("import gettext\n")
-            file_exec.write("\n")
-            file_exec.write("VERSION = '@VERSION@'\n")
-            file_exec.write("pkgdatadir = '@pkgdatadir@'\n")
-            file_exec.write("localedir = '@localedir@'\n")
-            file_exec.write("\n")
-            file_exec.write("sys.path.insert(1, pkgdatadir)\n")
-            file_exec.write("signal.signal(signal.SIGINT, signal.SIG_DFL)\n")
-            file_exec.write("gettext.install('%s', localedir)\n" % self.project_name)
-            file_exec.write("\n")
-            file_exec.write("if __name__ == '__main__':\n")
-            file_exec.write("    import gi\n")
-            file_exec.write("\n")
-            file_exec.write("    from gi.repository import Gio\n")
-            file_exec.write("    resource = Gio.Resource.load(os.path.join(pkgdatadir, '%s.gresource'))\n" % self.project_name)
-            file_exec.write("    resource._register()\n")
-            file_exec.write("\n")
-            file_exec.write("    from %s import main\n" % self.project_name_underscore)
-            file_exec.write("    sys.exit(main.main(VERSION))\n")
+        create_file(path + '/src/', 'main.py', text2)
+
+        text3 = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
+                f"moduledir = join_paths(pkgdatadir, '{self.project_name_underscore}')\n",
+                f"gnome = import('gnome')\n",
+                f"\n",
+                f"gnome.compile_resources('{self.project_name}',\n",
+                f"  '{self.project_name_underscore}.gresource.xml',\n",
+                f"  gresource_bundle: true,\n",
+                f"  install: true,\n",
+                f"  install_dir: pkgdatadir,\n",
+                f")\n",
+                f"\n",
+                f"desktop_utils = find_program('desktop-file-validate', required: false)\n",
+                f"if desktop_utils.found()\n",
+                f"  test('Validate desktop file', desktop_utils,\n",
+                f"    args: [desktop_file]\n",
+                f"  )\n",
+                f"endif\n",
+                f"\n",
+                f"python = import('python')\n",
+                f"\n",
+                f"conf = configuration_data()\n",
+                f"conf.set('PYTHON', python.find_installation('python3').path())\n",
+                f"conf.set('VERSION', meson.project_version())\n",
+                f"conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n",
+                f"conf.set('pkgdatadir', pkgdatadir)\n",
+                f"\n",
+                f"configure_file(\n",
+                f"  input: '{self.project_name}.in',\n",
+                f"  output: '{self.project_name}',\n",
+                f"  configuration: conf,\n",
+                f"  install: true,\n",
+                f"  install_dir: get_option('bindir')\n",
+                f")\n",
+                f"\n",
+                f"{self.project_name_underscore}_sources = [\n",
+                f"  '__init__.py',\n",
+                f"  'main.py',\n",
+                f"  'window.py',\n",
+                f"]\n",
+                f"\n",
+                f"install_data(%{self.project_name_underscore}_sources, install_dir: moduledir)\n",
+                f"\n",)
+
+        create_file(path + '/src/', 'meson.build', text3)
+
+        text4 = (f"#!@PYTHON@\n"",
+                f"#\n",
+                f"# {self.project_name}.in\n",
+                f"#\n",
+                f"# Copyright 2020\n",
+                f"#\n",
+                f"{self.gpl_text}",
+                f"import os\n",
+                f"import sys\n",
+                f"import signal\n",
+                f"import gettext\n",
+                f"\n",
+                f"VERSION = '@VERSION@'\n",
+                f"pkgdatadir = '@pkgdatadir@'\n",
+                f"localedir = '@localedir@'\n",
+                f"\n",
+                f"sys.path.insert(1, pkgdatadir)\n",
+                f"signal.signal(signal.SIGINT, signal.SIG_DFL)\n",
+                f"gettext.install('{self.project_name}', localedir)\n",
+                f"\n",
+                f"if __name__ == '__main__':\n",
+                f"    import gi\n",
+                f"\n",
+                f"    from gi.repository import Gio\n",
+                f"    resource = Gio.Resource.load(os.path.join(pkgdatadir, '{self.project_name}.gresource'))\n",
+                f"    resource._register()\n"",
+                f"\n",
+                f"    from {self.project_name_underscore} import main\n",
+                f"    sys.exit(main.main(VERSION))\n",)
+
+        create_file(path + '/src/', self.project_name + '.in', text4)
 
         st = os.stat(self.path + '/src/' + self.project_name + '.in')
         os.chmod(self.path + '/src/' + self.project_name + '.in', st.st_mode | stat.S_IEXEC)
@@ -221,25 +225,26 @@ class PythonTemplate(Template):
         files = ['window.ui']
         self.file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
 
-        with open(self.path + '/src/window.py', 'a') as file_py_window:
-            file_py_window.write("# window.py\n")
-            file_py_window.write("#\n")
-            file_py_window.write("# Copyright 2020\n")
-            file_py_window.write("#\n")
-            file_py_window.write(self.gpl_text)
-            file_py_window.write("\n")
-            file_py_window.write("from gi.repository import Gtk\n")
-            file_py_window.write("\n")
-            file_py_window.write("\n")
-            file_py_window.write("@Gtk.Template(resource_path='/%swindow.ui')\n" % self.project_id_reverse)
-            file_py_window.write("class %sWindow(Gtk.ApplicationWindow):\n" % self.class_name)
-            file_py_window.write("    __gtype_name__ = '%sWindow'\n" % self.class_name)
-            file_py_window.write("\n")
-            file_py_window.write("    label = Gtk.Template.Child()\n")
-            file_py_window.write("\n")
-            file_py_window.write("    def __init__(self, **kwargs):\n")
-            file_py_window.write("        super().__init__(**kwargs)\n")
-            file_py_window.write("\n")
+        text5 = (f"# window.py\n",
+                f"#\n",
+                f"# Copyright 2020\n",
+                f"#\n",
+                f"{self.gpl_text}",
+                f"\n",
+                f"from gi.repository import Gtk\n",
+                f"\n",
+                f"\n",
+                f"@Gtk.Template(resource_path='/{self.project_id_reverse}window.ui')\n",
+                f"class {self.class_name}Window(Gtk.ApplicationWindow):\n",
+                f"    __gtype_name__ = '{self.class_name}Window'\n",
+                f"\n",
+                f"    label = Gtk.Template.Child()\n",
+                f"\n",
+                f"    def __init__(self, **kwargs):\n",
+                f"        super().__init__(**kwargs)\n",
+                f"\n",)
+
+        create_file(path + '/src/', 'window.py', text5)
 
         self.file.create_window_ui_file(self.path, self.class_name)
     
