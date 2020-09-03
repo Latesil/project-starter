@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import stat
 
 def create_folders(folders):
     if len(folders) == 0:
@@ -36,3 +37,7 @@ def create_file(path, filename, text, empty=False):
         else:
             # TODO maybe there is another way to create an empty file?
             f.close()
+
+def make_executable(filename):
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC)

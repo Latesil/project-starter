@@ -107,7 +107,7 @@ class PythonTemplate(Template):
 
         create_file(path + '/src/', '__init__.py', text, empty=True)
 
-        text2 = (f"# main.py\n"
+        text_main = (f"# main.py\n"
                 f"#\n",
                 f"# Copyright 2020\n",
                 f"#\n",
@@ -140,9 +140,9 @@ class PythonTemplate(Template):
                 f"    return app.run(sys.argv)\n",
                 f"\n",)
 
-        create_file(path + '/src/', 'main.py', text2)
+        create_file(path + '/src/', 'main.py', text_main)
 
-        text3 = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
+        text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
                 f"moduledir = join_paths(pkgdatadir, '{self.project_name_underscore}')\n",
                 f"gnome = import('gnome')\n",
                 f"\n",
@@ -185,9 +185,9 @@ class PythonTemplate(Template):
                 f"install_data(%{self.project_name_underscore}_sources, install_dir: moduledir)\n",
                 f"\n",)
 
-        create_file(path + '/src/', 'meson.build', text3)
+        create_file(path + '/src/', 'meson.build', text_meson)
 
-        text4 = (f"#!@PYTHON@\n"",
+        text_id_in = (f"#!@PYTHON@\n"",
                 f"#\n",
                 f"# {self.project_name}.in\n",
                 f"#\n",
@@ -217,10 +217,8 @@ class PythonTemplate(Template):
                 f"    from {self.project_name_underscore} import main\n",
                 f"    sys.exit(main.main(VERSION))\n",)
 
-        create_file(path + '/src/', self.project_name + '.in', text4)
-
-        st = os.stat(self.path + '/src/' + self.project_name + '.in')
-        os.chmod(self.path + '/src/' + self.project_name + '.in', st.st_mode | stat.S_IEXEC)
+        create_file(path + '/src/', self.project_name + '.in', text_id_in)
+        make_executable(path + '/src/', self.project_name + '.in')
 
         files = ['window.ui']
         self.file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
