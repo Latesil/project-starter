@@ -153,7 +153,7 @@ class RustTemplate():
                          f"mod window;\n",
                          f"use crate::window::Window;\n",
                          f"\n",
-                         "fn main() {\n",
+                         f"fn main() {{\n",
                          f"    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));\n",
                          f"\n",
                          f"    setlocale(LocaleCategory::LcAll, \"\");\n",
@@ -165,21 +165,21 @@ class RustTemplate():
                          f"    gio::resources_register(&res);\n",
                          f"\n",
                          f"    let app = gtk::Application::new(Some(\"{p_id}\"), Default::default()).unwrap();\n",
-                         "    app.connect_activate(move |app| {\n",
+                         f"    app.connect_activate(move |app| {{\n",
                          f"        let window = Window::new();\n",
                          f"\n",
                          f"        window.widget.set_application(Some(app));\n",
                          f"        app.add_window(&window.widget);\n",
                          f"        window.widget.present();\n",
-                         "    });\n",
+                         f"    }});\n",
                          f"\n",
                          f"    let ret = app.run(&std::env::args().collect::<Vec<_>>());\n",
                          f"    std::process::exit(ret);\n",
-                         "}\n",)
+                         f"}}\n",)
         else:
-            text_main = ("fn main() {\n",
+            text_main = (f"fn main() {{\n",
                         f"    println!(\"Hello World\");\n",
-                        "}\n")
+                        f"}}\n")
 
         create_file(path + '/src/', 'main.rs', text_main)
 
@@ -251,20 +251,20 @@ class RustTemplate():
 
             text_window = (f"use gtk::prelude::*;\n",
                     f"\n",
-                    "pub struct Window {\n",
+                    f"pub struct Window {{\n",
                     f"    pub widget: gtk::ApplicationWindow,\n",
-                    "}\n",
+                    f"}}\n",
                     f"\n",
-                    "impl Window {\n",
-                    "    pub fn new() -> Self {\n",
+                    f"impl Window {{\n",
+                    f"    pub fn new() -> Self {{\n",
                     f"        let builder = gtk::Builder::new_from_resource(\"/{p_id_reverse_short}/window.ui\");\n",
                     f"        let widget: gtk::ApplicationWindow = builder\n",
                     f"            .get_object(\"window\")\n"",
                     f"            .expect(\"Failed to find the window object\");\n",
                     f"\n",
-                    "        Self { widget }\n",
-                    "    }\n",
-                    "}\n",)
+                    f"        Self {{ widget }}\n",
+                    f"    }}\n",
+                    f"}}\n",)
 
             create_file(path + '/src/', 'window.rs', text_window)
 
@@ -294,4 +294,4 @@ class RustTemplate():
                               f"""  </interface>\n""",)
 
             create_file(path + '/src/', 'window.ui', text_window_ui)
-            
+
