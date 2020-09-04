@@ -223,7 +223,7 @@ class PythonTemplate(Template):
         files = ['window.ui']
         self.file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
 
-        text5 = (f"# window.py\n",
+        text_window = (f"# window.py\n",
                 f"#\n",
                 f"# Copyright 2020\n",
                 f"#\n",
@@ -242,7 +242,7 @@ class PythonTemplate(Template):
                 f"        super().__init__(**kwargs)\n",
                 f"\n",)
 
-        create_file(path + '/src/', 'window.py', text5)
+        create_file(path + '/src/', 'window.py', text_window)
 
         self.file.create_window_ui_file(self.path, self.class_name)
     

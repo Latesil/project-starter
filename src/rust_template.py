@@ -17,9 +17,9 @@
 
 import sys
 import os
-import stat
 from .project_starter_constants import constants
 from .common_files import File
+from .helpers import *
 
 class RustTemplate():
 
@@ -57,55 +57,62 @@ class RustTemplate():
             self.file.create_manifest_file(path, p_id, p_name, self.lang)
             self.file.create_meson_postinstall_file(path)
 
-        with open(path + '/' + "meson.build", 'a') as file_meson_build:
-            file_meson_build.write("project('%s',\n" % p_name)
-            file_meson_build.write("          version: '0.1.0',\n")
-            file_meson_build.write("    meson_version: '>= %s',\n" % constants['MESON_VERSION'])
-            file_meson_build.write("  default_options: [ 'warning_level=2',\n")
-            file_meson_build.write("                   ],\n")
-            file_meson_build.write(")\n")
-            file_meson_build.write("\n")
-            if self.is_gui:
-                file_meson_build.write("i18n = import('i18n')\n")
-            file_meson_build.write("\n")
-            file_meson_build.write("\n")
-            if self.is_gui:
-                file_meson_build.write("subdir('data')\n")
-            file_meson_build.write("subdir('src')\n")
-            if self.is_gui:
-                file_meson_build.write("subdir('po')\n")
-            file_meson_build.write("\n")
-            if self.is_gui:
-                file_meson_build.write("meson.add_install_script('build-aux/meson/postinstall.py')\n")
+        text_meson = (f"project('{p_name}',\n",
+                      f"          version: '0.1.0',\n",
+                      f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
+                      f"  default_options: [ 'warning_level=2',\n",
+                      f"                   ],\n",
+                      f")\n",
+                      f"\n",)
 
-        with open(path + '/build-aux/cargo.sh', 'a') as file_cargo_shell_script:
-            file_cargo_shell_script.write("#!/bin/sh\n")
-            file_cargo_shell_script.write("\n")
-            file_cargo_shell_script.write("export MESON_BUILD_ROOT=\"$1\"\n")
-            file_cargo_shell_script.write("export MESON_SOURCE_ROOT=\"$2\"\n")
-            file_cargo_shell_script.write("export CARGO_TARGET_DIR=\"$MESON_BUILD_ROOT\"/target\n")
-            file_cargo_shell_script.write("export CARGO_HOME=\"$CARGO_TARGET_DIR\"/cargo-home\n")
-            file_cargo_shell_script.write("export OUTPUT=\"$3\"\n")
-            file_cargo_shell_script.write("export BUILDTYPE=\"$4\"\n")
-            file_cargo_shell_script.write("export APP_BIN=\"$5\"\n")
-            file_cargo_shell_script.write("\n")
-            file_cargo_shell_script.write("\n")
-            file_cargo_shell_script.write("if [[ $BUILDTYPE = \"release\" ]]\n")
-            file_cargo_shell_script.write("then\n")
-            file_cargo_shell_script.write("    echo \"RELEASE MODE\"\n")
-            file_cargo_shell_script.write("    cargo build --manifest-path \\\n")
-            file_cargo_shell_script.write("        \"$MESON_SOURCE_ROOT\"/Cargo.toml --release && \\\n")
-            file_cargo_shell_script.write("        cp \"$CARGO_TARGET_DIR\"/release/\"$APP_BIN\" \"$OUTPUT\"\n")
-            file_cargo_shell_script.write("else\n")
-            file_cargo_shell_script.write("    echo \"DEBUG MODE\"\n")
-            file_cargo_shell_script.write("    cargo build --manifest-path \\\n")
-            file_cargo_shell_script.write("        \"$MESON_SOURCE_ROOT\"/Cargo.toml --verbose && \\\n")
-            file_cargo_shell_script.write("        cp \"$CARGO_TARGET_DIR\"/debug/\"$APP_BIN\" \"$OUTPUT\"\n")
-            file_cargo_shell_script.write("fi\n")
-            file_cargo_shell_script.write("\n")
+        if self.is_gui:
+            text_meson += ("i18n = import('i18n')\n",)
 
-        st = os.stat(path + '/build-aux/cargo.sh')
-        os.chmod(path + '/build-aux/cargo.sh', st.st_mode | stat.S_IEXEC)
+        text_meson += (f"\n",
+                       f"\n",)
+
+        if self.is_gui:
+            text_meson += ("subdir('data')\n",)
+
+        text_meson += (f"subdir('src')\n",)
+
+        if self.is_gui:
+            text_meson += ("subdir('po')\n",)
+
+        text_meson += (f"\n",)
+
+        if self.is_gui:
+            text_meson += ("meson.add_install_script('build-aux/meson/postinstall.py')\n",)
+
+        create_file(path + '/', 'meson.build', text_meson)
+
+        text_cargo = (f"""#!/bin/sh\n""",
+                      f"""\n""",
+                      f"""export MESON_BUILD_ROOT="$1"\n""",
+                      f"""export MESON_SOURCE_ROOT="$2"\n""",
+                      f"""export CARGO_TARGET_DIR="$MESON_BUILD_ROOT"/target\n""",
+                      f"""export CARGO_HOME="$CARGO_TARGET_DIR"/cargo-home\n""",
+                      f"""export OUTPUT="$3"\n""",
+                      f"""export BUILDTYPE="$4"\n""",
+                      f"""export APP_BIN="$5"\n""",
+                      f"""\n""",
+                      f"""\n""",
+                      f"""if [[ $BUILDTYPE = "release" ]]\n""",
+                      f"""then\n""",
+                      f"""    echo "RELEASE MODE"\n""",
+                      f"""    cargo build --manifest-path \\\n""",
+                      f"""        "$MESON_SOURCE_ROOT"/Cargo.toml --release && \\\n""",
+                      f"""        cp "$CARGO_TARGET_DIR"/release/"$APP_BIN" "$OUTPUT"\n""",
+                      f"""else\n""",
+                      f"""    echo "DEBUG MODE"\n""",
+                      f"""    cargo build --manifest-path \\\n""",
+                      f"""        "$MESON_SOURCE_ROOT"/Cargo.toml --verbose && \\\n""",
+                      f"""        cp "$CARGO_TARGET_DIR"/debug/"$APP_BIN" "$OUTPUT"\n""",
+                      f"""fi\n""",
+                      f"""\n""",)
+        
+        create_file(path + '/build-aux/', 'cargo.sh', text_cargo)
+        make_executable(path + '/build-aux/cargo.sh')
 
     def populate_data_folder(self, p_id, p_name):
         p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
@@ -131,161 +138,160 @@ class RustTemplate():
         p_id_reverse_short = p_id.replace('.', '/')
 
         if self.is_gui:
-            with open(self.path + '/src/config.rs.in', 'a') as file_config_rs:
-                file_config_rs.write("pub static PKGDATADIR: &str = @pkgdatadir@;\n")
-                file_config_rs.write("pub static VERSION: &str = @VERSION@;\n")
-                file_config_rs.write("pub static LOCALEDIR: &str = @localedir@;\n")
+            text_config = (f"pub static PKGDATADIR: &str = @pkgdatadir@;\n",
+                           f"pub static VERSION: &str = @VERSION@;\n",
+                           f"pub static LOCALEDIR: &str = @localedir@;\n",)
+            
+            create_file(path + '/src/', 'config.rs.in', text_config)
 
-        with open(self.path + '/src/main.rs', 'a') as file_rs_main:
-            if self.is_gui:
-                file_rs_main.write("use gettextrs::*;\n")
-                file_rs_main.write("use gio::prelude::*;\n")
-                file_rs_main.write("use gtk::prelude::*;\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("mod config;\n")
-                file_rs_main.write("mod window;\n")
-                file_rs_main.write("use crate::window::Window;\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("fn main() {\n")
-                file_rs_main.write("    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("    setlocale(LocaleCategory::LcAll, \"\");\n")
-                file_rs_main.write("    bindtextdomain(\"%s\", config::LOCALEDIR);\n" % p_name)
-                file_rs_main.write("    textdomain(\"%s\");\n" % p_name)
-                file_rs_main.write("\n")
-                file_rs_main.write("    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/%s.gresource\")\n" % p_name)
-                file_rs_main.write("        .expect(\"Could not load resources\");\n")
-                file_rs_main.write("    gio::resources_register(&res);\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("    let app = gtk::Application::new(Some(\"%s\"), Default::default()).unwrap();\n" % p_id)
-                file_rs_main.write("    app.connect_activate(move |app| {\n")
-                file_rs_main.write("        let window = Window::new();\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("        window.widget.set_application(Some(app));\n")
-                file_rs_main.write("        app.add_window(&window.widget);\n")
-                file_rs_main.write("        window.widget.present();\n")
-                file_rs_main.write("    });\n")
-                file_rs_main.write("\n")
-                file_rs_main.write("    let ret = app.run(&std::env::args().collect::<Vec<_>>());\n")
-                file_rs_main.write("    std::process::exit(ret);\n")
-                file_rs_main.write("}\n")
-            else:
-                file_rs_main.write("fn main() {\n")
-                file_rs_main.write("    println!(\"Hello World\");\n")
-                file_rs_main.write("}\n")
+        if self.is_gui:
+            text_main = (f"use gettextrs::*;\n",
+                         f"use gio::prelude::*;\n",
+                         f"use gtk::prelude::*;\n",
+                         f"\n",
+                         f"mod config;\n",
+                         f"mod window;\n",
+                         f"use crate::window::Window;\n",
+                         f"\n",
+                         "fn main() {\n",
+                         f"    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));\n",
+                         f"\n",
+                         f"    setlocale(LocaleCategory::LcAll, \"\");\n",
+                         f"    bindtextdomain(\"{p_name}\", config::LOCALEDIR);\n",
+                         f"    textdomain(\"%{p_name}\");\n",
+                         f"\n",
+                         f"    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/{p_name}.gresource\")\n",
+                         f"        .expect(\"Could not load resources\");\n",
+                         f"    gio::resources_register(&res);\n",
+                         f"\n",
+                         f"    let app = gtk::Application::new(Some(\"{p_id}\"), Default::default()).unwrap();\n",
+                         "    app.connect_activate(move |app| {\n",
+                         f"        let window = Window::new();\n",
+                         f"\n",
+                         f"        window.widget.set_application(Some(app));\n",
+                         f"        app.add_window(&window.widget);\n",
+                         f"        window.widget.present();\n",
+                         "    });\n",
+                         f"\n",
+                         f"    let ret = app.run(&std::env::args().collect::<Vec<_>>());\n",
+                         f"    std::process::exit(ret);\n",
+                         "}\n",)
+        else:
+            text_main = ("fn main() {\n",
+                        f"    println!(\"Hello World\");\n",
+                        "}\n")
 
-        with open(self.path + '/src/meson.build', 'a') as file_meson_build:
-            if self.is_cli:
-                file_meson_build.write("pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n")
-                file_meson_build.write("gnome = import('gnome')\n")
-                file_meson_build.write("\n")
-                file_meson_build.write("gnome.compile_resources('%s',\n" % p_name)
-                file_meson_build.write("  '%s.gresource.xml',\n" % p_name_underscore)
-                file_meson_build.write("  gresource_bundle: true,\n")
-                file_meson_build.write("  install: true,\n")
-                file_meson_build.write("  install_dir: pkgdatadir,\n")
-                file_meson_build.write(")\n")
-                file_meson_build.write("\n")
-                file_meson_build.write("conf = configuration_data()\n")
-                file_meson_build.write("conf.set_quoted('VERSION', meson.project_version())\n")
-                file_meson_build.write("conf.set_quoted('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n")
-                file_meson_build.write("conf.set_quoted('pkgdatadir', pkgdatadir)\n")
-                file_meson_build.write("\n")
-                file_meson_build.write("configure_file(\n")
-                file_meson_build.write("  input: 'config.rs.in',\n")
-                file_meson_build.write("  output: 'config.rs',\n")
-                file_meson_build.write("  configuration: conf,\n")
-                file_meson_build.write(")\n")
-                file_meson_build.write("\n")
-                file_meson_build.write("# Copy the config.rs output to the source directory.\n")
-                file_meson_build.write("run_command(\n")
-                file_meson_build.write("  'cp',\n")
-                file_meson_build.write("  join_paths(meson.build_root(), 'src', 'config.rs'),\n")
-                file_meson_build.write("  join_paths(meson.source_root(), 'src', 'config.rs'),\n")
-                file_meson_build.write("  check: true\n")
-                file_meson_build.write(")\n")
-                file_meson_build.write("\n")
-            if self.is_cli:
-                file_meson_build.write("sources = files(\n")
-                file_meson_build.write("  'config.rs',\n")
-                file_meson_build.write("  'main.rs',\n")
-                file_meson_build.write("  'window.rs',\n")
-                file_meson_build.write(")\n")
-            else:
-                file_meson_build.write("%s_sources = [\n" % p_name_underscore)
-                file_meson_build.write("  'main.rs',\n")
-                file_meson_build.write("]\n")
-            file_meson_build.write("\n")
-            if not self.is_cli:
-                file_meson_build.write("%s_deps = [\n" % p_name_underscore)
-                file_meson_build.write("]\n")
-            file_meson_build.write("cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n")
-            file_meson_build.write("cargo_release = custom_target(\n")
-            file_meson_build.write("  'cargo-build',\n")
-            file_meson_build.write("  build_by_default: true,\n")
-            if self.is_gui:
-                file_meson_build.write("  input: sources,\n")
-            else:
-                file_meson_build.write("  input: %s_sources,\n" % p_name_underscore)
-            file_meson_build.write("  output: meson.project_name(),\n")
-            file_meson_build.write("  console: true,\n")
-            file_meson_build.write("  install: true,\n")
-            file_meson_build.write("  install_dir: get_option('bindir'),\n")
-            file_meson_build.write("  command: [\n")
-            file_meson_build.write("    cargo_script,\n")
-            file_meson_build.write("    meson.build_root(),\n")
-            file_meson_build.write("    meson.source_root(),\n")
-            file_meson_build.write("    '@OUTPUT@',\n")
-            file_meson_build.write("    get_option('buildtype'),\n")
-            file_meson_build.write("    meson.project_name(),\n")
-            file_meson_build.write("  ]\n")
-            file_meson_build.write(")\n")
+        create_file(path + '/src/', 'main.rs', text_main)
+
+        if self.is_cli:
+            text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
+                         f"gnome = import('gnome')\n",
+                         f"\n",
+                         f"gnome.compile_resources('{p_name}',\n",
+                         f"  '{p_name_underscore}.gresource.xml',\n",
+                         f"  gresource_bundle: true,\n"",
+                         f"  install: true,\n",
+                         f"  install_dir: pkgdatadir,\n",
+                         f")\n"",
+                         f"\n"",
+                         f"conf = configuration_data()\n",
+                         f"conf.set_quoted('VERSION', meson.project_version())\n",
+                         f"conf.set_quoted('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n",
+                         f"conf.set_quoted('pkgdatadir', pkgdatadir)\n",
+                         f"\n",
+                         f"configure_file(\n",
+                         f"  input: 'config.rs.in',\n",
+                         f"  output: 'config.rs',\n",
+                         f"  configuration: conf,\n",
+                         f")\n",
+                         f"\n",
+                         f"# Copy the config.rs output to the source directory.\n",
+                         f"run_command(\n",
+                         f"  'cp',\n",
+                         f"  join_paths(meson.build_root(), 'src', 'config.rs'),\n",
+                         f"  join_paths(meson.source_root(), 'src', 'config.rs'),\n",
+                         f"  check: true\n",
+                         f")\n",
+                         f"\n",
+                         f"sources = files(\n",
+                         f"  'config.rs',\n",
+                         f"  'main.rs',\n",
+                         f"  'window.rs',\n",
+                         f")\n",
+                         f"{p_name_underscore}_sources = [",
+                         f"  'main.rs',\n",
+                         f"]\n",
+                         f"{p_name_underscore}_deps = [\n",
+                         f"]\n",
+                         f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
+                         f"cargo_release = custom_target(\n",
+                         f"  'cargo-build',\n",
+                         f"  build_by_default: true,\n",
+                         f"  input: sources,\n",
+                         f"  input: {p_name_underscore}_sources,\n",
+                         f"  output: meson.project_name(),\n",
+                         f"  console: true,\n",
+                         f"  install: true,\n",
+                         f"  install_dir: get_option('bindir'),\n",
+                         f"  command: [\n",
+                         f"    cargo_script,\n",
+                         f"    meson.build_root(),\n",
+                         f"    meson.source_root(),\n",
+                         f"    '@OUTPUT@',\n",
+                         f"    get_option('buildtype'),\n",
+                         f"    meson.project_name(),\n",
+                         f" ]\n",
+                         f")\n",)
+
+        create_file(path + '/src/', 'meson.build', text_meson)
 
         if self.is_gui:
             files = ['window.ui']
             self.file.create_gresource_file(path, p_name_underscore, p_id_reverse, files)
 
-            with open(self.path + '/src/window.rs', 'a') as file_py_window:
-                file_py_window.write("use gtk::prelude::*;\n")
-                file_py_window.write("\n")
-                file_py_window.write("pub struct Window {\n")
-                file_py_window.write("    pub widget: gtk::ApplicationWindow,\n")
-                file_py_window.write("}\n")
-                file_py_window.write("\n")
-                file_py_window.write("impl Window {\n")
-                file_py_window.write("    pub fn new() -> Self {\n")
-                file_py_window.write("        let builder = gtk::Builder::new_from_resource(\"/%s/window.ui\");\n" % p_id_reverse_short)
-                file_py_window.write("        let widget: gtk::ApplicationWindow = builder\n")
-                file_py_window.write("            .get_object(\"window\")\n")
-                file_py_window.write("            .expect(\"Failed to find the window object\");\n")
-                file_py_window.write("\n")
-                file_py_window.write("        Self { widget }\n")
-                file_py_window.write("    }\n")
-                file_py_window.write("}\n")
+            text_window = (f"use gtk::prelude::*;\n",
+                    f"\n",
+                    "pub struct Window {\n",
+                    f"    pub widget: gtk::ApplicationWindow,\n",
+                    "}\n",
+                    f"\n",
+                    "impl Window {\n",
+                    "    pub fn new() -> Self {\n",
+                    f"        let builder = gtk::Builder::new_from_resource(\"/{p_id_reverse_short}/window.ui\");\n",
+                    f"        let widget: gtk::ApplicationWindow = builder\n",
+                    f"            .get_object(\"window\")\n"",
+                    f"            .expect(\"Failed to find the window object\");\n",
+                    f"\n",
+                    "        Self { widget }\n",
+                    "    }\n",
+                    "}\n",)
 
-            with open(self.path + '/src/window.ui', 'a') as file_window_ui:
-                file_window_ui.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-                file_window_ui.write("<interface>\n")
-                file_window_ui.write("  <requires lib=\"gtk+\" version=\"3.24\"/>\n")
-                file_window_ui.write("    <object class=\"GtkApplicationWindow\" id=\"window\">\n")
-                file_window_ui.write("      <property name=\"default-width\">600</property>\n")
-                file_window_ui.write("    <property name=\"default-height\">300</property>\n")
-                file_window_ui.write("    <child type=\"titlebar\">\n")
-                file_window_ui.write("      <object class=\"GtkHeaderBar\" id=\"header_bar\">\n")
-                file_window_ui.write("        <property name=\"visible\">True</property>\n")
-                file_window_ui.write("        <property name=\"show-close-button\">True</property>\n")
-                file_window_ui.write("        <property name=\"title\">Hello, World!</property>\n")
-                file_window_ui.write("      </object>\n")
-                file_window_ui.write("    </child>\n")
-                file_window_ui.write("    <child>\n")
-                file_window_ui.write("      <object class=\"GtkLabel\" id=\"label\">\n")
-                file_window_ui.write("        <property name=\"label\">Hello, World!</property>\n")
-                file_window_ui.write("        <property name=\"visible\">True</property>\n")
-                file_window_ui.write("        <attributes>\n")
-                file_window_ui.write("          <attribute name=\"weight\" value=\"bold\"/>\n")
-                file_window_ui.write("          <attribute name=\"scale\" value=\"2\"/>\n")
-                file_window_ui.write("        </attributes>\n")
-                file_window_ui.write("      </object>\n")
-                file_window_ui.write("    </child>\n")
-                file_window_ui.write("    </object>\n")
-                file_window_ui.write("  </interface>\n")
+            create_file(path + '/src/', 'window.rs', text_window)
+
+            text_window_ui = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+                              f"""<interface>\n""",
+                              f"""  <requires lib="gtk+" version="3.24"/>\n""",
+                              f"""    <object class="GtkApplicationWindow" id="window">\n""",
+                              f"""      <property name="default-width">600</property>\n""",
+                              f"""    <child type="titlebar">\n""",
+                              f"""      <object class="GtkHeaderBar" id="header_bar">\n""",
+                              f"""        <property name="visible">True</property>\n""",
+                              f"""        <property name="show-close-button">True</property>\n""",
+                              f"""        <property name="title">Hello, World!</property>\n""",
+                              f"""      </object>\n""",
+                              f"""    </child>\n""",
+                              f"""    <child>\n""",
+                              f"""      <object class="GtkLabel" id="label">\n""",
+                              f"""        <property name="label">Hello, World!</property>\n""",
+                              f"""        <property name="visible">True</property>\n""",
+                              f"""        <attributes>\n""",
+                              f"""          <attribute name="weight" value="bold"/>\n""",
+                              f"""          <attribute name="scale" value="2"/>\n""",
+                              f"""        </attributes>\n""",
+                              f"""      </object>\n"""",
+                              f"""    </child>\n""",
+                              f"""    </object>\n""",
+                              f"""  </interface>\n""",)
+
+            create_file(path + '/src/', 'window.ui', text_window_ui)
+            
