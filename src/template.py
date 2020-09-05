@@ -16,17 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from ..common_files import CommonFile
-from ..helpers import *
+from .common_files import CommonFile
+from .helpers import *
+
 
 class Template:
-
     folders = []
 
     def __init__(self, root):
         self.root = root if root.endswith('/') else root + '/'
-        self.create_folders(folders)
-
 
     def populate_data_folder(self, project_id, project_name):
         self.CommonFile.create_data_meson_file(self.path, self.project_full_name)
@@ -37,14 +35,15 @@ class Template:
     def prepare_manifest(self, filename):
         pass
 
-    def create_folders(folders):
+    def create_folders(self, folders):
         if len(folders) == 0:
             print('Folder creation error: empty list')
             return
-        
+
         for f in folders:
-            dir = self.root + f
-            if not os.path.exists(dir):
-                os.mkdir(dir)
+            directory = self.root + f
+            if not os.path.exists(directory):
+                os.mkdir(directory)
             else:
                 print(f'Folder with name {f} already exists!')
+                

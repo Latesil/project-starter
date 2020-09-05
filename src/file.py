@@ -25,10 +25,10 @@ class File:
         self.filename = filename
         self.text = text
 
-    def create(path, filename, text):
-        with open(path + filename, 'a') as f:
-            if text:
-                f.writelines(text)
+    def create(self):
+        with open(self.path + self.filename, 'a') as f:
+            if self.text:
+                f.writelines(self.text)
             else:
                 # TODO maybe there is another way to create an empty file?
                 f.close()  

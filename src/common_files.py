@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .project_starter_constants import constants
-from .helpers import *
+from .helpers import create_file, make_executable
+from .file import File
 
 class CommonFile:
 
@@ -40,27 +41,29 @@ class CommonFile:
 
     def create_copying_file(self, path, project_license):
         if project_license == 'GPL 3':
-            from .licenses.gpl import Gpl
+            from .gpl import Gpl
             license = Gpl('3')
         elif project_license == 'GPL 2':
-            from .licenses.gpl import Gpl
+            from .gpl import Gpl
             license = Gpl('2')
         elif project_license == 'AGPL 3':
-            from .licenses.agpl import Agpl
+            from .agpl import Agpl
             license = Agpl()
         elif project_license == 'Apache 2':
-            from .licenses.apache import Apache
+            from .apache import Apache
             license = Apache()
         elif project_license == 'LGPL 3':
-            from .licenses.lgpl import Lgpl
+            from .lgpl import Lgpl
             license = Lgpl('3')
         elif project_license == 'LGPL 2':
-            from .licenses.lgpl import Lgpl
+            from .lgpl import Lgpl
             license = Lgpl('2')
         elif project_license == 'MIT/X11':
-            from .licenses.mit import Mit
+            from .mit import Mit
             license = Mit()
-        create_file(path, 'COPYING', license.get_text())
+
+        f = File(path, 'COPYING', license.get_text())
+        return f
 
     def create_manifest_file(self, path, p_id, p_name, command, lang, sdk_extension=None, build_options=None):
         text = (f"""app-id: {p_id}\n""",
@@ -102,17 +105,22 @@ class CommonFile:
                 f"""      - type: dir\n""",
                 f"""      - .\n""",)
 
-        create_file(path + '/', p_id + ".yaml", text)
+        f = File(path, p_id + ".yaml", text)
+        return f
 
     def create_po_meson_file(self, path, p_name):
         text = (f"i18n.gettext('{p_name}', preset: 'glib')\n",)
 
-        create_file(path, 'meson.build', text)
+        f = File(path, 'meson.build', text)
+        return f
+
+        
 
     def create_po_linguas_file(self, path):
         text = ()
 
-        create_file(path, 'LINGUAS', text, empty=True)
+        f = File(path, 'LINGUAS', text)
+        return f
 
     def create_po_potfiles_file(self, path, p_id, files):
         if not isinstance(files, list):
@@ -128,7 +136,8 @@ class CommonFile:
 
         text += (f"\n",)
 
-        create_file(path, 'POTFILES', text)
+        f = File(path, 'POTFILES', text)
+        return f
 
     def create_meson_postinstall_file(self, path):
         text = (f"#!/usr/bin/env python3\n",
@@ -152,7 +161,8 @@ class CommonFile:
                 f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
                 f"\n",)
 
-        create_file(path + '/build-aux/meson/', 'postinstall.py', text)
+        f = File(path + '/build-aux/meson/', 'postinstall.py', text)
+        return f
 
     def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
         text = (f"[Desktop Entry]\n",
@@ -167,7 +177,8 @@ class CommonFile:
                  f"StartupNotify=true\n",
                  f"Icon={p_id}\n",)
 
-        create_file(path, p_full_name + '.desktop.in', text)
+        f = File(path, p_full_name + '.desktop.in', text)
+        return f
 
     def create_gschema_file(self, path, p_full_name, p_name, p_path):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
@@ -176,7 +187,8 @@ class CommonFile:
                 f"""    </schema>\n""",
                 f"""</schemalist>\n""",)
 
-        create_file(path, p_full_name + '.gschema.xml', text)
+        f = File(path, p_full_name + '.gschema.xml', text)
+        return f
 
     def create_data_meson_file(self, path, p_full_name):
         text = (f"desktop_file = i18n.merge_file(\n",
@@ -222,7 +234,8 @@ class CommonFile:
                 f"endif\n",
                 f"\n",)
 
-        create_file(path, 'meson.build', text)
+        f = File(path, 'meson.build', text)
+        return f
 
     def create_appdata_file(self, path, p_id, project_license):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
@@ -250,7 +263,8 @@ class CommonFile:
                 f"""</component>\n""",
                 f"""\n""",)
 
-        create_file(path, p_id + '.appdata.xml.in', text)
+        f = File(path, p_id + '.appdata.xml.in', text)
+        return f
 
     def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short, files):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
@@ -264,7 +278,8 @@ class CommonFile:
                 f"""</gresources>\n""",
                 f"""\n""",)
 
-        create_file(path + '/src/', p_name_underscore + '.gresource.xml', text)
+        f = File(path + '/src/', p_name_underscore + '.gresource.xml', text)
+        return f
 
     def create_window_ui_file(self, path, window_name):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
@@ -294,5 +309,5 @@ class CommonFile:
                 f"""    </template>\n""",
                 f"""  </interface>\n""",)
 
-        create_file(path + '/src/', 'window.ui', text)
-
+        f = File(path + '/src/', 'window.ui', text)
+        return f

@@ -1,3 +1,5 @@
 .flatpak-builder/
 build-dir
 builddir
+.idea
+venv
