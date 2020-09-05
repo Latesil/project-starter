@@ -250,35 +250,34 @@ class CTemplate():
 
         create_file(path + '/src/', 'main.c', text_main)
         
-        with open(self.path + '/src/meson.build', 'a') as file_meson_build:
-            text_meson = (f"{p_id_underscore}_sources = [\n",
-                          f"  'main.c',\n",)
+        text_meson = (f"{p_id_underscore}_sources = [\n",
+                        f"  'main.c',\n",)
 
-            if self.is_gui:
-                text_meson += (f"  '{p_id_underscore}-window.c',\n",)
+        if self.is_gui:
+            text_meson += (f"  '{p_id_underscore}-window.c',\n",)
 
-            text_meson += (f"]\n",
-                           f"\n",
-                           f"{p_id_underscore}_deps = [\n",
-                           f"  dependency('gio-2.0', version: '>= 2.50'),\n",)
+        text_meson += (f"]\n",
+                        f"\n",
+                        f"{p_id_underscore}_deps = [\n",
+                        f"  dependency('gio-2.0', version: '>= 2.50'),\n",)
 
-            if self.is_gui:
-                text_meson += (f"  dependency('gtk+-3.0', version: '>= 3.22'),\n",)
+        if self.is_gui:
+            text_meson += (f"  dependency('gtk+-3.0', version: '>= 3.22'),\n",)
 
-            text_meson += (f"]\n",
-                           f"\n",
-                           f"gnome = import('gnome')\n",
-                           f"\n",
-                           f"{p_id_underscore}_sources += gnome.compile_resources('{p_id_underscore}-resources',\n",
-                           f"  '{p_id_underscore}.gresource.xml',\n",
-                           f"  c_name: '{p_id_underscore}'\n",
-                           f")\n",
-                           f"\n",
-                           f"executable('{p_name}', {p_name_underscore}_sources,\n",
-                           f"  dependencies: {p_id_underscore}_deps,\n",
-                           f"  install: true,\n",
-                           f")\n",
-                           f"\n",)
+        text_meson += (f"]\n",
+                        f"\n",
+                        f"gnome = import('gnome')\n",
+                        f"\n",
+                        f"{p_id_underscore}_sources += gnome.compile_resources('{p_id_underscore}-resources',\n",
+                        f"  '{p_id_underscore}.gresource.xml',\n",
+                        f"  c_name: '{p_id_underscore}'\n",
+                        f")\n",
+                        f"\n",
+                        f"executable('{p_name}', {p_name_underscore}_sources,\n",
+                        f"  dependencies: {p_id_underscore}_deps,\n",
+                        f"  install: true,\n",
+                        f")\n",
+                        f"\n",)
         
         create_file(path + '/src/', 'meson.build', text_meson)
 
