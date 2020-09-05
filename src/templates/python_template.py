@@ -17,14 +17,15 @@
 
 import sys
 import os
-import stat
 from gi.repository import GLib
-from .project_starter_constants import constants
-from .common_files import File
+from ..project_starter_constants import constants
+from ..common_files import CommonFile
 from .template import Template
-from .helpers import *
+from ..helpers import create_file, make_executable
 
 class PythonTemplate(Template):
+
+    folders = ['build-aux/meson', 'data', 'src', 'po']
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
         self.is_gui = is_gui
@@ -34,8 +35,8 @@ class PythonTemplate(Template):
         self.is_git = is_git
         self.lang = 'python'
         self.license = license
-        self.file = File()
-        self.gpl_text = self.file.get_gpl()
+        self.common_file = CommonFile()
+        self.gpl_text = self.common_file.get_gpl()
 
         ########################################################################
 
@@ -66,9 +67,9 @@ class PythonTemplate(Template):
 
         path = self.path + '/'
 
-        self.file.create_copying_file(path, self.license)
-        self.file.create_manifest_file(path, self.project_full_name, self.project_name, self.project_name, self.lang)
-        self.file.create_meson_postinstall_file(path)
+        self.common_file.create_copying_file(path, self.license)
+        self.common_file.create_manifest_file(path, self.project_full_name, self.project_name, self.project_name, self.lang)
+        self.common_file.create_meson_postinstall_file(path)
 
         text = (f"project('{self.project_name}',\n",
                 f"          version: '0.1.0',\n",
@@ -90,17 +91,17 @@ class PythonTemplate(Template):
 
     def populate_data_folder(self, project_id, project_name):
         path = self.path + '/data/'
-        self.file.create_data_meson_file(path, self.project_full_name)
-        self.file.create_appdata_file(path, self.project_full_name, self.license)
-        self.file.create_desktop_file(path, self.project_full_name, self.project_name, self.project_id)
-        self.file.create_gschema_file(path, self.project_full_name, self.project_name, self.project_path)
+        self.common_file.create_data_meson_file(path, self.project_full_name)
+        self.common_file.create_appdata_file(path, self.project_full_name, self.license)
+        self.common_file.create_desktop_file(path, self.project_full_name, self.project_name, self.project_id)
+        self.common_file.create_gschema_file(path, self.project_full_name, self.project_name, self.project_path)
 
     def populate_po_dir(self, project_id, project_name):
         files = ['window.ui', 'main.py', 'window.py']
         path = self.path + '/po/'
-        self.file.create_po_linguas_file(path)
-        self.file.create_po_meson_file(path, self.project_name)
-        self.file.create_po_potfiles_file(path, self.project_id, files)
+        self.common_file.create_po_linguas_file(path)
+        self.common_file.create_po_meson_file(path, self.project_name)
+        self.common_file.create_po_potfiles_file(path, self.project_id, files)
 
     def populate_src_dir(self, project_id, project_name):
         text = ()
@@ -221,7 +222,7 @@ class PythonTemplate(Template):
         make_executable(path + '/src/', self.project_name + '.in')
 
         files = ['window.ui']
-        self.file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
+        self.common_file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
 
         text_window = (f"# window.py\n",
                 f"#\n",
@@ -244,5 +245,5 @@ class PythonTemplate(Template):
 
         create_file(path + '/src/', 'window.py', text_window)
 
-        self.file.create_window_ui_file(self.path, self.class_name)
+        self.common_file.create_window_ui_file(self.path, self.class_name)
     

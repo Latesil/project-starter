@@ -22,6 +22,7 @@ import os.path
 from os import path
 from .about_window import AboutWindow
 from .keyboard_shortcuts import KeyboardShortcutsWindow
+from .templates import template
 
 @Gtk.Template(resource_path='/com/github/Latesil/project-starter/window.ui')
 class ProjectStarterWindow(Gtk.ApplicationWindow):
@@ -114,24 +115,24 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
         # Create template class on main button click and call start() function
 
         if self.language == 'Python':
-            from .python_template import PythonTemplate
+            from .templates.python_template import PythonTemplate
             self.complete_template = PythonTemplate(is_gui, self.project_id, self.project_name,
                                                     self.project_full_path, self.is_git, self.license)
         elif self.language == 'Rust':
-            from .rust_template import RustTemplate
+            from templates.rust_template import RustTemplate
             self.complete_template = RustTemplate(is_gui, self.project_id, self.project_name,
                                                     self.project_full_path, self.is_git, self.license)
         elif self.language == 'C':
-            from .c_template import CTemplate
+            from templates.c_template import CTemplate
             self.complete_template = CTemplate(is_gui, self.project_id, self.project_name,
                                                     self.project_full_path, self.is_git, self.license)
         elif self.language == 'JS':
             if self.template == 'GNOME Extension':
-                from .gnome_extension_template import GnomeExtensionTemplate
+                from .templates.gnome_extension_template import GnomeExtensionTemplate
                 self.complete_template = GnomeExtensionTemplate(self.ext_name, self.ext_uuid, self.ext_description, self.is_git)
                 self.project_full_path = GLib.get_home_dir() + '/.local/share/gnome-shell/extensions/' + self.ext_uuid
             else:
-                from .js_template import JsTemplate
+                from .templates.js_template import JsTemplate
                 self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,
                                                     self.project_full_path, self.is_git, self.license)
 

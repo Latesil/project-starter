@@ -1,4 +1,4 @@
-# helpers.py
+# file.py
 #
 # Copyright 2020 Latesil
 #
@@ -15,17 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .project_starter_constants import constants
 import os
-import stat
 
-def create_file(path, filename, text, empty=False):
-    with open(path + filename, 'a') as f:
-        if not empty:
-            f.writelines(text)
-        else:
-            # TODO maybe there is another way to create an empty file?
-            f.close()
+class File:
 
-def make_executable(filename):
-    st = os.stat(filename)
-    os.chmod(filename, st.st_mode | stat.S_IEXEC)
+    def __init__(self, path, filename, text):
+        self.path = path if path.endswith('/') else path + '/'
+        self.filename = filename
+        self.text = text
+
+    def create(path, filename, text):
+        with open(path + filename, 'a') as f:
+            if text:
+                f.writelines(text)
+            else:
+                # TODO maybe there is another way to create an empty file?
+                f.close()  
