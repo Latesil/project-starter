@@ -23,27 +23,18 @@ from .helpers import *
 class Template:
     folders = []
 
-    def __init__(self, root):
-        self.root = root if root.endswith('/') else root + '/'
-
-    def populate_data_folder(self, project_id, project_name):
-        self.CommonFile.create_data_meson_file(self.path, self.project_full_name)
-        self.CommonFile.create_appdata_file(self.path, self.project_full_name, self.license)
-        self.CommonFile.create_desktop_file(self.path, self.project_full_name, self.project_name, self.project_id)
-        self.CommonFile.create_gschema_file(self.path, self.project_full_name, self.project_name, p_path)
-
     def prepare_manifest(self, filename):
         pass
 
-    def create_folders(self, folders):
+    def create_folders(self, root, folders):
         if len(folders) == 0:
             print('Folder creation error: empty list')
             return
 
-        for f in folders:
-            directory = self.root + f
+        for folder in folders:
+            directory = root + '/' + folder + '/'
             if not os.path.exists(directory):
-                os.mkdir(directory)
+                os.makedirs(directory)
             else:
-                print(f'Folder with name {f} already exists!')
-                
+                print(f'Folder with name {folder} already exists!')
+

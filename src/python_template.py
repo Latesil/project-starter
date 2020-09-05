@@ -39,6 +39,7 @@ class PythonTemplate(Template):
         self.license = license
         self.common_file = CommonFile()
         self.gpl_text = self.common_file.get_gpl()
+        self.files = []
 
         ########################################################################
 
@@ -56,20 +57,31 @@ class PythonTemplate(Template):
             self.populate_data_folder(self.project_id, self.project_name)
             self.populate_po_dir(self.project_id, self.project_name)
             self.populate_src_dir(self.project_id, self.project_name)
+            
             if self.is_git:
                 os.chdir(self.path)
                 os.system('git init')
 
+            for f in self.files:
+                f.create()
+
+            make_executable(self.path + '/src/' + self.project_name + '.in')
+
     def create_basic_gui_structure(self, project_id, project_name, path):
 
-        super().create_folders(self.folders)
+        super().create_folders(self.path, self.folders)
 
         path = self.path + '/'
 
-        self.common_file.create_copying_file(path, self.license)
-        self.common_file.create_manifest_file(path, self.project_full_name, self.project_name, self.project_name,
-                                              self.lang)
-        self.common_file.create_meson_postinstall_file(path)
+        copying_file = self.common_file.create_copying_file(path, self.license)
+        self.files.append(copying_file)
+
+        manifest = self.common_file.create_manifest_file(path, self.project_full_name, self.project_name, self.project_name,
+                                                         self.lang)
+        self.files.append(manifest)
+
+        post_install = self.common_file.create_meson_postinstall_file(path)
+        self.files.append(post_install)
 
         text = (f"project('{self.project_name}',\n",
                 f"          version: '0.1.0',\n",
@@ -87,31 +99,37 @@ class PythonTemplate(Template):
                 f"\n",
                 f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-        f = File(path, 'meson.build', text)
-        return f
+        main_meson = File(path, 'meson.build', text)
+        self.files.append(main_meson)
 
     def populate_data_folder(self, project_id, project_name):
         path = self.path + '/data/'
-        self.common_file.create_data_meson_file(path, self.project_full_name)
-        self.common_file.create_appdata_file(path, self.project_full_name, self.license)
-        self.common_file.create_desktop_file(path, self.project_full_name, self.project_name, self.project_id)
-        self.common_file.create_gschema_file(path, self.project_full_name, self.project_name, self.project_path)
+        meson_data_file = self.common_file.create_data_meson_file(path, self.project_full_name)
+        self.files.append(meson_data_file)
+        appdata_file = self.common_file.create_appdata_file(path, self.project_full_name, self.license)
+        self.files.append(appdata_file)
+        desktop_file = self.common_file.create_desktop_file(path, self.project_full_name, self.project_name, self.project_id)
+        self.files.append(desktop_file)
+        gschema_file = self.common_file.create_gschema_file(path, self.project_full_name, self.project_name, self.project_path)
+        self.files.append(gschema_file)
 
     def populate_po_dir(self, project_id, project_name):
         files = ['window.ui', 'main.py', 'window.py']
         path = self.path + '/po/'
-        self.common_file.create_po_linguas_file(path)
-        self.common_file.create_po_meson_file(path, self.project_name)
-        self.common_file.create_po_potfiles_file(path, self.project_id, files)
+        linguas_file = self.common_file.create_po_linguas_file(path)
+        self.files.append(linguas_file)
+        po_meson_file = self.common_file.create_po_meson_file(path, self.project_name)
+        self.files.append(po_meson_file)
+        potfiles_file = self.common_file.create_po_potfiles_file(path, self.project_id, files)
+        self.files.append(potfiles_file)
 
     def populate_src_dir(self, project_id, project_name):
         path = self.path + '/src/'
-        src_files = []
 
         text = ()
 
         init_file = File(path, '__init__.py', text)
-        src_files.append(init_file)
+        self.files.append(init_file)
 
         text_main = (f"# main.py\n"
                      f"#\n",
@@ -147,7 +165,7 @@ class PythonTemplate(Template):
                      f"\n",)
 
         main_file = File(path, 'main.py', text_main)
-        src_files.append(main_file)
+        self.files.append(main_file)
 
         text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
                       f"moduledir = join_paths(pkgdatadir, '{self.project_name_underscore}')\n",
@@ -193,7 +211,7 @@ class PythonTemplate(Template):
                       f"\n",)
 
         meson_file = File(path, 'meson.build', text_meson)
-        src_files.append(meson_file)
+        self.files.append(meson_file)
 
         text_id_in = (f"#!@PYTHON@\n",
                       f"#\n",
@@ -226,11 +244,11 @@ class PythonTemplate(Template):
                       f"    sys.exit(main.main(VERSION))\n",)
 
         in_file = File(path, self.project_name + '.in', text_id_in)
-        make_executable(path + self.project_name + '.in')
-        src_files.append(in_file)
+        self.files.append(in_file)
 
         files = ['window.ui']
-        self.common_file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
+        gresource_file = self.common_file.create_gresource_file(self.path, self.project_name_underscore, self.project_id_reverse, files)
+        self.files.append(gresource_file)
 
         text_window = (f"# window.py\n",
                        f"#\n",
@@ -252,8 +270,8 @@ class PythonTemplate(Template):
                        f"\n",)
 
         window_file = File(path, 'window.py', text_window)
-        src_files.append(window_file)
+        self.files.append(window_file)
 
-        self.common_file.create_window_ui_file(self.path, self.class_name)
+        window_ui_file = self.common_file.create_window_ui_file(self.path, self.class_name)
+        self.files.append(window_ui_file)
 
-        return src_files

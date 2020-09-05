@@ -161,7 +161,7 @@ class CommonFile:
                 f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
                 f"\n",)
 
-        f = File(path + '/build-aux/meson/', 'postinstall.py', text)
+        f = File(path + 'build-aux/meson/', 'postinstall.py', text)
         return f
 
     def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
