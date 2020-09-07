@@ -111,7 +111,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             os.makedirs(self.main_path)
 
         is_gui = self.check_gui(self.template)
-        self.project_full_path = self.main_path + self.project_name
+        self.project_full_path = self.main_path + self.project_name + '/'
 
         # Create template class on main button click and call start() function
 

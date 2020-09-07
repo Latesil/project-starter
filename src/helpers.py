@@ -15,17 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import stat
 
-def create_file(path, filename, text, empty=False):
-    with open(path + filename, 'a') as f:
-        if not empty:
-            f.writelines(text)
-        else:
-            # TODO maybe there is another way to create an empty file?
-            f.close()
-
-def make_executable(filename):
-    st = os.stat(filename)
-    os.chmod(filename, st.st_mode | stat.S_IEXEC)
+def filter_string(string, i):
+    """
+    return list of strings contain string
+    """
+    return list(filter(lambda x: string in x, i))

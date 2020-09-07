@@ -17,6 +17,7 @@
 
 from .project_starter_constants import constants
 import os
+import stat
 
 class File:
 
@@ -27,6 +28,10 @@ class File:
         self.fullname = self.path + self.filename
 
     def create(self):
+        """
+        Creates a file in given path with a given filename.
+        If text == (), creates empty file. 
+        """
         with open(self.fullname, 'a') as f:
             if self.text:
                 f.writelines(self.text)

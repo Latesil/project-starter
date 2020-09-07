@@ -17,14 +17,13 @@
 
 import os
 from .project_starter_constants import constants
-from .common_files import CommonFile
 from .file import File
 
 
 class Template:
 
     gui_folders = ['build-aux/meson', 'data', 'src', 'po']
-    cli_folders = []
+    cli_folders = ['src']
 
     _gpl = """# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,20 +40,23 @@ class Template:
 """
 
     def get_gpl(self):
+        """
+        return GPL text in the beginning of the file
+        """
         return self._gpl
 
-    def prepare_manifest(self, filename):
-        pass
-
-    def create_folders(self, root, folders, gui=True):
-        if len(folders) == 0:
-            print('Folder creation error: empty list')
-            return
+    def create_folders(self, root, additional_folders=None, gui=True):
+        if additional_folders == None:
+            additional_folders = []
+        else:
+            if len(folders) == 0:
+                print('Folder creation error: empty list')
+                return
 
         if gui:
-            final_folders = self.gui_folders + folders
+            final_folders = self.gui_folders + additional_folders
         else:
-            final_folders = self.cli_folders + folders
+            final_folders = self.cli_folders + additional_folders
 
         for folder in final_folders:
             directory = root + '/' + folder + '/'
@@ -62,6 +64,8 @@ class Template:
                 os.makedirs(directory)
             else:
                 print(f'Folder with name {folder} already exists!')
+
+    ########## /build-aux/meson/ dir ###############
 
     def create_meson_postinstall_file(self, path):
         text = (f"#!/usr/bin/env python3\n",
@@ -85,21 +89,24 @@ class Template:
                 f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
                 f"\n",)
 
-        f = File(path + 'build-aux/meson/', 'postinstall.py', text)
+        f = File(path, 'postinstall.py', text)
         return f
+
+    ########## end /build-aux/meson/ dir ########
+
 
     ################## /po dir ##################
 
-    def create_po_potfiles_file(self, path, p_id, files):
-        if not isinstance(files, list):
+    def create_po_potfiles_file(self, path, data):
+        if not isinstance(data['po_files'], list):
             print('Cannot create POTFILES. Argument is invalid (must be list)')
             return
 
-        text = (f"data/{p_id}.desktop.in\n",
-                f"data/{p_id}.appdata.xml.in\n",
-                f"data/{p_id}.gschema.xml\n",)
+        text = (f"data/{data['project_id']}.desktop.in\n",
+                f"data/{data['project_id']}.appdata.xml.in\n",
+                f"data/{data['project_id']}.gschema.xml\n",)
 
-        for f in files:
+        for f in data['po_files']:
             text += (f"src/{f}\n",)
 
         text += (f"\n",)
@@ -109,48 +116,47 @@ class Template:
 
     def create_po_linguas_file(self, path):
         text = ()
-
         f = File(path, 'LINGUAS', text)
         return f
 
-    def create_po_meson_file(self, path, p_name):
-        text = (f"i18n.gettext('{p_name}', preset: 'glib')\n",)
-
+    def create_po_meson_file(self, path, data):
+        text = (f"i18n.gettext('{data['project_name']}', preset: 'glib')\n",)
         f = File(path, 'meson.build', text)
         return f
 
-    ################## end /po dir ################## 
+    ################## end /po dir ##################
+
 
     ################## / dir ########################
 
-    def create_copying_file(self, path, project_license):
-        if project_license == 'GPL 3':
+    def create_copying_file(self, path, data):
+        if data['project_license'] == 'GPL 3':
             from .gpl import Gpl
             license = Gpl('3')
-        elif project_license == 'GPL 2':
+        elif data['project_license'] == 'GPL 2':
             from .gpl import Gpl
             license = Gpl('2')
-        elif project_license == 'AGPL 3':
+        elif data['project_license'] == 'AGPL 3':
             from .agpl import Agpl
             license = Agpl()
-        elif project_license == 'Apache 2':
+        elif data['project_license'] == 'Apache 2':
             from .apache import Apache
             license = Apache()
-        elif project_license == 'LGPL 3':
+        elif data['project_license'] == 'LGPL 3':
             from .lgpl import Lgpl
             license = Lgpl('3')
-        elif project_license == 'LGPL 2':
+        elif data['project_license'] == 'LGPL 2':
             from .lgpl import Lgpl
             license = Lgpl('2')
-        elif project_license == 'MIT/X11':
+        elif data['project_license'] == 'MIT/X11':
             from .mit import Mit
             license = Mit()
 
         f = File(path, 'COPYING', license.get_text())
         return f
 
-    def create_manifest_file(self, path, p_id, p_name, command, lang, sdk_extension=None, build_options=None):
-        text = (f"""app-id: {p_id}\n""",
+    def create_manifest_file(self, path, data, sdk_extension=None, build_options=None):
+        text = (f"""app-id: {data['project_id']}\n""",
                 f"""runtime: org.gnome.Platform\n""",
                 f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'\n""",
                 f"""sdk: org.gnome.Sdk\n""",)
@@ -158,7 +164,7 @@ class Template:
         if sdk_extension:
             text += sdk_extension
 
-        text += (f"""command: {command}\n""",
+        text += (f"""command: {data['project_name']}\n""",
                 f"""finish-args:\n""",
                 f"""  - --share=network\n""",
                 f"""  - --share=ipc\n""",
@@ -174,7 +180,7 @@ class Template:
                 f"""  - /man\n""",
                 f"""  - /share/doc\n""",)
 
-        if lang == 'js' or lang == 'c':
+        if data['lang'] == 'js' or data['lang'] == 'c':
             text += (f"""  - /share/gtk-doc\n""",)
 
         text += (f"""  - /share/man\n""",
@@ -189,17 +195,18 @@ class Template:
                 f"""      - type: dir\n""",
                 f"""      - .\n""",)
 
-        f = File(path, p_id + ".yaml", text)
+        f = File(path, data['project_id'] + ".yaml", text)
         return f
 
     ################# end / dir #################
 
+
     ################# /data dir #################
 
-    def create_desktop_file(self, path, p_full_name, p_name, p_id, gui=True):
+    def create_desktop_file(self, path, data, gui=True):
         text = (f"[Desktop Entry]\n",
-                f"Name={p_name}\n",
-                f"Exec={p_name}\n",)
+                f"Name={data['project_name']}\n",
+                f"Exec={data['project_name']}\n",)
 
         if gui:
             text += (f"Terminal=false\n",)
@@ -207,25 +214,25 @@ class Template:
         text += (f"Type=Application\n",
                  f"Categories=GTK;\n",
                  f"StartupNotify=true\n",
-                 f"Icon={p_id}\n",)
+                 f"Icon={data['project_id']}\n",)
 
-        f = File(path, p_full_name + '.desktop.in', text)
+        f = File(path, data['project_full_name'] + '.desktop.in', text)
         return f
 
-    def create_gschema_file(self, path, p_full_name, p_name, p_path):
+    def create_gschema_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""<schemalist gettext-domain="{p_name}">\n""",
-                f"""    <schema id="{p_full_name}" path="/{p_path}/">\n""",
+                f"""<schemalist gettext-domain="{data['project_name']}">\n""",
+                f"""    <schema id="{data['project_full_name']}" path="/{data['project_id'].replace('.', '/')}/">\n""",
                 f"""    </schema>\n""",
                 f"""</schemalist>\n""",)
 
-        f = File(path, p_full_name + '.gschema.xml', text)
+        f = File(path, data['project_full_name'] + '.gschema.xml', text)
         return f
 
-    def create_data_meson_file(self, path, p_full_name):
+    def create_data_meson_file(self, path, data):
         text = (f"desktop_file = i18n.merge_file(\n",
-                f"  input: '{p_full_name}.desktop.in',\n",
-                f"  output: '{p_full_name}.desktop',\n",
+                f"  input: '{data['project_full_name']}.desktop.in',\n",
+                f"  output: '{data['project_full_name']}.desktop',\n",
                 f"  type: 'desktop',\n",
                 f"  po_dir: '../po',\n",
                 f"  install: true,\n",
@@ -240,8 +247,8 @@ class Template:
                 f"endif\n",
                 f"\n",
                 f"appstream_file = i18n.merge_file(\n",
-                f"  input: '{p_full_name}.appdata.xml.in',\n",
-                f"  output: '{p_full_name}.appdata.xml',\n",
+                f"  input: '{data['project_full_name']}.appdata.xml.in',\n",
+                f"  output: '{data['project_full_name']}.appdata.xml',\n",
                 f"  po_dir: '../po',\n",
                 f"  install: true,\n",
                 f"  install_dir: join_paths(get_option('datadir'), '{constants['METADATA_FOLDER']}')\n",
@@ -254,7 +261,7 @@ class Template:
                 f"  )\n",
                 f"endif\n",
                 f"\n",
-                f"install_data('{p_full_name}.gschema.xml',\n",
+                f"install_data('{data['project_full_name']}.gschema.xml',\n",
                 f"  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n",
                 f")\n",
                 f"\n",
@@ -269,25 +276,25 @@ class Template:
         f = File(path, 'meson.build', text)
         return f
 
-    def create_appdata_file(self, path, p_id, project_license):
+    def create_appdata_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<component type="desktop">\n""",
-                f"""  <id>{p_id}.desktop</id>\n""",
+                f"""  <id>{data['project_id']}.desktop</id>\n""",
                 f"""  <metadata_license>CC0-1.0</metadata_license>\n""",)
 
-        if project_license == "GPL 3":
+        if data['project_license'] == "GPL 3":
             text += (f"""  <project_license>GPL-3.0-or-later</project_license>\n""",)
-        elif project_license == "AGPL 3":
+        elif data['project_license'] == "AGPL 3":
             text += (f"""  <project_license>AGPL-3.0-or-later</project_license>\n""",)
-        elif project_license == "Apache 2":
+        elif data['project_license'] == "Apache 2":
             text += (f"""  <project_license></project_license>\n""",)
-        elif project_license == "GPL 2":
+        elif data['project_license'] == "GPL 2":
             text += (f"""  <project_license></project_license>\n""",)
-        elif project_license == "LGPL 2":
+        elif data['project_license'] == "LGPL 2":
             text += (f"""  <project_license>LGPL-2.1-or-later</project_license>\n""",)
-        elif project_license == "LGPL 3":
+        elif data['project_license'] == "LGPL 3":
             text += (f"""  <project_license>LGPL-3.0-or-later</project_license>\n""",)
-        elif project_license == "MIT/X11":
+        elif data['project_license'] == "MIT/X11":
             text += (f"""  <project_license>MIT</project_license>\n""",)
 
         text += (f"""  <description>\n""",
@@ -295,32 +302,35 @@ class Template:
                 f"""</component>\n""",
                 f"""\n""",)
 
-        f = File(path, p_id + '.appdata.xml.in', text)
+        f = File(path, data['project_id'] + '.appdata.xml.in', text)
         return f
 
-    def create_gresource_file(self, path, p_name_underscore, p_id_reverse_short, files):
+    def create_gresource_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<gresources>\n""",
-                f"""  <gresource prefix="/{p_id_reverse_short}">\n""",)
+                f"""  <gresource prefix="/{data['project_full_name'].replace('.', '/')}">\n""",)
         
-        for f in files:
+        for f in data['gresource_files']:
             text += (f"    <file>{f}</file>\n",)
             
         text += (f"""  </gresource>\n""",
                 f"""</gresources>\n""",
                 f"""\n""",)
 
-        f = File(path + '/src/', p_name_underscore + '.gresource.xml', text)
+        f = File(path, self.project_name.replace('-', '_') + '.gresource.xml', text)
         return f
 
     ############### end /data dir #################
 
-    def create_window_ui_file(self, path, window_name):
+
+    ################# /src/ dir ###################
+
+    def create_window_ui_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""\n""",
                 f"""<interface>\n""",
                 f"""  <requires lib="gtk+" version="3.24"/>\n""",
-                f"""    <template class="{window_name}Window" parent="GtkApplicationWindow">\n""",
+                f"""    <template class="{data['class_name']}Window" parent="GtkApplicationWindow">\n""",
                 f"""      <property name="default-width">600</property>\n""",
                 f"""    <property name="default-height">300</property>\n""",
                 f"""    <child type="titlebar">\n""",
@@ -343,5 +353,7 @@ class Template:
                 f"""    </template>\n""",
                 f"""  </interface>\n""",)
 
-        f = File(path + '/src/', 'window.ui', text)
+        f = File(path, 'window.ui', text)
         return f
+
+    ############### end /src/ dir #################
