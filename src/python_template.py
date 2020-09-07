@@ -22,7 +22,6 @@ from .project_starter_constants import constants
 from .common_files import CommonFile
 from .file import File
 from .template import Template
-from .helpers import create_file, make_executable
 
 
 class PythonTemplate(Template):
@@ -65,7 +64,6 @@ class PythonTemplate(Template):
             for f in self.files:
                 f.create()
 
-            make_executable(self.path + '/src/' + self.project_name + '.in')
 
     def create_basic_gui_structure(self, project_id, project_name, path):
 
@@ -244,6 +242,7 @@ class PythonTemplate(Template):
                       f"    sys.exit(main.main(VERSION))\n",)
 
         in_file = File(path, self.project_name + '.in', text_id_in)
+        in_file.make_executable()
         self.files.append(in_file)
 
         files = ['window.ui']

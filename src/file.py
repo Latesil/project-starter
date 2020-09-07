@@ -24,11 +24,16 @@ class File:
         self.path = path if path.endswith('/') else path + '/'
         self.filename = filename
         self.text = text
+        self.fullname = self.path + self.filename
 
     def create(self):
-        with open(self.path + self.filename, 'a') as f:
+        with open(self.fullname, 'a') as f:
             if self.text:
                 f.writelines(self.text)
             else:
                 # TODO maybe there is another way to create an empty file?
-                f.close()  
+                f.close()
+
+    def make_executable(self):
+        st = os.stat(self.fullname)
+        os.chmod(self.fullname, st.st_mode | stat.S_IEXEC)
