@@ -42,7 +42,6 @@ project_starter_sources = [
   'lgpl.py',
   'agpl.py',
   'project_starter_constants.py',
-  'common_files.py',
   'template.py',
   'helpers.py',
   'file.py',
