@@ -46,10 +46,10 @@ class Template:
         return self._gpl
 
     def create_folders(self, root, additional_folders=None, gui=True):
-        if additional_folders == None:
+        if additional_folders is None:
             additional_folders = []
         else:
-            if len(folders) == 0:
+            if len(additional_folders) == 0:
                 print('Folder creation error: empty list')
                 return
 

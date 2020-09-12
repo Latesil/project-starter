@@ -3,3 +3,4 @@ build-dir
 builddir
 .idea
 venv
+.vscode

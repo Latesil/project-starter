@@ -15,127 +15,154 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
-import stat
 from .project_starter_constants import constants
-from .common_files import File
-from .helpers import *
+from .file import File
+from .template import Template
 
-class CTemplate():
+class CTemplate(Template):
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
         self.is_gui = is_gui
         self.project_id = project_id
         self.project_name = project_name
-        self.path = path
+        self.root = path
         self.is_git = is_git
+        self.project_license = license
+        self.files = []
         self.lang = 'c'
-        self.license = license
-        self.file = File()
-        self.gpl_text = self.file.get_gpl()
+        self.gresource_files = ['window.ui']
+
+        #####################################################
+
+        self.project_full_name = self.project_id + '.' + self.project_name
+        self.project_id_underscore = self.project_id.replace('.', '_').lower()
+        self.project_id_reverse = self.project_id.replace('.', '/') + '/' + self.project_name + '/'
+        self.project_path = self.project_id.replace('.', '/')
+        self.project_name_underscore = self.project_name.replace('-', '_')
+        self.project_id_reverse_short = self.project_id.replace('.', '/')
+        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
+
+        self.po_files = self.project_id_underscore + '-window.ui', 'main.c', self.project_id_underscore + '-window.c'
+
+        self.data = vars(self)
+
+        #####################################################
 
     def start(self):
-        self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
+        if self.is_gui:
+            self.create_folders(self.root)
+        else:
+            self.create_folders(self.root, gui=False)
+
+        self.populate_root_dir(self.data)
 
         if self.is_gui:
-            self.populate_data_folder(self.project_id, self.project_name)
-            self.populate_po_dir(self.project_id, self.project_name)
+            self.populate_data_dir(self.data)
+            self.populate_po_dir(self.data)
 
-        self.populate_src_dir(self.project_id, self.project_name)
+        self.populate_src_dir(self.data)
 
         if self.is_git:
-            os.chdir(self.path)
+            os.chdir(self.root)
             os.system('git init')
 
-    def create_basic_gui_structure(self, p_id, p_name, path):
-        p_full_name = p_id + '.' + p_name
-        p_id_underscore = p_id.replace('.', '_').lower()
+        for f in self.files:
+            f.create()
+            if f.filename == self.project_name + '.in':
+                f.make_executable()
+
+    def populate_root_dir(self, data):
+        path = self.root + 'build-aux/meson/'
+
+        copying_file = self.create_copying_file(self.root, data)
+        self.files.append(copying_file)
+
+        post_install_file = self.create_meson_postinstall_file(path)
+        self.files.append(post_install_file)
+
+        text = (f"project('{data['project_name']}', 'c',\n",
+                f"          version: '0.1.0',\n",
+                f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
+                f"  default_options: [ 'warning_level=2',\n",
+                f"                     'c_std=gnu11',\n",
+                f"                   ],\n",
+                f")\n",
+                f"\n",
+                f"i18n = import('i18n')\n",
+                f"\n",
+                f"config_h = configuration_data()\n",
+                f"config_h.set_quoted('PACKAGE_VERSION', meson.project_version())\n",
+                f"config_h.set_quoted('GETTEXT_PACKAGE', '{data['project_name']}')\n",
+                f"config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))\n",
+                f"configure_file(\n",
+                f"  output: '{data['project_id_underscore']}-config.h',\n",
+                f"  configuration: config_h,\n",
+                f")\n",
+                f"\n",
+                f"add_project_arguments([\n",
+                f"  '-I' + meson.build_root(),\n",
+                f"], language: 'c')\n",
+                f"\n",)
 
         if self.is_gui:
-            os.makedirs(path + '/build-aux/meson')
-            os.makedirs(path + '/' + 'data')
-            os.makedirs(path + '/' + 'po')
-        os.makedirs(path + '/' + 'src')
+            text += (f"subdir('data')\n",)
 
-        self.file.create_copying_file(path, self.license)
+        text += (f"subdir('src')\n",)
 
         if self.is_gui:
-            self.file.create_meson_postinstall_file(path)
-
-        with open(path + '/' + "meson.build", 'a') as file_meson_build:
-            text = (f"project('{p_name}', 'c',\n",
-                    f"          version: '0.1.0',\n",
-                    f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
-                    f"  default_options: [ 'warning_level=2',\n",
-                    f"                     'c_std=gnu11',\n",
-                    f"                   ],\n",
-                    f")\n",
-                    f"\n",
-                    f"i18n = import('i18n')\n",
-                    f"\n",
-                    f"config_h = configuration_data()\n",
-                    f"config_h.set_quoted('PACKAGE_VERSION', meson.project_version())\n",
-                    f"config_h.set_quoted('GETTEXT_PACKAGE', '{p_name}')\n",
-                    f"config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))\n",
-                    f"configure_file(\n",
-                    f"  output: '{p_id_underscore}-config.h',\n",
-                    f"  configuration: config_h,\n",
-                    f")\n",
-                    f"\n",
-                    f"add_project_arguments([\n",
-                    f"  '-I' + meson.build_root(),\n",
-                    f"], language: 'c')\n",
-                    f"\n",)
-
-            if self.is_gui:
-                text += (f"subdir('data')\n",)
-
-            text += (f"subdir('src')\n",)
-
-            if self.is_gui:
-                text = (f"subdir('po')\n",)
-            
-            text += (f"\n",)
-
-            if self.is_gui:
-                text += (f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
+            text = (f"subdir('po')\n",)
+        
+        text += (f"\n",)
 
         if self.is_gui:
-            self.file.create_manifest_file(path, p_id, p_name, self.lang)
+            text += (f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-    def populate_data_folder(self, p_id, p_name):
-        p_path = p_id.replace('.', '/')
+        if self.is_gui:
+            manifest_file = self.create_manifest_file(self.root, data)
+            self.files.append(manifest_file)
 
-        self.file.create_data_meson_file(self.path, p_id)
-        self.file.create_appdata_file(self.path, p_id, self.license)
-        self.file.create_desktop_file(self.path, p_full_name, p_name, p_id, gui=self.gui)
-        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
+    def populate_data_dir(self, data):
+        path = self.root + 'data/'
 
-    def populate_po_dir(self, p_id, p_name):
-        p_id_underscore = p_id.replace('.', '_').lower()
-        files = [p_id_underscore + '-window.ui', 'main.c', p_id_underscore + '-window.c']
-        self.file.create_po_linguas_file(self.path)
-        self.file.create_po_meson_file(self.path, p_name)
-        self.file.create_po_potfiles_file(self.path, p_id, files)
+        meson_data_file = self.create_data_meson_file(path, data)
+        self.files.append(meson_data_file)
 
-    def populate_src_dir(self, p_id, p_name):
-        p_id_underscore = p_id.replace('.', '_').lower()
-        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
-        p_id_reverse_short = p_id.replace('.', '/')
-        window_name = "".join(w.capitalize() for w in p_name.split('-'))
+        appdata_file = self.create_appdata_file(path, data)
+        self.files.append(appdata_file)
+
+        desktop_file = self.create_desktop_file(path, data, gui=self.is_gui)
+        self.files.append(desktop_file)
+
+        gschema_file = self.create_gschema_file(path, data)
+        self.files.append(gschema_file)
+
+    def populate_po_dir(self, data):
+        path = self.root + 'po/'
+
+        linguas_file = self.create_po_linguas_file(path)
+        self.files.append(linguas_file)
+
+        po_meson_file = self.create_po_meson_file(path, data)
+        self.files.append(po_meson_file)
+
+        potfiles_file = self.create_po_potfiles_file(path, data)
+        self.files.append(potfiles_file)
+
+    def populate_src_dir(self, data):
+        path = self.root + 'src/'
 
         if self.is_gui:
             text_main = (f"/* main.c\n",
                         f" *\n",
                         f" * Copyright 2020\n",
                         f"\n",
-                        self.gpl_text,
+                        f"{self.get_gpl()}",
                         f"\n",
                         f"#include <glib/gi18n.h>\n",
                         f"\n",
-                        f"#include \"{p_id_underscore}-config.h\"\n",
-                        f"#include \"{p_id_underscore}-window.h\"\n",
+                        f"#include \"{data['project_id_underscore']}-config.h\"\n",
+                        f"#include \"{data['project_id_underscore']}-window.h\"\n",
                         f"\n",
                         f"static void\n",
                         f"on_activate (GtkApplication *app)\n",
@@ -152,7 +179,7 @@ class CTemplate():
                         f"	/* Get the current window or create one if necessary. */\n",
                         f"	window = gtk_application_get_active_window (app);\n",
                         f"	if (window == NULL)\n",
-                        f"		window = g_object_new ({p_id_underscore.upper()}_TYPE_WINDOW,\n",
+                        f"		window = g_object_new ({data['project_id_underscore'].upper()}_TYPE_WINDOW,\n",
                         f"		                       \"application\", app,\n",
                         f"		                       \"default-width\", 600,\n",
                         f"		                       \"default-height\", 300,\n",
@@ -179,7 +206,7 @@ class CTemplate():
                         f"	 * application windows, integration with the window manager/compositor, and\n",
                         f"	 * desktop features such as file opening and single-instance applications.\n",
                         f"	 */\n",
-                        f"	app = gtk_application_new (\"{p_id}\", G_APPLICATION_FLAGS_NONE);\n",
+                        f"	app = gtk_application_new (\"{data['project_id']}\", G_APPLICATION_FLAGS_NONE);\n",
                         f"\n",
                         f"	/*\n",
                         f"	 * We connect to the activate signal to create a window when the application\n",
@@ -211,9 +238,9 @@ class CTemplate():
                         f" *\n",
                         f" * Copyright 2020\n",
                         f"\n",
-                        self.gpl_text,
+                        f"{self.get_gpl()}",
                         f"\n",
-                        f"#include \"{p_id_underscore}-config.h\"\n",
+                        f"#include \"{data['project_id_underscore']}-config.h\"\n",
                         f"\n",
                         f"#include <glib.h>\n",
                         f"#include <stdlib.h>\n",
@@ -248,17 +275,18 @@ class CTemplate():
                         f"  return EXIT_SUCCESS;\n",
                         f"}}\n",)
 
-        create_file(path + '/src/', 'main.c', text_main)
+        main_c_file = File(path, 'main.c', text_main)
+        self.files.append(main_c_file)
         
-        text_meson = (f"{p_id_underscore}_sources = [\n",
+        text_meson = (f"{data['project_id_underscore']}_sources = [\n",
                         f"  'main.c',\n",)
 
         if self.is_gui:
-            text_meson += (f"  '{p_id_underscore}-window.c',\n",)
+            text_meson += (f"  '{data['project_id_underscore']}-window.c',\n",)
 
         text_meson += (f"]\n",
                         f"\n",
-                        f"{p_id_underscore}_deps = [\n",
+                        f"{data['project_id_underscore']}_deps = [\n",
                         f"  dependency('gio-2.0', version: '>= 2.50'),\n",)
 
         if self.is_gui:
@@ -268,33 +296,34 @@ class CTemplate():
                         f"\n",
                         f"gnome = import('gnome')\n",
                         f"\n",
-                        f"{p_id_underscore}_sources += gnome.compile_resources('{p_id_underscore}-resources',\n",
-                        f"  '{p_id_underscore}.gresource.xml',\n",
-                        f"  c_name: '{p_id_underscore}'\n",
+                        f"{data['project_id_underscore']}_sources += gnome.compile_resources('{data['project_id_underscore']}-resources',\n",
+                        f"  '{data['project_id_underscore']}.gresource.xml',\n",
+                        f"  c_name: '{data['project_id_underscore']}'\n",
                         f")\n",
                         f"\n",
-                        f"executable('{p_name}', {p_name_underscore}_sources,\n",
-                        f"  dependencies: {p_id_underscore}_deps,\n",
+                        f"executable('{data['project_name']}', {data['project_name_underscore']}_sources,\n",
+                        f"  dependencies: {data['project_id_underscore']}_deps,\n",
                         f"  install: true,\n",
                         f")\n",
                         f"\n",)
         
-        create_file(path + '/src/', 'meson.build', text_meson)
+        meson_src_file = File(path, 'meson.build', text_meson)
+        self.files.append(meson_src_file)
 
         if self.is_gui:
-            files = ['window.ui']
-            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse, files)
+            gresource_file = self.create_gresource_file(path, data)
+            self.files.append(gresource_file)
 
         if self.is_gui:
             text_window = (f"/* main.c\n",
                            f" *\n",
                            f" * Copyright 2020\n",
-                           self.gpl_text
+                           f"{self.get_gpl()}",
                            f"\n",
-                           f"#include \"{p_id_underscore}-config.h\"\n",
-                           f"#include \"{p_id_underscore}-window.h\"\n",
+                           f"#include \"{data['project_id_underscore']}-config.h\"\n",
+                           f"#include \"{data['project_id_underscore']}-window.h\"\n",
                            f"\n",
-                           f"struct _{window_name}Window\n", #CGuiExample
+                           f"struct _{data['window_name']}Window\n", #CGuiExample
                            f"{{\n",
                            f"  GtkApplicationWindow  parent_instance;\n",
                            f"\n",
@@ -303,31 +332,34 @@ class CTemplate():
                            f"  GtkLabel            *label;\n",
                            f"}};\n",
                            f"\n",
-                           f"G_DEFINE_TYPE ({window_name}Window, {p_id_underscore}_window, GTK_TYPE_APPLICATION_WINDOW)\n",
+                           f"G_DEFINE_TYPE ({data['window_name']}Window, {data['project_id_underscore']}_window, GTK_TYPE_APPLICATION_WINDOW)\n",
                            f"\n",
                            f"static void\n",
-                           f"{p_id_underscore}_window_class_init ({window_name}WindowClass *klass)\n",
+                           f"{data['project_id_underscore']}_window_class_init ({data['window_name']}WindowClass *klass)\n",
                            f"{{\n",
                            f"  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);\n",
                            f"\n",
-                           f"  gtk_widget_class_set_template_from_resource (widget_class, \"/{p_id_reverse_short}/{p_id_underscore}-window.ui\");\n",
-                           f"  gtk_widget_class_bind_template_child (widget_class, {window_name}Window, header_bar);\n",
-                           f"  gtk_widget_class_bind_template_child (widget_class, {window_name}Window, label);\n",
+                           f"  gtk_widget_class_set_template_from_resource (widget_class, \"/{data['project_id_reverse_short']}/{data['project_id_underscore']}-window.ui\");\n",
+                           f"  gtk_widget_class_bind_template_child (widget_class, {data['window_name']}Window, header_bar);\n",
+                           f"  gtk_widget_class_bind_template_child (widget_class, {data['window_name']}Window, label);\n",
                            f"}}\n",
                            f"\n",
                            f"static void\n",
-                           f"{p_id_underscore}_window_init ({window_name}Window *self)\n",
+                           f"{data['project_id_underscore']}_window_init ({data['window_name']}Window *self)\n",
                            f"{{\n",
                            f"  gtk_widget_init_template (GTK_WIDGET (self));\n",
                            f"}}\n",)
             
-            create_file(path + '/src/', p_id_underscore + '-window.c', text_window)
+            window_file = File(path, data['project_id_underscore'] + '-window.c', text_window)
+            self.files.append(window_file)
 
-            self.file.create_window_ui_file(self, path, window_name)
+            window_ui_file = self.create_window_ui_file(path, data)
+            self.files.append(window_ui_file)
+
             text_window_h = (f"/* c_gui_example-window.h\n",
                             f" *\n",
                             f" * Copyright 2020\n",
-                            self.gpl_text,
+                            f"{self.get_gpl()}",
                             f"\n",
                             f"#pragma once\n",
                             f"\n",
@@ -335,10 +367,11 @@ class CTemplate():
                             f"\n",
                             f"G_BEGIN_DECLS\n",
                             f"\n",
-                            f"#define {p_id_underscore.upper()}_TYPE_WINDOW ({p_id_underscore}_window_get_type())\n",
+                            f"#define {data['project_id_underscore'].upper()}_TYPE_WINDOW ({data['project_id_underscore']}_window_get_type())\n",
                             f"\n",
-                            f"G_DECLARE_FINAL_TYPE ({window_name}Window, {p_id_underscore}_window, {p_id_underscore.upper()}, WINDOW, GtkApplicationWindow)\n",
+                            f"G_DECLARE_FINAL_TYPE ({data['window_name']}Window, {data['project_id_underscore']}_window, {data['project_id_underscore'].upper()}, WINDOW, GtkApplicationWindow)\n",
                             f"\n",
                             f"G_END_DECLS\n",)
 
-            create_file(path + '/src/', p_id_underscore + '-window.h', text_window_h)
+            window_h_file = File(path, data['project_id_underscore'] + '-window.h', text_window_h)
+            self.files.append(window_h_file)

@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 from .project_starter_constants import constants
 from .file import File
@@ -65,7 +64,7 @@ class PythonTemplate(Template):
 
             for f in self.files:
                 f.create()
-                if f.filename ==  self.project_name + '.in':
+                if f.filename == self.project_name + '.in':
                     f.make_executable()
 
     def populate_root_dir(self, data):
