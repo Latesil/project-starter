@@ -207,7 +207,7 @@ class PythonTemplate(Template):
                       f"  'window.py',\n",
                       f"]\n",
                       f"\n",
-                      f"install_data(%{data['project_name'].replace('-', '_')}_sources, install_dir: moduledir)\n",
+                      f"install_data({data['project_name'].replace('-', '_')}_sources, install_dir: moduledir)\n",
                       f"\n",)
         meson_src_file = File(path, 'meson.build', text_meson)
         self.files.append(meson_src_file)
@@ -256,7 +256,7 @@ class PythonTemplate(Template):
                        f"from gi.repository import Gtk\n",
                        f"\n",
                        f"\n",
-                       f"@Gtk.Template(resource_path='/{data['project_id_reverse']}window.ui')\n",
+                       f"@Gtk.Template(resource_path='/{data['project_path']}/window.ui')\n",
                        f"class {data['class_name']}Window(Gtk.ApplicationWindow):\n",
                        f"    __gtype_name__ = '{data['class_name']}Window'\n",
                        f"\n",

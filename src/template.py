@@ -193,7 +193,7 @@ class Template:
                 f"""    buildsystem: meson\n""",
                 f"""    sources:\n""",
                 f"""      - type: dir\n""",
-                f"""      - .\n""",)
+                f"""        path: .\n""",)
 
         f = File(path, data['project_id'] + ".yaml", text)
         return f
