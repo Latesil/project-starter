@@ -216,17 +216,17 @@ class Template:
                  f"StartupNotify=true\n",
                  f"Icon={data['project_id']}\n",)
 
-        f = File(path, data['project_full_name'] + '.desktop.in', text)
+        f = File(path, data['project_id'] + '.desktop.in', text)
         return f
 
     def create_gschema_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<schemalist gettext-domain="{data['project_name']}">\n""",
-                f"""    <schema id="{data['project_full_name']}" path="/{data['project_id'].replace('.', '/')}/">\n""",
+                f"""    <schema id="{data['project_id']}" path="/{data['project_id'].replace('.', '/')}/">\n""",
                 f"""    </schema>\n""",
                 f"""</schemalist>\n""",)
 
-        f = File(path, data['project_full_name'] + '.gschema.xml', text)
+        f = File(path, data['project_id'] + '.gschema.xml', text)
         return f
 
     def create_data_meson_file(self, path, data):
