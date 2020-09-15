@@ -164,7 +164,7 @@ class CTemplate(Template):
         if self.is_gui:
             text_main = (f"/* main.c\n",
                         f" *\n",
-                        f" * Copyright 2020\n",
+                        f" * Copyright {self.year}\n",
                         f"\n",
                         f"{self.get_gpl(self.lang)}",
                         f" */\n",
@@ -246,7 +246,7 @@ class CTemplate(Template):
         else:
             text_main = (f"/* main.c\n",
                         f" *\n",
-                        f" * Copyright 2020\n",
+                        f" * Copyright {self.year}\n",
                         f"\n",
                         f"{self.get_gpl(self.lang)}",
                         f" */\n",
@@ -328,7 +328,7 @@ class CTemplate(Template):
         if self.is_gui:
             text_window = (f"/* main.c\n",
                            f" *\n",
-                           f" * Copyright 2020\n",
+                           f" * Copyright {self.year}\n",
                            f"{self.get_gpl(self.lang)}",
                            f" */\n",
                            f"\n",
@@ -370,7 +370,7 @@ class CTemplate(Template):
 
             text_window_h = (f"/* c_gui_example-window.h\n",
                             f" *\n",
-                            f" * Copyright 2020\n",
+                            f" * Copyright {self.year}\n",
                             f"{self.get_gpl(self.lang)}",
                             f" */\n",
                             f"\n",
