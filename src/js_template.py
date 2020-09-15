@@ -16,8 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import datetime
 from .project_starter_constants import constants
-from .common_files import File
+from .file import File
 from .template import Template
 
 
@@ -38,6 +39,8 @@ class JsTemplate(Template):
         self.files = []
         self.po_files = ['window.ui', 'window.js', 'main.js']
         self.gresource_files = ['window.ui', 'window.js', 'main.js']
+        now = datetime.datetime.now()
+        self.year = now.year
 
         ##############################################################
 
@@ -132,9 +135,10 @@ class JsTemplate(Template):
 
         text_main = (f"/* main.js\n",
                      f" *\n",
-                     f" * Copyright 2020\n",
+                     f" * Copyright {self.year}\n",
                      f" *\n",
-                     f"{self.get_gpl()}",
+                     f"{self.get_gpl(self.lang)}",
+                     f" */\n",
                      f"\n",
                      f"pkg.initGettext();\n",
                      f"pkg.initFormat();\n",
@@ -223,9 +227,10 @@ class JsTemplate(Template):
 
         text_window = (f"/* window.js\n",
                         f" *\n",
-                        f" * Copyright 2020\n",
+                        f" * Copyright {self.year}\n",
                         f" *\n",
-                        f"{self.get_gpl()}",
+                        f"{self.get_gpl(self.lang)}",
+                        f" */\n",
                         f"\n",
                         f"const {{ GObject, Gtk }} = imports.gi;\n",
                         f"\n",

@@ -28,7 +28,7 @@ class Template:
     def get_gpl(self, lang):
         if lang == 'python':
             comment = '#'
-        elif lang == 'c':
+        else:
             comment = '*'
 
         gpl = f"""{comment} This program is free software: you can redistribute it and/or modify

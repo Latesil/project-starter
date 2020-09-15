@@ -15,49 +15,80 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 from .project_starter_constants import constants
-from .common_files import File
-from .helpers import *
+from .file import File
+from .template import Template
 
-class RustTemplate():
+class RustTemplate(Template):
+
+    """
+    Rust Template Class
+    """
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
         self.is_gui = is_gui
         self.project_id = project_id
         self.project_name = project_name
-        self.path = path
+        self.root = path
         self.is_git = is_git
         self.lang = 'rust'
-        self.license = license
-        self.file = File()
+        self.project_license = license
+        self.files = []
+        self.po_files = ['window.ui']
+        self.gresource_files = ['window.ui']
+
+        ##############################################################
+
+        self.project_full_name = self.project_id + '.' + self.project_name
+        self.project_id_underscore = self.project_id.replace('.', '_').lower()
+        self.project_id_reverse = self.project_id.replace('.', '/') + '/' + self.project_name + '/'
+        self.project_path = self.project_id.replace('.', '/')
+        self.project_name_underscore = self.project_name.replace('-', '_')
+        self.project_id_reverse_short = self.project_id.replace('.', '/')
+        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
+
+        self.data = vars()
+
+        ##############################################################
 
     def start(self):
-        self.create_basic_gui_structure(self.project_id, self.project_name, self.path)
         if self.is_gui:
-            self.populate_data_folder(self.project_id, self.project_name)
-            self.populate_po_dir(self.project_id, self.project_name)
-        self.populate_src_dir(self.project_id, self.project_name)
+            self.create_folders(self.root)
+        else:
+            self.create_folders(self.root, gui=False)
+
+        self.populate_root_dir(self.data)
+
+        if self.is_gui:
+            self.populate_data_dir(self.data)
+            self.populate_po_dir(self.data)
+
+        self.populate_src_dir(self.data)
+
         if self.is_git:
-            os.chdir(self.path)
+            os.chdir(self.root)
             os.system('git init')
 
-    def create_basic_gui_structure(self, p_id, p_name, path):
-        build_aux_path = '/build-aux/meson' if self.is_gui else '/build-aux'
-        os.makedirs(path + build_aux_path)
+        for f in self.files:
+            f.create()
+            if f.filename == 'cargo.sh':
+                f.make_executable()
+
+    def populate_root_dir(self, data):
+        path = self.root + '/build-aux/meson' if self.is_gui else self.root + '/build-aux'
+
+        copying_file = self.create_copying_file(self.root, data)
+        self.files.append(copying_file)
+
         if self.is_gui:
-            os.makedirs(path + '/' + 'data')
-            os.makedirs(path + '/' + 'po')
-        os.makedirs(path + '/' + 'src')
+            manifest_file = self.create_manifest_file(self.root, data)
+            self.files.append(manifest_file)
+            
+            post_install_file = self.create_meson_postinstall_file(path)
+            self.files.append(post_install_file)
 
-        self.file.create_copying_file(path, self.license)
-
-        if self.is_gui:
-            self.file.create_manifest_file(path, p_id, p_name, self.lang)
-            self.file.create_meson_postinstall_file(path)
-
-        text_meson = (f"project('{p_name}',\n",
+        text_meson = (f"project('{data['project_name']}',\n",
                       f"          version: '0.1.0',\n",
                       f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
                       f"  default_options: [ 'warning_level=2',\n",
@@ -84,7 +115,8 @@ class RustTemplate():
         if self.is_gui:
             text_meson += ("meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-        create_file(path + '/', 'meson.build', text_meson)
+        main_meson_file = File(self.root, 'meson.build', text_meson)
+        self.files.append(main_meson_file)
 
         text_cargo = (f"""#!/bin/sh\n""",
                       f"""\n""",
@@ -111,38 +143,46 @@ class RustTemplate():
                       f"""fi\n""",
                       f"""\n""",)
         
-        create_file(path + '/build-aux/', 'cargo.sh', text_cargo)
-        make_executable(path + '/build-aux/cargo.sh')
+        cargo_file = File(self.root + '/build-aux/', 'cargo.sh', text_cargo)
+        self.files.append(cargo_file)
 
-    def populate_data_folder(self, p_id, p_name):
-        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
-        p_full_name = p_id + '.' + p_name
-        p_path = p_id.replace('.', '/')
+    def populate_data_dir(self, data):
+        path = self.root + 'data/'
 
-        self.file.create_data_meson_file(self.path, p_id)
-        self.file.create_appdata_file(self.path, p_id, self.license)
-        self.file.create_desktop_file(self.path, p_full_name, p_name, p_id)
-        self.file.create_gschema_file(self.path, p_full_name, p_name, p_path)
+        meson_data_file = self.create_data_meson_file(path, data)
+        self.files.append(meson_data_file)
 
-    def populate_po_dir(self, p_id, p_name):
-        p_full_name = p_id + '.' + p_name
-        files = ['window.ui']
+        appdata_file = self.create_appdata_file(path, data)
+        self.files.append(appdata_file)
 
-        self.file.create_po_linguas_file(self.path)
-        self.file.create_po_meson_file(self.path, p_name)
-        self.file.create_po_potfiles_file(self.path, p_id, files)
+        desktop_file = self.create_desktop_file(path, data)
+        self.files.append(desktop_file)
 
-    def populate_src_dir(self, p_id, p_name):
-        p_name_underscore = p_name.replace('-', '_')
-        p_id_reverse = p_id.replace('.', '/') + '/' + p_name + '/'
-        p_id_reverse_short = p_id.replace('.', '/')
+        gschema_file = self.create_gschema_file(path, data)
+        self.files.append(gschema_file)
+
+    def populate_po_dir(self, data):
+        path = self.root + 'po/'
+
+        linguas_file = self.create_po_linguas_file(path)
+        self.files.append(linguas_file)
+
+        po_meson_file = self.create_po_meson_file(path, data)
+        self.files.append(po_meson_file)
+
+        potfiles_file = self.create_po_potfiles_file(path, data)
+        self.files.append(potfiles_file)
+
+    def populate_src_dir(self, data):
+        path = self.root + 'src/'
 
         if self.is_gui:
             text_config = (f"pub static PKGDATADIR: &str = @pkgdatadir@;\n",
                            f"pub static VERSION: &str = @VERSION@;\n",
                            f"pub static LOCALEDIR: &str = @localedir@;\n",)
             
-            create_file(path + '/src/', 'config.rs.in', text_config)
+            config_src_file = File(path, 'config.rs.in', text_config)
+            self.files.append(config_src_file)
 
         if self.is_gui:
             text_main = (f"use gettextrs::*;\n",
@@ -157,14 +197,14 @@ class RustTemplate():
                          f"    gtk::init().unwrap_or_else(|_| panic!(\"Failed to initialize GTK.\"));\n",
                          f"\n",
                          f"    setlocale(LocaleCategory::LcAll, \"\");\n",
-                         f"    bindtextdomain(\"{p_name}\", config::LOCALEDIR);\n",
-                         f"    textdomain(\"%{p_name}\");\n",
+                         f"    bindtextdomain(\"{data['project_name']}\", config::LOCALEDIR);\n",
+                         f"    textdomain(\"%{data['project_name']}\");\n",
                          f"\n",
-                         f"    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/{p_name}.gresource\")\n",
+                         f"    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/{data['project_name']}.gresource\")\n",
                          f"        .expect(\"Could not load resources\");\n",
                          f"    gio::resources_register(&res);\n",
                          f"\n",
-                         f"    let app = gtk::Application::new(Some(\"{p_id}\"), Default::default()).unwrap();\n",
+                         f"    let app = gtk::Application::new(Some(\"{data['project_id']}\"), Default::default()).unwrap();\n",
                          f"    app.connect_activate(move |app| {{\n",
                          f"        let window = Window::new();\n",
                          f"\n",
@@ -181,14 +221,15 @@ class RustTemplate():
                         f"    println!(\"Hello World\");\n",
                         f"}}\n")
 
-        create_file(path + '/src/', 'main.rs', text_main)
+        main_src_file = File(path, 'main.rs', text_main)
+        self.files.append(main_src_file)
 
-        if self.is_cli:
+        if not self.is_gui:
             text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
                          f"gnome = import('gnome')\n",
                          f"\n",
-                         f"gnome.compile_resources('{p_name}',\n",
-                         f"  '{p_name_underscore}.gresource.xml',\n",
+                         f"gnome.compile_resources('{data['project_name']}',\n",
+                         f"  '{data['project_name_underscore']}.gresource.xml',\n",
                          f"  gresource_bundle: true,\n",
                          f"  install: true,\n",
                          f"  install_dir: pkgdatadir,\n",
@@ -218,17 +259,17 @@ class RustTemplate():
                          f"  'main.rs',\n",
                          f"  'window.rs',\n",
                          f")\n",
-                         f"{p_name_underscore}_sources = [",
+                         f"{data['project_name_underscore']}_sources = [",
                          f"  'main.rs',\n",
                          f"]\n",
-                         f"{p_name_underscore}_deps = [\n",
+                         f"{data['project_name_underscore']}_deps = [\n",
                          f"]\n",
                          f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
                          f"cargo_release = custom_target(\n",
                          f"  'cargo-build',\n",
                          f"  build_by_default: true,\n",
                          f"  input: sources,\n",
-                         f"  input: {p_name_underscore}_sources,\n",
+                         f"  input: {data['project_name_underscore']}_sources,\n",
                          f"  output: meson.project_name(),\n",
                          f"  console: true,\n",
                          f"  install: true,\n",
@@ -243,30 +284,32 @@ class RustTemplate():
                          f" ]\n",
                          f")\n",)
 
-        create_file(path + '/src/', 'meson.build', text_meson)
+        meson_src_file = File(path, 'meson.build', text_meson)
+        self.files.append(meson_src_file)
 
         if self.is_gui:
-            files = ['window.ui']
-            self.file.create_gresource_file(path, p_name_underscore, p_id_reverse, files)
+            gresource_file = self.create_gresource_file(path, data)
+            self.files.append(gresource_file)
 
             text_window = (f"use gtk::prelude::*;\n",
-                    f"\n",
-                    f"pub struct Window {{\n",
-                    f"    pub widget: gtk::ApplicationWindow,\n",
-                    f"}}\n",
-                    f"\n",
-                    f"impl Window {{\n",
-                    f"    pub fn new() -> Self {{\n",
-                    f"        let builder = gtk::Builder::new_from_resource(\"/{p_id_reverse_short}/window.ui\");\n",
-                    f"        let widget: gtk::ApplicationWindow = builder\n",
-                    f"            .get_object(\"window\")\n",
-                    f"            .expect(\"Failed to find the window object\");\n",
-                    f"\n",
-                    f"        Self {{ widget }}\n",
-                    f"    }}\n",
-                    f"}}\n",)
+                           f"\n",
+                           f"pub struct Window {{\n",
+                           f"    pub widget: gtk::ApplicationWindow,\n",
+                           f"}}\n",
+                           f"\n",
+                           f"impl Window {{\n",
+                           f"    pub fn new() -> Self {{\n",
+                           f"        let builder = gtk::Builder::new_from_resource(\"/{data['project_id_reverse_short']}/window.ui\");\n",
+                           f"        let widget: gtk::ApplicationWindow = builder\n",
+                           f"            .get_object(\"window\")\n",
+                           f"            .expect(\"Failed to find the window object\");\n",
+                           f"\n",
+                           f"        Self {{ widget }}\n",
+                           f"    }}\n",
+                           f"}}\n",)
 
-            create_file(path + '/src/', 'window.rs', text_window)
+            window_file = File(path, 'window.rs', text_window)
+            self.files.append(window_file)
 
             text_window_ui = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                               f"""<interface>\n""",
@@ -292,6 +335,6 @@ class RustTemplate():
                               f"""    </child>\n""",
                               f"""    </object>\n""",
                               f"""  </interface>\n""",)
-
-            create_file(path + '/src/', 'window.ui', text_window_ui)
+            window_file_ui = File(path, 'window.ui', text_window_ui)
+            self.files.append(window_file_ui)
 
