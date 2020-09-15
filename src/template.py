@@ -178,17 +178,14 @@ class Template:
                 f"""  - /include\n""",
                 f"""  - /lib/pkgconfig\n""",
                 f"""  - /man\n""",
-                f"""  - /share/doc\n""",)
-
-        if data['lang'] == 'js' or data['lang'] == 'c':
-            text += (f"""  - /share/gtk-doc\n""",)
-
-        text += (f"""  - /share/man\n""",
+                f"""  - /share/doc\n""",
+                f"""  - /share/gtk-doc\n""",
+                f"""  - /share/man\n""",
                 f"""  - /share/pkgconfig\n""",
                 f"""  - '*.la'\n""",
                 f"""  - '*.a'\n""",
                 f"""modules:\n""",
-                f"""  - name:\n""",
+                f"""  - name: {data['project_name']}\n""",
                 f"""    builddir: true\n""",
                 f"""    buildsystem: meson\n""",
                 f"""    sources:\n""",
@@ -213,8 +210,7 @@ class Template:
 
         text += (f"Type=Application\n",
                  f"Categories=GTK;\n",
-                 f"StartupNotify=true\n",
-                 f"Icon={data['project_id']}\n",)
+                 f"StartupNotify=true\n",)
 
         f = File(path, data['project_id'] + '.desktop.in', text)
         return f
@@ -231,8 +227,8 @@ class Template:
 
     def create_data_meson_file(self, path, data):
         text = (f"desktop_file = i18n.merge_file(\n",
-                f"  input: '{data['project_full_name']}.desktop.in',\n",
-                f"  output: '{data['project_full_name']}.desktop',\n",
+                f"  input: '{data['project_id']}.desktop.in',\n",
+                f"  output: '{data['project_id']}.desktop',\n",
                 f"  type: 'desktop',\n",
                 f"  po_dir: '../po',\n",
                 f"  install: true,\n",
@@ -247,8 +243,8 @@ class Template:
                 f"endif\n",
                 f"\n",
                 f"appstream_file = i18n.merge_file(\n",
-                f"  input: '{data['project_full_name']}.appdata.xml.in',\n",
-                f"  output: '{data['project_full_name']}.appdata.xml',\n",
+                f"  input: '{data['project_id']}.appdata.xml.in',\n",
+                f"  output: '{data['project_id']}.appdata.xml',\n",
                 f"  po_dir: '../po',\n",
                 f"  install: true,\n",
                 f"  install_dir: join_paths(get_option('datadir'), '{constants['METADATA_FOLDER']}')\n",
@@ -261,7 +257,7 @@ class Template:
                 f"  )\n",
                 f"endif\n",
                 f"\n",
-                f"install_data('{data['project_full_name']}.gschema.xml',\n",
+                f"install_data('{data['project_id']}.gschema.xml',\n",
                 f"  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n",
                 f")\n",
                 f"\n",
@@ -298,6 +294,8 @@ class Template:
             text += (f"""  <project_license>MIT</project_license>\n""",)
 
         text += (f"""  <description>\n""",
+                f"""<p>""",
+                f"""</p>""",
                 f"""  </description>\n""",
                 f"""</component>\n""",
                 f"""\n""",)
@@ -308,7 +306,7 @@ class Template:
     def create_gresource_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<gresources>\n""",
-                f"""  <gresource prefix="/{data['project_full_name'].replace('.', '/')}">\n""",)
+                f"""  <gresource prefix="/{data['project_id'].replace('.', '/')}">\n""",)
         
         for f in data['gresource_files']:
             text += (f"    <file>{f}</file>\n",)
@@ -327,7 +325,6 @@ class Template:
 
     def create_window_ui_file(self, path, data):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""\n""",
                 f"""<interface>\n""",
                 f"""  <requires lib="gtk+" version="3.24"/>\n""",
                 f"""    <template class="{data['class_name']}Window" parent="GtkApplicationWindow">\n""",
