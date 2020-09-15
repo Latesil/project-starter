@@ -25,25 +25,26 @@ class Template:
     gui_folders = ['build-aux/meson', 'data', 'src', 'po']
     cli_folders = ['src']
 
-    _gpl = """# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+    def get_gpl(self, lang):
+        if lang == 'python':
+            comment = '#'
+        elif lang == 'c':
+            comment = '*'
 
-    def get_gpl(self):
-        """
-        return GPL text in the beginning of the file
-        """
-        return self._gpl
+        gpl = f"""{comment} This program is free software: you can redistribute it and/or modify
+{comment} it under the terms of the GNU General Public License as published by
+{comment} the Free Software Foundation, either version 3 of the License, or
+{comment} (at your option) any later version.
+{comment}
+{comment} This program is distributed in the hope that it will be useful,
+{comment} but WITHOUT ANY WARRANTY; without even the implied warranty of
+{comment} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+{comment} GNU General Public License for more details.
+{comment}
+{comment} You should have received a copy of the GNU General Public License
+{comment} along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+        return gpl
 
     def create_folders(self, root, additional_folders=None, gui=True):
         if additional_folders is None:
@@ -315,7 +316,7 @@ class Template:
                 f"""</gresources>\n""",
                 f"""\n""",)
 
-        f = File(path, self.project_name.replace('-', '_') + '.gresource.xml', text)
+        f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
         return f
 
     ############### end /data dir #################
@@ -327,7 +328,7 @@ class Template:
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<interface>\n""",
                 f"""  <requires lib="gtk+" version="3.24"/>\n""",
-                f"""    <template class="{data['class_name']}Window" parent="GtkApplicationWindow">\n""",
+                f"""    <template class="{data['window_name']}Window" parent="GtkApplicationWindow">\n""",
                 f"""      <property name="default-width">600</property>\n""",
                 f"""    <property name="default-height">300</property>\n""",
                 f"""    <child type="titlebar">\n""",
@@ -350,7 +351,10 @@ class Template:
                 f"""    </template>\n""",
                 f"""  </interface>\n""",)
 
-        f = File(path, 'window.ui', text)
+        if data['lang'] == 'c':
+            f = File(path, data['ui_filename'], text)
+        else:
+            f = File(path, 'window.ui', text)
         return f
 
     ############### end /src/ dir #################

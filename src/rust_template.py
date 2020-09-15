@@ -53,7 +53,7 @@ class RustTemplate():
 
         self.file.create_copying_file(path, self.license)
 
-        if self.is_gui
+        if self.is_gui:
             self.file.create_manifest_file(path, p_id, p_name, self.lang)
             self.file.create_meson_postinstall_file(path)
 
@@ -189,11 +189,11 @@ class RustTemplate():
                          f"\n",
                          f"gnome.compile_resources('{p_name}',\n",
                          f"  '{p_name_underscore}.gresource.xml',\n",
-                         f"  gresource_bundle: true,\n"",
+                         f"  gresource_bundle: true,\n",
                          f"  install: true,\n",
                          f"  install_dir: pkgdatadir,\n",
-                         f")\n"",
-                         f"\n"",
+                         f")\n",
+                         f"\n",
                          f"conf = configuration_data()\n",
                          f"conf.set_quoted('VERSION', meson.project_version())\n",
                          f"conf.set_quoted('localedir', join_paths(get_option('prefix'), get_option('localedir')))\n",
@@ -259,7 +259,7 @@ class RustTemplate():
                     f"    pub fn new() -> Self {{\n",
                     f"        let builder = gtk::Builder::new_from_resource(\"/{p_id_reverse_short}/window.ui\");\n",
                     f"        let widget: gtk::ApplicationWindow = builder\n",
-                    f"            .get_object(\"window\")\n"",
+                    f"            .get_object(\"window\")\n",
                     f"            .expect(\"Failed to find the window object\");\n",
                     f"\n",
                     f"        Self {{ widget }}\n",
@@ -288,7 +288,7 @@ class RustTemplate():
                               f"""          <attribute name="weight" value="bold"/>\n""",
                               f"""          <attribute name="scale" value="2"/>\n""",
                               f"""        </attributes>\n""",
-                              f"""      </object>\n"""",
+                              f"""      </object>\n""",
                               f"""    </child>\n""",
                               f"""    </object>\n""",
                               f"""  </interface>\n""",)

@@ -31,7 +31,6 @@ class CTemplate(Template):
         self.project_license = license
         self.files = []
         self.lang = 'c'
-        self.gresource_files = ['window.ui']
 
         #####################################################
 
@@ -42,8 +41,12 @@ class CTemplate(Template):
         self.project_name_underscore = self.project_name.replace('-', '_')
         self.project_id_reverse_short = self.project_id.replace('.', '/')
         self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
+        self.ui_filename = self.project_id_underscore + '-window.ui'
 
-        self.po_files = self.project_id_underscore + '-window.ui', 'main.c', self.project_id_underscore + '-window.c'
+        self.po_files = [self.project_id_underscore + '-window.ui', 
+                        'main.c', 
+                        self.project_id_underscore + '-window.c']
+        self.gresource_files = [self.project_id_underscore + '-window.ui']
 
         self.data = vars(self)
 
@@ -111,12 +114,15 @@ class CTemplate(Template):
         text += (f"subdir('src')\n",)
 
         if self.is_gui:
-            text = (f"subdir('po')\n",)
+            text += (f"subdir('po')\n",)
         
         text += (f"\n",)
 
         if self.is_gui:
             text += (f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
+
+        main_meson_file = File(self.root, 'meson.build', text)
+        self.files.append(main_meson_file)
 
         if self.is_gui:
             manifest_file = self.create_manifest_file(self.root, data)
@@ -157,7 +163,8 @@ class CTemplate(Template):
                         f" *\n",
                         f" * Copyright 2020\n",
                         f"\n",
-                        f"{self.get_gpl()}",
+                        f"{self.get_gpl(self.lang)}",
+                        f" */\n",
                         f"\n",
                         f"#include <glib/gi18n.h>\n",
                         f"\n",
@@ -238,7 +245,8 @@ class CTemplate(Template):
                         f" *\n",
                         f" * Copyright 2020\n",
                         f"\n",
-                        f"{self.get_gpl()}",
+                        f"{self.get_gpl(self.lang)}",
+                        f" */\n",
                         f"\n",
                         f"#include \"{data['project_id_underscore']}-config.h\"\n",
                         f"\n",
@@ -318,7 +326,8 @@ class CTemplate(Template):
             text_window = (f"/* main.c\n",
                            f" *\n",
                            f" * Copyright 2020\n",
-                           f"{self.get_gpl()}",
+                           f"{self.get_gpl(self.lang)}",
+                           f" */\n",
                            f"\n",
                            f"#include \"{data['project_id_underscore']}-config.h\"\n",
                            f"#include \"{data['project_id_underscore']}-window.h\"\n",
@@ -359,7 +368,8 @@ class CTemplate(Template):
             text_window_h = (f"/* c_gui_example-window.h\n",
                             f" *\n",
                             f" * Copyright 2020\n",
-                            f"{self.get_gpl()}",
+                            f"{self.get_gpl(self.lang)}",
+                            f" */\n",
                             f"\n",
                             f"#pragma once\n",
                             f"\n",

@@ -44,7 +44,7 @@ class PythonTemplate(Template):
 
         ########################################################################
 
-        self.class_name = "".join(w.capitalize() for w in self.project_name.split('-'))
+        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
 
         self.data = vars(self)
 
@@ -136,7 +136,7 @@ class PythonTemplate(Template):
                      f"#\n",
                      f"# Copyright {self.year}\n",
                      f"#\n",
-                     f"{self.get_gpl()}",
+                     f"{self.get_gpl(self.lang)}",
                      f"\n",
                      f"import sys\n",
                      f"import gi\n",
@@ -145,7 +145,7 @@ class PythonTemplate(Template):
                      f"\n",
                      f"from gi.repository import Gtk, Gio\n",
                      f"\n",
-                     f"from .window import {data['class_name']}Window\n",
+                     f"from .window import {data['window_name']}Window\n",
                      f"\n",
                      f"\n",
                      f"class Application(Gtk.Application):\n",
@@ -156,7 +156,7 @@ class PythonTemplate(Template):
                      f"    def do_activate(self):\n",
                      f"        win = self.props.active_window\n",
                      f"        if not win:\n",
-                     f"            win = {data['class_name']}Window(application=self)\n",
+                     f"            win = {data['window_name']}Window(application=self)\n",
                      f"        win.present()\n",
                      f"\n",
                      f"\n",
@@ -211,7 +211,7 @@ class PythonTemplate(Template):
                       f"#\n",
                       f"# Copyright {self.year}\n",
                       f"#\n",
-                      f"{self.get_gpl()}",
+                      f"{self.get_gpl(self.lang)}",
                       f"\n",
                       f"import os\n",
                       f"import sys\n",
@@ -245,14 +245,14 @@ class PythonTemplate(Template):
                        f"#\n",
                        f"# Copyright {self.year}\n",
                        f"#\n",
-                       f"{self.get_gpl()}",
+                       f"{self.get_gpl(self.lang)}",
                        f"\n",
                        f"from gi.repository import Gtk\n",
                        f"\n",
                        f"\n",
                        f"@Gtk.Template(resource_path='/{data['project_id'].replace('.', '/')}/window.ui')\n",
-                       f"class {data['class_name']}Window(Gtk.ApplicationWindow):\n",
-                       f"    __gtype_name__ = '{data['class_name']}Window'\n",
+                       f"class {data['window_name']}Window(Gtk.ApplicationWindow):\n",
+                       f"    __gtype_name__ = '{data['window_name']}Window'\n",
                        f"\n",
                        f"    label = Gtk.Template.Child()\n",
                        f"\n",
