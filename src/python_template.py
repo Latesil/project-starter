@@ -41,9 +41,6 @@ class PythonTemplate(Template):
 
         ########################################################################
 
-        self.project_full_name = self.project_id + '.' + self.project_name
-        self.project_path = self.project_id.replace('.', '/')
-        self.project_id_reverse = self.project_path + '/' + self.project_name + '/'
         self.class_name = "".join(w.capitalize() for w in self.project_name.split('-'))
 
         self.data = vars(self)
@@ -250,7 +247,7 @@ class PythonTemplate(Template):
                        f"from gi.repository import Gtk\n",
                        f"\n",
                        f"\n",
-                       f"@Gtk.Template(resource_path='/{data['project_path']}/window.ui')\n",
+                       f"@Gtk.Template(resource_path='/{data['project_id'].replace('.', '/')}/window.ui')\n",
                        f"class {data['class_name']}Window(Gtk.ApplicationWindow):\n",
                        f"    __gtype_name__ = '{data['class_name']}Window'\n",
                        f"\n",

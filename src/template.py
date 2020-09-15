@@ -294,8 +294,8 @@ class Template:
             text += (f"""  <project_license>MIT</project_license>\n""",)
 
         text += (f"""  <description>\n""",
-                f"""<p>""",
-                f"""</p>""",
+                f"""    <p>\n""",
+                f"""    </p>\n""",
                 f"""  </description>\n""",
                 f"""</component>\n""",
                 f"""\n""",)
