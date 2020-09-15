@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import datetime
 from .project_starter_constants import constants
 from .file import File
 from .template import Template
@@ -31,6 +32,8 @@ class CTemplate(Template):
         self.project_license = license
         self.files = []
         self.lang = 'c'
+        now = datetime.datetime.now()
+        self.year = now.year
 
         #####################################################
 
