@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import datetime
 from .project_starter_constants import constants
 from .file import File
 from .template import Template
@@ -38,6 +39,8 @@ class PythonTemplate(Template):
         self.lang = 'python'
         self.po_files = ['window.ui', 'main.py', 'window.py']
         self.gresource_files = ['window.ui']
+        now = datetime.datetime.now()
+        self.year = now.year
 
         ########################################################################
 
@@ -131,7 +134,7 @@ class PythonTemplate(Template):
 
         text_main = (f"# main.py\n"
                      f"#\n",
-                     f"# Copyright 2020\n",
+                     f"# Copyright {self.year}\n",
                      f"#\n",
                      f"{self.get_gpl()}",
                      f"\n",
@@ -206,7 +209,7 @@ class PythonTemplate(Template):
                       f"#\n",
                       f"# {data['project_name']}.in\n",
                       f"#\n",
-                      f"# Copyright 2020\n",
+                      f"# Copyright {self.year}\n",
                       f"#\n",
                       f"{self.get_gpl()}",
                       f"\n",
@@ -240,7 +243,7 @@ class PythonTemplate(Template):
 
         text_window = (f"# window.py\n",
                        f"#\n",
-                       f"# Copyright 2020\n",
+                       f"# Copyright {self.year}\n",
                        f"#\n",
                        f"{self.get_gpl()}",
                        f"\n",
