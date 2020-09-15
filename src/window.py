@@ -324,7 +324,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     def check_project_name(self, text):
         if text:
-            return False if text[0].isdigit() or re.search('\s', text) or not text.islower() else True
+            return False if text[0].isdigit() or re.search('\s', text) or re.search('\.', text) or not text.islower() else True
 
     def check_project_id(self, text):
         if text:
