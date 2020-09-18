@@ -327,6 +327,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
             return False if text[0].isdigit() or re.search('\s', text) or re.search('\.', text) or not text.islower() else True
 
     def check_project_id(self, text):
+        # TODO two perios check
         if text:
             return True if re.match('[a-zA-Z]+\.[a-zA-Z]+', text) else False
 

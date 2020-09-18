@@ -29,59 +29,60 @@ class JsTemplate(Template):
     """
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
-        self.is_gui = is_gui
-        self.project_id = project_id
-        self.project_name = project_name
-        self.root = path
-        self.is_git = is_git
-        self.lang = 'js'
-        self.project_license = license
+        self.data = {}
+        self.data['is_gui'] = is_gui
+        self.data['project_id'] = project_id
+        self.data['project_name'] = project_name
+        self.data['root'] = path
+        self.data['is_git'] = is_git
+        self.data['lang'] = 'js'
+        self.data['project_license'] = license
+        self.data['po_files'] = ['window.ui', 'window.js', 'main.js']
+        self.data['gresource_files'] = ['window.ui']
+        self.data['gresource_files_additional'] = ['window.js', 'main.js']
+        self.data['year'] = datetime.datetime.now().year
+
+        ##############################################################
+
+        self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
+        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
+        self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
+        self.data['project_path'] = self.data['project_id'].replace('.', '/')
+        self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
+        self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
+        self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
+
+        ##############################################################
+
         self.files = []
-        self.po_files = ['window.ui', 'window.js', 'main.js']
-        self.gresource_files = ['window.ui', 'window.js', 'main.js']
-        now = datetime.datetime.now()
-        self.year = now.year
-
-        ##############################################################
-
-        self.project_full_name = self.project_id + '.' + self.project_name
-        self.project_id_underscore = self.project_id.replace('.', '_').lower()
-        self.project_id_reverse = self.project_id.replace('.', '/') + '/' + self.project_name + '/'
-        self.project_path = self.project_id.replace('.', '/')
-        self.project_name_underscore = self.project_name.replace('-', '_')
-        self.project_id_reverse_short = self.project_id.replace('.', '/')
-        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
-
-        self.data = vars()
-
-        ##############################################################
 
     def start(self):
-        self.create_folders(self.root)
+        self.create_folders(self.data['root'])
         self.populate_root_dir(self.data)
         self.populate_data_dir(self.data)
         self.populate_po_dir(self.data)
         self.populate_src_dir(self.data)
 
-        if self.is_git:
-            os.chdir(self.root)
+        if self.data['is_git']:
+            os.chdir(self.data['root'])
             os.system('git init')
 
         for f in self.files:
             f.create()
-            if f.filename == self.project_name + '.in':
+            if f.filename == self.data['project_id'] + '.in':
                 f.make_executable()
 
     def populate_root_dir(self, data):
-        path = self.root + 'build-aux/meson/'
+        path = data['root']
+        path_meson_postinstall = self.data['root'] + 'build-aux/meson/'
 
-        copying_file = self.create_copying_file(self.root, data)
+        copying_file = self.create_copying_file(path, data)
         self.files.append(copying_file)
 
-        manifest_file = self.create_manifest_file(self.root, data)
+        manifest_file = self.create_manifest_file(path, data)
         self.files.append(manifest_file)
 
-        post_install_file = self.create_meson_postinstall_file(path)
+        post_install_file = self.create_meson_postinstall_file(path_meson_postinstall)
         self.files.append(post_install_file)
 
         text = (f"project('{data['project_name']}',\n",
@@ -100,11 +101,11 @@ class JsTemplate(Template):
                 f"\n",
                 f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-        main_meson_file = File(self.root, 'meson.build', text)
+        main_meson_file = File(path, 'meson.build', text)
         self.files.append(main_meson_file)
 
     def populate_data_dir(self, data):
-        path = self.root + 'data/'
+        path = data['root'] + 'data/'
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)
@@ -119,7 +120,7 @@ class JsTemplate(Template):
         self.files.append(gschema_file)
 
     def populate_po_dir(self, data):
-        path = self.root + 'po/'
+        path = data['root'] + 'po/'
 
         linguas_file = self.create_po_linguas_file(path)
         self.files.append(linguas_file)
@@ -131,13 +132,13 @@ class JsTemplate(Template):
         self.files.append(potfiles_file)
 
     def populate_src_dir(self, data):
-        path = self.root + 'src/'
+        path = data['root'] + 'src/'
 
         text_main = (f"/* main.js\n",
                      f" *\n",
-                     f" * Copyright {self.year}\n",
+                     f" * Copyright {self.data['year']}\n",
                      f" *\n",
-                     f"{self.get_gpl(self.lang)}",
+                     f"{self.get_gpl(self.data['lang'])}",
                      f" */\n",
                      f"\n",
                      f"pkg.initGettext();\n",
@@ -173,17 +174,17 @@ class JsTemplate(Template):
         main_src_file = File(path, 'main.js', text_main)
         self.files.append(main_src_file)
 
-        text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
+        text_meson = (f"pkgdatadir = join_paths(get_option('datadir'), meson.project_name())\n",
                       f"gnome = import('gnome')\n",
                       f"\n",
-                      f"gnome.compile_resources('{data['project_id']}.src',\n",
+                      f"src_res = gnome.compile_resources('{data['project_id']}.src',\n",
                       f"  '{data['project_id']}.src.gresource.xml',\n",
                       f"  gresource_bundle: true,\n",
                       f"  install: true,\n",
                       f"  install_dir: pkgdatadir,\n",
                       f")\n",
                       f"\n",
-                      f"gnome.compile_resources('{data['project_id']}.data',\n",
+                      f"data_res = gnome.compile_resources('{data['project_id']}.data',\n",
                       f"  '{data['project_id']}.data.gresource.xml',\n",
                       f"  gresource_bundle: true,\n",
                       f"  install: true,\n",
@@ -209,8 +210,11 @@ class JsTemplate(Template):
         meson_src_file = File(path, 'meson.build', text_meson)
         self.files.append(meson_src_file)
         
-        gresource_file = self.create_gresource_file(path, data)
+        gresource_file = self.create_gresource_file(path, data, prefix='data')
         self.files.append(gresource_file)
+
+        additional_gresource_file = self.create_gresource_file(path, data, additional=True, prefix='src')
+        self.files.append(additional_gresource_file)
 
         text_id_in = (f"#!@GJS@\n",
                         f"imports.package.init({{\n",
@@ -222,14 +226,14 @@ class JsTemplate(Template):
                         f"}});\n",
                         f"imports.package.run(imports.main);\n",)
 
-        in_src_file = File(path, self.project_name + '.in', text_id_in)
+        in_src_file = File(path, self.data['project_id'] + '.in', text_id_in)
         self.files.append(in_src_file)
 
         text_window = (f"/* window.js\n",
                         f" *\n",
-                        f" * Copyright {self.year}\n",
+                        f" * Copyright {self.data['year']}\n",
                         f" *\n",
-                        f"{self.get_gpl(self.lang)}",
+                        f"{self.get_gpl(self.data['lang'])}",
                         f" */\n",
                         f"\n",
                         f"const {{ GObject, Gtk }} = imports.gi;\n",
@@ -238,7 +242,7 @@ class JsTemplate(Template):
                         f"    GTypeName: '{data['window_name']}Window',\n",
                         f"    Template: 'resource:///{data['project_id_reverse_short']}/window.ui',\n",
                         f"    InternalChildren: ['label']\n",
-                        f"}}, class %sWindow extends Gtk.ApplicationWindow {{\n",
+                        f"}}, class {data['window_name']}Window extends Gtk.ApplicationWindow {{\n",
                         f"    _init(application) {{\n",
                         f"        super._init({{ application }});\n",
                         f"    }}\n",

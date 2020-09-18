@@ -31,18 +31,18 @@ class Template:
         else:
             comment = '*'
 
-        gpl = f"""{comment} This program is free software: you can redistribute it and/or modify
-{comment} it under the terms of the GNU General Public License as published by
-{comment} the Free Software Foundation, either version 3 of the License, or
-{comment} (at your option) any later version.
-{comment}
-{comment} This program is distributed in the hope that it will be useful,
-{comment} but WITHOUT ANY WARRANTY; without even the implied warranty of
-{comment} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-{comment} GNU General Public License for more details.
-{comment}
-{comment} You should have received a copy of the GNU General Public License
-{comment} along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        gpl = f""" {comment} This program is free software: you can redistribute it and/or modify
+ {comment} it under the terms of the GNU General Public License as published by
+ {comment} the Free Software Foundation, either version 3 of the License, or
+ {comment} (at your option) any later version.
+ {comment}
+ {comment} This program is distributed in the hope that it will be useful,
+ {comment} but WITHOUT ANY WARRANTY; without even the implied warranty of
+ {comment} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ {comment} GNU General Public License for more details.
+ {comment}
+ {comment} You should have received a copy of the GNU General Public License
+ {comment} along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
         return gpl
 
@@ -165,8 +165,12 @@ class Template:
         if sdk_extension:
             text += sdk_extension
 
-        text += (f"""command: {data['project_name']}\n""",
-                f"""finish-args:\n""",
+        if data['lang'] == 'js':
+            text += (f"""command: {data['project_id']}\n""",)
+        else:
+            text += (f"""command: {data['project_name']}\n""",)
+        
+        text += (f"""finish-args:\n""",
                 f"""  - --share=network\n""",
                 f"""  - --share=ipc\n""",
                 f"""  - --socket=fallback-x11\n""",
@@ -204,7 +208,7 @@ class Template:
     def create_desktop_file(self, path, data, gui=True):
         text = (f"[Desktop Entry]\n",
                 f"Name={data['project_name']}\n",
-                f"Exec={data['project_name']}\n",)
+                f"Exec={data['project_id']}\n",)
 
         if gui:
             text += (f"Terminal=false\n",)
@@ -304,19 +308,27 @@ class Template:
         f = File(path, data['project_id'] + '.appdata.xml.in', text)
         return f
 
-    def create_gresource_file(self, path, data):
+    def create_gresource_file(self, path, data, additional=False, prefix=None):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
                 f"""<gresources>\n""",
                 f"""  <gresource prefix="/{data['project_id'].replace('.', '/')}">\n""",)
         
-        for f in data['gresource_files']:
-            text += (f"    <file>{f}</file>\n",)
+        if not additional:
+            for f in data['gresource_files']:
+                text += (f"    <file>{f}</file>\n",)
+        else:
+            for f in data['gresource_files_additional']:
+                text += (f"    <file>{f}</file>\n",)
             
         text += (f"""  </gresource>\n""",
                 f"""</gresources>\n""",
                 f"""\n""",)
 
-        f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
+        if prefix:
+            f = File(path, data['project_id'] + '.' + prefix + '.gresource.xml', text)
+        else:
+            f = File(path, data['project_id'] + '.gresource.xml', text)
+
         return f
 
     ############### end /data dir #################
@@ -331,9 +343,14 @@ class Template:
                 f"""    <template class="{data['window_name']}Window" parent="GtkApplicationWindow">\n""",
                 f"""      <property name="default-width">600</property>\n""",
                 f"""    <property name="default-height">300</property>\n""",
-                f"""    <child type="titlebar">\n""",
-                f"""      <object class="GtkHeaderBar" id="header_bar">\n""",
-                f"""        <property name="visible">True</property>\n""",
+                f"""    <child type="titlebar">\n""",)
+        
+        if data['lang'] == 'js':
+            text += (f"""      <object class="GtkHeaderBar" id="headerBar">\n""",)
+        else:
+            text += (f"""      <object class="GtkHeaderBar" id="header_bar">\n""",)
+
+        text += (f"""        <property name="visible">True</property>\n""",
                 f"""        <property name="show-close-button">True</property>\n""",
                 f"""        <property name="title">Hello, World!</property>\n""",
                 f"""      </object>\n""",

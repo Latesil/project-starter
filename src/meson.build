@@ -37,7 +37,7 @@ project_starter_sources = [
   'keyboard_shortcuts.py',
   'about_window.py',
   'gpl.py',
-  'mit-x11.py',
+  'mit.py',
   'apache.py',
   'lgpl.py',
   'agpl.py',

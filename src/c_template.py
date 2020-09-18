@@ -24,64 +24,62 @@ from .template import Template
 class CTemplate(Template):
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
-        self.is_gui = is_gui
-        self.project_id = project_id
-        self.project_name = project_name
-        self.root = path
-        self.is_git = is_git
-        self.project_license = license
+        self.data = {}
+        self.data['is_gui'] = is_gui
+        self.data['project_id'] = project_id
+        self.data['project_name'] = project_name
+        self.data['root'] = path
+        self.data['is_git'] = is_git
+        self.data['project_license'] = license
         self.files = []
-        self.lang = 'c'
-        now = datetime.datetime.now()
-        self.year = now.year
+        self.data['lang'] = 'c'
+        self.data['year'] = datetime.datetime.now().year
 
         #####################################################
 
-        self.project_full_name = self.project_id + '.' + self.project_name
-        self.project_id_underscore = self.project_id.replace('.', '_').lower()
-        self.project_id_reverse = self.project_id.replace('.', '/') + '/' + self.project_name + '/'
-        self.project_path = self.project_id.replace('.', '/')
-        self.project_name_underscore = self.project_name.replace('-', '_')
-        self.project_id_reverse_short = self.project_id.replace('.', '/')
-        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
-        self.ui_filename = self.project_id_underscore + '-window.ui'
+        self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
+        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
+        self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
+        self.data['project_path'] = self.data['project_id'].replace('.', '/')
+        self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
+        self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
+        self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
+        self.data['ui_filename'] = self.data['project_id_underscore'] + '-window.ui'
 
-        self.po_files = [self.project_id_underscore + '-window.ui', 
+        self.data['po_files'] = [self.data['project_id_underscore'] + '-window.ui', 
                         'main.c', 
-                        self.project_id_underscore + '-window.c']
-        self.gresource_files = [self.project_id_underscore + '-window.ui']
-
-        self.data = vars(self)
+                        self.data['project_id_underscore'] + '-window.c']
+        self.data['gresource_files'] = [self.data['project_id_underscore'] + '-window.ui']
 
         #####################################################
 
     def start(self):
-        if self.is_gui:
-            self.create_folders(self.root)
+        if self.data['is_gui']:
+            self.create_folders(self.data['root'])
         else:
-            self.create_folders(self.root, gui=False)
+            self.create_folders(self.data['root'], gui=False)
 
         self.populate_root_dir(self.data)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             self.populate_data_dir(self.data)
             self.populate_po_dir(self.data)
 
         self.populate_src_dir(self.data)
 
-        if self.is_git:
-            os.chdir(self.root)
+        if self.data['is_git']:
+            os.chdir(self.data['root'])
             os.system('git init')
 
         for f in self.files:
             f.create()
-            if f.filename == self.project_name + '.in':
+            if f.filename == self.data['project_name'] + '.in':
                 f.make_executable()
 
     def populate_root_dir(self, data):
-        path = self.root + 'build-aux/meson/'
+        path = self.data['root'] + 'build-aux/meson/'
 
-        copying_file = self.create_copying_file(self.root, data)
+        copying_file = self.create_copying_file(self.data['root'], data)
         self.files.append(copying_file)
 
         post_install_file = self.create_meson_postinstall_file(path)
@@ -111,28 +109,28 @@ class CTemplate(Template):
                 f"], language: 'c')\n",
                 f"\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text += (f"subdir('data')\n",)
 
         text += (f"subdir('src')\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text += (f"subdir('po')\n",)
         
         text += (f"\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text += (f"meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-        main_meson_file = File(self.root, 'meson.build', text)
+        main_meson_file = File(self.data['root'], 'meson.build', text)
         self.files.append(main_meson_file)
 
-        if self.is_gui:
-            manifest_file = self.create_manifest_file(self.root, data)
+        if self.data['is_gui']:
+            manifest_file = self.create_manifest_file(self.data['root'], data)
             self.files.append(manifest_file)
 
     def populate_data_dir(self, data):
-        path = self.root + 'data/'
+        path = self.data['root'] + 'data/'
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)
@@ -140,14 +138,14 @@ class CTemplate(Template):
         appdata_file = self.create_appdata_file(path, data)
         self.files.append(appdata_file)
 
-        desktop_file = self.create_desktop_file(path, data, gui=self.is_gui)
+        desktop_file = self.create_desktop_file(path, data, gui=self.data['is_gui'])
         self.files.append(desktop_file)
 
         gschema_file = self.create_gschema_file(path, data)
         self.files.append(gschema_file)
 
     def populate_po_dir(self, data):
-        path = self.root + 'po/'
+        path = self.data['root'] + 'po/'
 
         linguas_file = self.create_po_linguas_file(path)
         self.files.append(linguas_file)
@@ -159,14 +157,14 @@ class CTemplate(Template):
         self.files.append(potfiles_file)
 
     def populate_src_dir(self, data):
-        path = self.root + 'src/'
+        path = self.data['root'] + 'src/'
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_main = (f"/* main.c\n",
                         f" *\n",
-                        f" * Copyright {self.year}\n",
+                        f" * Copyright {self.data['year']}\n",
                         f"\n",
-                        f"{self.get_gpl(self.lang)}",
+                        f"{self.get_gpl(self.data['lang'])}",
                         f" */\n",
                         f"\n",
                         f"#include <glib/gi18n.h>\n",
@@ -246,9 +244,9 @@ class CTemplate(Template):
         else:
             text_main = (f"/* main.c\n",
                         f" *\n",
-                        f" * Copyright {self.year}\n",
+                        f" * Copyright {self.data['year']}\n",
                         f"\n",
-                        f"{self.get_gpl(self.lang)}",
+                        f"{self.get_gpl(self.data['lang'])}",
                         f" */\n",
                         f"\n",
                         f"#include \"{data['project_id_underscore']}-config.h\"\n",
@@ -292,7 +290,7 @@ class CTemplate(Template):
         text_meson = (f"{data['project_id_underscore']}_sources = [\n",
                         f"  'main.c',\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += (f"  '{data['project_id_underscore']}-window.c',\n",)
 
         text_meson += (f"]\n",
@@ -300,7 +298,7 @@ class CTemplate(Template):
                         f"{data['project_id_underscore']}_deps = [\n",
                         f"  dependency('gio-2.0', version: '>= 2.50'),\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += (f"  dependency('gtk+-3.0', version: '>= 3.22'),\n",)
 
         text_meson += (f"]\n",
@@ -321,15 +319,15 @@ class CTemplate(Template):
         meson_src_file = File(path, 'meson.build', text_meson)
         self.files.append(meson_src_file)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             gresource_file = self.create_gresource_file(path, data)
             self.files.append(gresource_file)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_window = (f"/* main.c\n",
                            f" *\n",
-                           f" * Copyright {self.year}\n",
-                           f"{self.get_gpl(self.lang)}",
+                           f" * Copyright {self.data['year']}\n",
+                           f"{self.get_gpl(self.data['lang'])}",
                            f" */\n",
                            f"\n",
                            f"#include \"{data['project_id_underscore']}-config.h\"\n",
@@ -370,8 +368,8 @@ class CTemplate(Template):
 
             text_window_h = (f"/* c_gui_example-window.h\n",
                             f" *\n",
-                            f" * Copyright {self.year}\n",
-                            f"{self.get_gpl(self.lang)}",
+                            f" * Copyright {self.data['year']}\n",
+                            f"{self.get_gpl(self.data['lang'])}",
                             f" */\n",
                             f"\n",
                             f"#pragma once\n",
