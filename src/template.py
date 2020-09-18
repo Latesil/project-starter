@@ -310,8 +310,12 @@ class Template:
 
     def create_gresource_file(self, path, data, additional=False, prefix=None):
         text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""<gresources>\n""",
-                f"""  <gresource prefix="/{data['project_id'].replace('.', '/')}">\n""",)
+                f"""<gresources>\n""",)
+        
+        if not additional:
+            text += (f"""  <gresource prefix="/{data['project_id'].replace('.', '/')}">\n""",)
+        else:
+            text += (f"""  <gresource prefix="/{data['project_id'].replace('.', '/')}/js">\n""",)
         
         if not additional:
             for f in data['gresource_files']:
