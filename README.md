@@ -16,5 +16,3 @@ To install this software you could clone that repo and use `flatpak-builder` fro
 `flatpak-builder --install <build-dir> com.github.Latesil.project-starter.json`
 
 (where \<build dir\> is a local folder where do you want to install a program)
-
-Please note that before installing you should change path in `com.github.Latesil.project-starter.json`.
