@@ -41,12 +41,12 @@ class RustTemplate(Template):
 
         ##############################################################
 
-        self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
-        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
-        self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
-        self.data['project_path'] = self.data['project_id'].replace('.', '/')
-        self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
-        self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
+        #self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
+        #self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
+        #self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
+        #self.data['project_path'] = self.data['project_id'].replace('.', '/')
+        #self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
+        #self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
         self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
 
         ##############################################################
@@ -293,7 +293,7 @@ class RustTemplate(Template):
                 f"gnome = import('gnome')\n",
                 f"\n",
                 f"gnome.compile_resources('{data['project_name']}',\n",
-                f"  '{data['project_name_underscore']}.gresource.xml',\n",
+                f"  '{data['project_name'].replace('-', '_')}.gresource.xml',\n",
                 f"  gresource_bundle: true,\n",
                 f"  install: true,\n",
                 f"  install_dir: pkgdatadir,\n",
@@ -359,7 +359,7 @@ class RustTemplate(Template):
                 f"\n",
                 f"impl Window {{\n",
                 f"    pub fn new() -> Self {{\n",
-                f"        let builder = gtk::Builder::new_from_resource(\"/{data['project_id_reverse_short']}/window.ui\");\n",
+                f"        let builder = gtk::Builder::new_from_resource(\"/{data['project_id'].replace('.', '/')}/window.ui\");\n",
                 f"        let widget: gtk::ApplicationWindow = builder\n",
                 f"            .get_object(\"window\")\n",
                 f"            .expect(\"Failed to find the window object\");\n",

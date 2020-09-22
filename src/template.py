@@ -355,7 +355,7 @@ class Template:
             f = File(path, data['project_id'] + '.' + prefix + '.gresource.xml', text)
         else:
             if data['lang'] == 'rust':
-                f = File(path, data['project_name_underscore'] + '.gresource.xml', text)
+                f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
             else:
                 f = File(path, data['project_id'] + '.gresource.xml', text)
 
