@@ -138,18 +138,6 @@ class CTemplate(Template):
         gschema_file = self.create_gschema_file(path, data)
         self.files.append(gschema_file)
 
-    def populate_po_dir(self, data):
-        path = data['root'] + 'po/'
-
-        linguas_file = self.create_po_linguas_file(path)
-        self.files.append(linguas_file)
-
-        po_meson_file = self.create_po_meson_file(path, data)
-        self.files.append(po_meson_file)
-
-        potfiles_file = self.create_po_potfiles_file(path, data)
-        self.files.append(potfiles_file)
-
     def populate_src_dir(self, data):
         path = data['root'] + 'src/'
 

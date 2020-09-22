@@ -196,33 +196,6 @@ class RustTemplate(Template):
         cargo_toml_file = File(data['root'], 'Cargo.toml', text_cargo_toml)
         self.files.append(cargo_toml_file)
 
-    def populate_data_dir(self, data):
-        path = data['root'] + 'data/'
-
-        meson_data_file = self.create_data_meson_file(path, data)
-        self.files.append(meson_data_file)
-
-        appdata_file = self.create_appdata_file(path, data)
-        self.files.append(appdata_file)
-
-        desktop_file = self.create_desktop_file(path, data)
-        self.files.append(desktop_file)
-
-        gschema_file = self.create_gschema_file(path, data)
-        self.files.append(gschema_file)
-
-    def populate_po_dir(self, data):
-        path = data['root'] + 'po/'
-
-        linguas_file = self.create_po_linguas_file(path)
-        self.files.append(linguas_file)
-
-        po_meson_file = self.create_po_meson_file(path, data)
-        self.files.append(po_meson_file)
-
-        potfiles_file = self.create_po_potfiles_file(path, data)
-        self.files.append(potfiles_file)
-
     def populate_src_dir(self, data):
         path = data['root'] + 'src/'
 
