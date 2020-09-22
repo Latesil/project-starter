@@ -61,10 +61,6 @@ class PythonTemplate(Template):
                 os.system('git init')
 
             self.create_files(self.files, executable=self.data['project_name'] + '.in')
-            """for f in self.files:
-                f.create()
-                if f.filename == self.data['project_name'] + '.in':
-                    f.make_executable()"""
 
     def populate_root_dir(self, data):
         path = data['root'] + 'build-aux/meson/'

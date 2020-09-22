@@ -63,10 +63,7 @@ class RustTemplate(Template):
             os.chdir(self.data['root'])
             os.system('git init')
 
-        for f in self.files:
-            f.create()
-            if f.filename == 'cargo.sh':
-                f.make_executable()
+        self.create_files(self.files, executable='cargo.sh')
 
     def populate_root_dir(self, data):
         path = data['root'] + '/build-aux/meson' if data['is_gui'] else data['root'] + '/build-aux'

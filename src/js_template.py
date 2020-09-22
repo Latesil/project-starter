@@ -61,10 +61,7 @@ class JsTemplate(Template):
             os.chdir(self.data['root'])
             os.system('git init')
 
-        for f in self.files:
-            f.create()
-            if f.filename == self.data['project_id'] + '.in':
-                f.make_executable()
+        self.create_files(self.files, executable=self.data['project_id'] + '.in')
 
     def populate_root_dir(self, data):
         path = data['root']
