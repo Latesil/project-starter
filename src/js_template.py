@@ -68,7 +68,7 @@ class JsTemplate(Template):
 
     def populate_root_dir(self, data):
         path = data['root']
-        path_meson_postinstall = self.data['root'] + 'build-aux/meson/'
+        path_meson_postinstall = data['root'] + 'build-aux/meson/'
 
         copying_file = self.create_copying_file(path, data)
         self.files.append(copying_file)
@@ -133,9 +133,9 @@ class JsTemplate(Template):
         text_main = (
             f"/* main.js\n",
             f" *\n",
-            f" * Copyright {self.data['year']}\n",
+            f" * Copyright {data['year']}\n",
             f" *\n",
-            f"{self.get_gpl(self.data['lang'])}",
+            f"{self.get_gpl(data['lang'])}",
             f" */\n",
             f"\n",
             f"pkg.initGettext();\n",
@@ -228,15 +228,15 @@ class JsTemplate(Template):
             f"imports.package.run(imports.main);\n",
         )
 
-        in_src_file = File(path, self.data['project_id'] + '.in', text_id_in)
+        in_src_file = File(path, data['project_id'] + '.in', text_id_in)
         self.files.append(in_src_file)
 
         text_window = (
             f"/* window.js\n",
             f" *\n",
-            f" * Copyright {self.data['year']}\n",
+            f" * Copyright {data['year']}\n",
             f" *\n",
-            f"{self.get_gpl(self.data['lang'])}",
+            f"{self.get_gpl(data['lang'])}",
             f" */\n",
             f"\n",
             f"const {{ GObject, Gtk }} = imports.gi;\n",
