@@ -44,7 +44,7 @@ class PythonTemplate(Template):
 
         ########################################################################
 
-        self.window_name = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
+        self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
 
         ########################################################################
 
@@ -60,10 +60,11 @@ class PythonTemplate(Template):
                 os.chdir(self.data['root'])
                 os.system('git init')
 
-            for f in self.files:
+            self.create_files(self.files, executable=self.data['project_name'] + '.in')
+            """for f in self.files:
                 f.create()
                 if f.filename == self.data['project_name'] + '.in':
-                    f.make_executable()
+                    f.make_executable()"""
 
     def populate_root_dir(self, data):
         path = data['root'] + 'build-aux/meson/'

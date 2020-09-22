@@ -354,7 +354,7 @@ class Template:
         if prefix:
             f = File(path, data['project_id'] + '.' + prefix + '.gresource.xml', text)
         else:
-            if data['lang'] == 'rust':
+            if data['lang'] == 'rust' or data['lang'] == 'python':
                 f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
             else:
                 f = File(path, data['project_id'] + '.gresource.xml', text)
@@ -409,3 +409,14 @@ class Template:
         return f
 
     ############### end /src/ dir #################
+
+    def create_files(self, files, executable=None):
+        """
+        Creates all files in list, and make one of them executable
+        executable is a string contains filename
+        """
+        for f in files:
+            f.create()
+            if executable:
+                if f.filename == executable:
+                    f.make_executable()
