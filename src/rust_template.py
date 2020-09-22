@@ -27,47 +27,46 @@ class RustTemplate(Template):
     """
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
-        self.is_gui = is_gui
-        self.project_id = project_id
-        self.project_name = project_name
-        self.root = path
-        self.is_git = is_git
-        self.lang = 'rust'
-        self.project_license = license
+        self.data = {}
+        self.data['is_gui'] = is_gui
+        self.data['project_id'] = project_id
+        self.data['project_name'] = project_name
+        self.data['root'] = path
+        self.data['is_git'] = is_git
+        self.data['lang'] = 'rust'
+        self.data['project_license'] = license
         self.files = []
-        self.po_files = ['window.ui']
-        self.gresource_files = ['window.ui']
+        self.data['po_files'] = ['window.ui']
+        self.data['gresource_files'] = ['window.ui']
 
         ##############################################################
 
-        self.project_full_name = self.project_id + '.' + self.project_name
-        self.project_id_underscore = self.project_id.replace('.', '_').lower()
-        self.project_id_reverse = self.project_id.replace('.', '/') + '/' + self.project_name + '/'
-        self.project_path = self.project_id.replace('.', '/')
-        self.project_name_underscore = self.project_name.replace('-', '_')
-        self.project_id_reverse_short = self.project_id.replace('.', '/')
-        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
-
-        self.data = vars()
+        self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
+        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
+        self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
+        self.data['project_path'] = self.data['project_id'].replace('.', '/')
+        self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
+        self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
+        self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
 
         ##############################################################
 
     def start(self):
-        if self.is_gui:
-            self.create_folders(self.root)
+        if self.data['is_gui']:
+            self.create_folders(self.data['root'])
         else:
-            self.create_folders(self.root, gui=False)
+            self.create_folders(self.data['root'], gui=False)
 
         self.populate_root_dir(self.data)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             self.populate_data_dir(self.data)
             self.populate_po_dir(self.data)
 
         self.populate_src_dir(self.data)
 
-        if self.is_git:
-            os.chdir(self.root)
+        if self.data['is_gui']:
+            os.chdir(self.data['root'])
             os.system('git init')
 
         for f in self.files:
@@ -76,46 +75,66 @@ class RustTemplate(Template):
                 f.make_executable()
 
     def populate_root_dir(self, data):
-        path = self.root + '/build-aux/meson' if self.is_gui else self.root + '/build-aux'
+        path = self.data['root'] + '/build-aux/meson' if self.data['is_gui'] else self.data['root'] + '/build-aux'
 
-        copying_file = self.create_copying_file(self.root, data)
+        sdk_extension = (
+            f"sdk-extensions:\n",
+            f"  - org.freedesktop.Sdk.Extension.rust-stable\n",
+        )
+
+        build_options = (
+            f"build-options:\n",
+            f"    append-path: /usr/lib/sdk/rust-stable/bin\n",
+            f"    build-args:\n",
+            f"      - --share=network\n",
+            f"    env:\n",
+            f"      - CARGO_HOME: /run/build/rust-example/cargo\n",
+            f"        RUST_BACKTRACE: 1\n",
+            f"        RUST_LOG: rust-example=debug\n",
+        )
+
+        copying_file = self.create_copying_file(self.data['root'], data)
         self.files.append(copying_file)
 
-        if self.is_gui:
-            manifest_file = self.create_manifest_file(self.root, data)
+        if self.data['is_gui']:
+            manifest_file = self.create_manifest_file(self.data['root'], data, 
+                                                      sdk_extension=sdk_extension,
+                                                      build_options=build_options)
             self.files.append(manifest_file)
             
             post_install_file = self.create_meson_postinstall_file(path)
             self.files.append(post_install_file)
 
-        text_meson = (f"project('{data['project_name']}',\n",
-                      f"          version: '0.1.0',\n",
-                      f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
-                      f"  default_options: [ 'warning_level=2',\n",
-                      f"                   ],\n",
-                      f")\n",
-                      f"\n",)
+        text_meson = (
+            f"project('{data['project_name']}',\n",
+            f"          version: '0.1.0',\n",
+            f"    meson_version: '>= {constants['MESON_VERSION']}',\n",
+            f"  default_options: [ 'warning_level=2',\n",
+            f"                   ],\n",
+            f")\n",
+            f"\n",
+        )
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += ("i18n = import('i18n')\n",)
 
         text_meson += (f"\n",
                        f"\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += ("subdir('data')\n",)
 
         text_meson += (f"subdir('src')\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += ("subdir('po')\n",)
 
         text_meson += (f"\n",)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_meson += ("meson.add_install_script('build-aux/meson/postinstall.py')\n",)
 
-        main_meson_file = File(self.root, 'meson.build', text_meson)
+        main_meson_file = File(self.data['root'], 'meson.build', text_meson)
         self.files.append(main_meson_file)
 
         text_cargo = (f"""#!/bin/sh\n""",
@@ -129,7 +148,7 @@ class RustTemplate(Template):
                       f"""export APP_BIN="$5"\n""",
                       f"""\n""",
                       f"""\n""",
-                      f"""if [[ $BUILDTYPE = "release" ]]\n""",
+                      f"""if [ $BUILDTYPE = "release" ]\n""",
                       f"""then\n""",
                       f"""    echo "RELEASE MODE"\n""",
                       f"""    cargo build --manifest-path \\\n""",
@@ -143,11 +162,38 @@ class RustTemplate(Template):
                       f"""fi\n""",
                       f"""\n""",)
         
-        cargo_file = File(self.root + '/build-aux/', 'cargo.sh', text_cargo)
+        cargo_file = File(self.data['root'] + '/build-aux/', 'cargo.sh', text_cargo)
         self.files.append(cargo_file)
 
+        text_cargo_toml = (f"[package]\n",
+                           f"name = \"rust-example\"\n",
+                           f"version = \"0.1.0\"\n",
+                           f"edition = \"2018\"\n",
+                           f"\n",
+                           f"[dependencies.gtk]\n",
+                           f"version = \"0.8.1\"\n",
+                           f"features = [\"v3_24\"]\n",
+                           f"\n",
+                           f"[dependencies.gdk]\n",
+                           f"version = \"0.12.1\"\n",
+                           f"features = [\"v3_24\"]\n",
+                           f"\n",
+                           f"[dependencies.gio]\n",
+                           f"version = \"0.8.1\"\n",
+                           f"features = [\"v2_60\"]\n",
+                           f"\n",
+                           f"[dependencies.glib]\n",
+                           f"version = \"0.9.2\"\n",
+                           f"features = [\"v2_60\"]\n",
+                           f"\n",
+                           f"[dependencies.gettext-rs]\n",
+                           f"version = \"0.4.4\"\n",
+                           f"features = [\"gettext-system\"]\n",)
+        cargo_toml_file = File(self.data['root'], 'Cargo.toml', text_cargo_toml)
+        self.files.append(cargo_toml_file)
+
     def populate_data_dir(self, data):
-        path = self.root + 'data/'
+        path = self.data['root'] + 'data/'
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)
@@ -162,7 +208,7 @@ class RustTemplate(Template):
         self.files.append(gschema_file)
 
     def populate_po_dir(self, data):
-        path = self.root + 'po/'
+        path = self.data['root'] + 'po/'
 
         linguas_file = self.create_po_linguas_file(path)
         self.files.append(linguas_file)
@@ -174,9 +220,9 @@ class RustTemplate(Template):
         self.files.append(potfiles_file)
 
     def populate_src_dir(self, data):
-        path = self.root + 'src/'
+        path = self.data['root'] + 'src/'
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_config = (f"pub static PKGDATADIR: &str = @pkgdatadir@;\n",
                            f"pub static VERSION: &str = @VERSION@;\n",
                            f"pub static LOCALEDIR: &str = @localedir@;\n",)
@@ -184,7 +230,7 @@ class RustTemplate(Template):
             config_src_file = File(path, 'config.rs.in', text_config)
             self.files.append(config_src_file)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             text_main = (f"use gettextrs::*;\n",
                          f"use gio::prelude::*;\n",
                          f"use gtk::prelude::*;\n",
@@ -198,7 +244,7 @@ class RustTemplate(Template):
                          f"\n",
                          f"    setlocale(LocaleCategory::LcAll, \"\");\n",
                          f"    bindtextdomain(\"{data['project_name']}\", config::LOCALEDIR);\n",
-                         f"    textdomain(\"%{data['project_name']}\");\n",
+                         f"    textdomain(\"{data['project_name']}\");\n",
                          f"\n",
                          f"    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + \"/{data['project_name']}.gresource\")\n",
                          f"        .expect(\"Could not load resources\");\n",
@@ -224,7 +270,7 @@ class RustTemplate(Template):
         main_src_file = File(path, 'main.rs', text_main)
         self.files.append(main_src_file)
 
-        if not self.is_gui:
+        if self.data['is_gui']:
             text_meson = (f"pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())\n",
                          f"gnome = import('gnome')\n",
                          f"\n",
@@ -259,17 +305,12 @@ class RustTemplate(Template):
                          f"  'main.rs',\n",
                          f"  'window.rs',\n",
                          f")\n",
-                         f"{data['project_name_underscore']}_sources = [",
-                         f"  'main.rs',\n",
-                         f"]\n",
-                         f"{data['project_name_underscore']}_deps = [\n",
-                         f"]\n",
+                         f"\n",
                          f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
                          f"cargo_release = custom_target(\n",
                          f"  'cargo-build',\n",
                          f"  build_by_default: true,\n",
                          f"  input: sources,\n",
-                         f"  input: {data['project_name_underscore']}_sources,\n",
                          f"  output: meson.project_name(),\n",
                          f"  console: true,\n",
                          f"  install: true,\n",
@@ -284,10 +325,10 @@ class RustTemplate(Template):
                          f" ]\n",
                          f")\n",)
 
-        meson_src_file = File(path, 'meson.build', text_meson)
-        self.files.append(meson_src_file)
+            meson_src_file = File(path, 'meson.build', text_meson)
+            self.files.append(meson_src_file)
 
-        if self.is_gui:
+        if self.data['is_gui']:
             gresource_file = self.create_gresource_file(path, data)
             self.files.append(gresource_file)
 
@@ -316,6 +357,7 @@ class RustTemplate(Template):
                               f"""  <requires lib="gtk+" version="3.24"/>\n""",
                               f"""    <object class="GtkApplicationWindow" id="window">\n""",
                               f"""      <property name="default-width">600</property>\n""",
+                              f"""      <property name="default-height">300</property>\n""",
                               f"""    <child type="titlebar">\n""",
                               f"""      <object class="GtkHeaderBar" id="header_bar">\n""",
                               f"""        <property name="visible">True</property>\n""",

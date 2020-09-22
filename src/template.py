@@ -206,9 +206,14 @@ class Template:
     ################# /data dir #################
 
     def create_desktop_file(self, path, data, gui=True):
-        text = (f"[Desktop Entry]\n",
-                f"Name={data['project_name']}\n",
-                f"Exec={data['project_id']}\n",)
+        text = (f"[Desktop Entry]\n",)
+
+        if data['lang'] == 'rust':
+            text += (f"Name={data['project_name']}\n",
+                    f"Exec={data['project_name']}\n",)
+        else:
+            text += (f"Name={data['project_name']}\n",
+                    f"Exec={data['project_id']}\n",)
 
         if gui:
             text += (f"Terminal=false\n",)
@@ -331,7 +336,10 @@ class Template:
         if prefix:
             f = File(path, data['project_id'] + '.' + prefix + '.gresource.xml', text)
         else:
-            f = File(path, data['project_id'] + '.gresource.xml', text)
+            if data['lang'] == 'rust':
+                f = File(path, data['project_name_underscore'] + '.gresource.xml', text)
+            else:
+                f = File(path, data['project_id'] + '.gresource.xml', text)
 
         return f
 
