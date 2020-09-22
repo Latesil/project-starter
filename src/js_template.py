@@ -43,13 +43,7 @@ class JsTemplate(Template):
         self.data['year'] = datetime.datetime.now().year
 
         ##############################################################
-
-        self.data['project_full_name'] = self.data['project_id'] + '.' + self.data['project_name']
-        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
-        self.data['project_id_reverse'] = self.data['project_id'].replace('.', '/') + '/' + self.data['project_name'] + '/'
-        self.data['project_path'] = self.data['project_id'].replace('.', '/')
-        self.data['project_name_underscore'] = self.data['project_name'].replace('-', '_')
-        self.data['project_id_reverse_short'] = self.data['project_id'].replace('.', '/')
+        
         self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
 
         ##############################################################
@@ -249,7 +243,7 @@ class JsTemplate(Template):
             f"\n",
             f"var {data['window_name']}Window = GObject.registerClass({{\n",
             f"    GTypeName: '{data['window_name']}Window',\n",
-            f"    Template: 'resource:///{data['project_id_reverse_short']}/window.ui',\n",
+            f"    Template: 'resource:///{data['project_id'].replace('.', '/')}/window.ui',\n",
             f"    InternalChildren: ['label']\n",
             f"}}, class {data['window_name']}Window extends Gtk.ApplicationWindow {{\n",
             f"    _init(application) {{\n",
