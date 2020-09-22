@@ -29,51 +29,49 @@ class PythonTemplate(Template):
     """
 
     def __init__(self, is_gui, project_id, project_name, path, is_git, license):
-        self.is_gui = is_gui
-        self.project_id = project_id
-        self.project_name = project_name
-        self.root = path
-        self.is_git = is_git
-        self.project_license = license
+        self.data = {}
+        self.data['is_gui'] = is_gui
+        self.data['project_id'] = project_id
+        self.data['project_name'] = project_name
+        self.data['root'] = path
+        self.data['is_git'] = is_git
+        self.data['lang'] = 'python'
+        self.data['project_license'] = license
         self.files = []
-        self.lang = 'python'
-        self.po_files = ['window.ui', 'main.py', 'window.py']
-        self.gresource_files = ['window.ui']
-        now = datetime.datetime.now()
-        self.year = now.year
+        self.data['po_files'] = ['window.ui', 'main.py', 'window.py']
+        self.data['gresource_files'] = ['window.ui']
+        self.data['year'] = datetime.datetime.now().year
 
         ########################################################################
 
-        self.window_name = "".join(w.capitalize() for w in self.project_name.split('-'))
-
-        self.data = vars(self)
+        self.window_name = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
 
         ########################################################################
 
     def start(self):
-        if self.is_gui:
-            self.create_folders(self.root)
+        if self.data['is_gui']:
+            self.create_folders(self.data['root'])
             self.populate_root_dir(self.data)
             self.populate_data_dir(self.data)
             self.populate_po_dir(self.data)
             self.populate_src_dir(self.data)
             
-            if self.is_git:
-                os.chdir(self.root)
+            if self.data['is_gui']:
+                os.chdir(self.data['root'])
                 os.system('git init')
 
             for f in self.files:
                 f.create()
-                if f.filename == self.project_name + '.in':
+                if f.filename == self.data['project_name'] + '.in':
                     f.make_executable()
 
     def populate_root_dir(self, data):
-        path = self.root + 'build-aux/meson/'
+        path = data['root'] + 'build-aux/meson/'
 
-        copying_file = self.create_copying_file(self.root, data)
+        copying_file = self.create_copying_file(data['root'], data)
         self.files.append(copying_file)
 
-        manifest_file = self.create_manifest_file(self.root, data)
+        manifest_file = self.create_manifest_file(data['root'], data)
         self.files.append(manifest_file)
 
         post_install_file = self.create_meson_postinstall_file(path)
@@ -97,11 +95,11 @@ class PythonTemplate(Template):
             f"meson.add_install_script('build-aux/meson/postinstall.py')\n",
         )
 
-        main_meson_file = File(self.root, 'meson.build', text)
+        main_meson_file = File(data['root'], 'meson.build', text)
         self.files.append(main_meson_file)
 
     def populate_data_dir(self, data):
-        path = self.root + 'data/'
+        path = data['root'] + 'data/'
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)
@@ -116,7 +114,7 @@ class PythonTemplate(Template):
         self.files.append(gschema_file)
 
     def populate_po_dir(self, data):
-        path = self.root + 'po/'
+        path = data['root'] + 'po/'
 
         linguas_file = self.create_po_linguas_file(path)
         self.files.append(linguas_file)
@@ -128,7 +126,7 @@ class PythonTemplate(Template):
         self.files.append(potfiles_file)
 
     def populate_src_dir(self, data):
-        path = self.root + 'src/'
+        path = data['root'] + 'src/'
 
         text = ()
         init_src_file = File(path, '__init__.py', text)
@@ -137,9 +135,9 @@ class PythonTemplate(Template):
         text_main = (
             f"# main.py\n"
             f"#\n",
-            f"# Copyright {self.year}\n",
+            f"# Copyright {data['year']}\n",
             f"#\n",
-            f"{self.get_gpl(self.lang)}",
+            f"{self.get_gpl(data['lang'])}",
             f"\n",
             f"import sys\n",
             f"import gi\n",
@@ -216,9 +214,9 @@ class PythonTemplate(Template):
             f"#\n",
             f"# {data['project_name']}.in\n",
             f"#\n",
-            f"# Copyright {self.year}\n",
+            f"# Copyright {data['year']}\n",
             f"#\n",
-            f"{self.get_gpl(self.lang)}",
+            f"{self.get_gpl(data['lang'])}",
             f"\n",
             f"import os\n",
             f"import sys\n",
@@ -243,7 +241,7 @@ class PythonTemplate(Template):
             f"    from {data['project_name'].replace('-', '_')} import main\n",
             f"    sys.exit(main.main(VERSION))\n",
         )
-        in_src_file = File(path, self.project_name + '.in', text_id_in)
+        in_src_file = File(path, data['project_name'] + '.in', text_id_in)
         self.files.append(in_src_file)
 
         gresource_file = self.create_gresource_file(path, data)
@@ -252,9 +250,9 @@ class PythonTemplate(Template):
         text_window = (
             f"# window.py\n",
             f"#\n",
-            f"# Copyright {self.year}\n",
+            f"# Copyright {data['year']}\n",
             f"#\n",
-            f"{self.get_gpl(self.lang)}",
+            f"{self.get_gpl(data['lang'])}",
             f"\n",
             f"from gi.repository import Gtk\n",
             f"\n",
