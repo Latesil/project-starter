@@ -69,26 +69,28 @@ class Template:
     ########## /build-aux/meson/ dir ###############
 
     def create_meson_postinstall_file(self, path):
-        text = (f"#!/usr/bin/env python3\n",
-                f"\n",
-                f"from os import environ, path\n",
-                f"from subprocess import call\n",
-                f"\n",
-                f"prefix = environ.get('MESON_INSTALL_PREFIX', '/usr/local')\n",
-                f"datadir = path.join(prefix, 'share')\n",
-                f"destdir = environ.get('DESTDIR', '')\n",
-                f"\n",
-                f"# Package managers set this so we don't need to run\n",
-                f"if not destdir:\n",
-                f"    print('Updating icon cache...')\n",
-                f"    call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])\n",
-                f"\n",
-                f"    print('Updating desktop database...')\n",
-                f"    call(['update-desktop-database', '-q', path.join(datadir, 'applications')])\n",
-                f"\n",
-                f"    print('Compiling GSettings schemas...')\n",
-                f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
-                f"\n",)
+        text = (
+            f"#!/usr/bin/env python3\n",
+            f"\n",
+            f"from os import environ, path\n",
+            f"from subprocess import call\n",
+            f"\n",
+            f"prefix = environ.get('MESON_INSTALL_PREFIX', '/usr/local')\n",
+            f"datadir = path.join(prefix, 'share')\n",
+            f"destdir = environ.get('DESTDIR', '')\n",
+            f"\n",
+            f"# Package managers set this so we don't need to run\n",
+            f"if not destdir:\n",
+            f"    print('Updating icon cache...')\n",
+            f"    call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])\n",
+            f"\n",
+            f"    print('Updating desktop database...')\n",
+            f"    call(['update-desktop-database', '-q', path.join(datadir, 'applications')])\n",
+            f"\n",
+            f"    print('Compiling GSettings schemas...')\n",
+            f"    call(['glib-compile-schemas', path.join(datadir, 'glib-2.0', 'schemas')])\n",
+            f"\n",
+        )
 
         f = File(path, 'postinstall.py', text)
         return f
@@ -103,9 +105,11 @@ class Template:
             print('Cannot create POTFILES. Argument is invalid (must be list)')
             return
 
-        text = (f"data/{data['project_id']}.desktop.in\n",
-                f"data/{data['project_id']}.appdata.xml.in\n",
-                f"data/{data['project_id']}.gschema.xml\n",)
+        text = (
+            f"data/{data['project_id']}.desktop.in\n",
+            f"data/{data['project_id']}.appdata.xml.in\n",
+            f"data/{data['project_id']}.gschema.xml\n",
+        )
 
         for f in data['po_files']:
             text += (f"src/{f}\n",)
@@ -157,10 +161,12 @@ class Template:
         return f
 
     def create_manifest_file(self, path, data, sdk_extension=None, build_options=None):
-        text = (f"""app-id: {data['project_id']}\n""",
-                f"""runtime: org.gnome.Platform\n""",
-                f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'\n""",
-                f"""sdk: org.gnome.Sdk\n""",)
+        text = (
+            f"""app-id: {data['project_id']}\n""",
+            f"""runtime: org.gnome.Platform\n""",
+            f"""runtime-version: '{constants['GNOME_PLATFORM_VERSION']}'\n""",
+            f"""sdk: org.gnome.Sdk\n""",
+        )
 
         if sdk_extension:
             text += sdk_extension
@@ -170,32 +176,36 @@ class Template:
         else:
             text += (f"""command: {data['project_name']}\n""",)
         
-        text += (f"""finish-args:\n""",
-                f"""  - --share=network\n""",
-                f"""  - --share=ipc\n""",
-                f"""  - --socket=fallback-x11\n""",
-                f"""  - --socket=wayland\n""",)
+        text += (
+            f"""finish-args:\n""",
+            f"""  - --share=network\n""",
+            f"""  - --share=ipc\n""",
+            f"""  - --socket=fallback-x11\n""",
+            f"""  - --socket=wayland\n""",
+        )
 
         if build_options:
             text += build_options
 
-        text += (f"""cleanup:\n""",
-                f"""  - /include\n""",
-                f"""  - /lib/pkgconfig\n""",
-                f"""  - /man\n""",
-                f"""  - /share/doc\n""",
-                f"""  - /share/gtk-doc\n""",
-                f"""  - /share/man\n""",
-                f"""  - /share/pkgconfig\n""",
-                f"""  - '*.la'\n""",
-                f"""  - '*.a'\n""",
-                f"""modules:\n""",
-                f"""  - name: {data['project_name']}\n""",
-                f"""    builddir: true\n""",
-                f"""    buildsystem: meson\n""",
-                f"""    sources:\n""",
-                f"""      - type: dir\n""",
-                f"""        path: .\n""",)
+        text += (
+            f"""cleanup:\n""",
+            f"""  - /include\n""",
+            f"""  - /lib/pkgconfig\n""",
+            f"""  - /man\n""",
+            f"""  - /share/doc\n""",
+            f"""  - /share/gtk-doc\n""",
+            f"""  - /share/man\n""",
+            f"""  - /share/pkgconfig\n""",
+            f"""  - '*.la'\n""",
+            f"""  - '*.a'\n""",
+            f"""modules:\n""",
+            f"""  - name: {data['project_name']}\n""",
+            f"""    builddir: true\n""",
+            f"""    buildsystem: meson\n""",
+            f"""    sources:\n""",
+            f"""      - type: dir\n""",
+            f"""        path: .\n""",
+        )
 
         f = File(path, data['project_id'] + ".yaml", text)
         return f
@@ -226,67 +236,73 @@ class Template:
         return f
 
     def create_gschema_file(self, path, data):
-        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""<schemalist gettext-domain="{data['project_name']}">\n""",
-                f"""    <schema id="{data['project_id']}" path="/{data['project_id'].replace('.', '/')}/">\n""",
-                f"""    </schema>\n""",
-                f"""</schemalist>\n""",)
+        text = (
+            f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+            f"""<schemalist gettext-domain="{data['project_name']}">\n""",
+            f"""    <schema id="{data['project_id']}" path="/{data['project_id'].replace('.', '/')}/">\n""",
+            f"""    </schema>\n""",
+            f"""</schemalist>\n""",
+        )
 
         f = File(path, data['project_id'] + '.gschema.xml', text)
         return f
 
     def create_data_meson_file(self, path, data):
-        text = (f"desktop_file = i18n.merge_file(\n",
-                f"  input: '{data['project_id']}.desktop.in',\n",
-                f"  output: '{data['project_id']}.desktop',\n",
-                f"  type: 'desktop',\n",
-                f"  po_dir: '../po',\n",
-                f"  install: true,\n",
-                f"  install_dir: join_paths(get_option('datadir'), 'applications')\n",
-                f")\n",
-                f"\n",
-                f"desktop_utils = find_program('desktop-file-validate', required: false)\n",
-                f"if desktop_utils.found()\n",
-                f"  test('Validate desktop file', desktop_utils,\n",
-                f"    args: [desktop_file]\n",
-                f"  )\n",
-                f"endif\n",
-                f"\n",
-                f"appstream_file = i18n.merge_file(\n",
-                f"  input: '{data['project_id']}.appdata.xml.in',\n",
-                f"  output: '{data['project_id']}.appdata.xml',\n",
-                f"  po_dir: '../po',\n",
-                f"  install: true,\n",
-                f"  install_dir: join_paths(get_option('datadir'), '{constants['METADATA_FOLDER']}')\n",
-                f")\n",
-                f"\n",
-                f"appstream_util = find_program('appstream-util', required: false)\n",
-                f"if appstream_util.found()\n",
-                f"  test('Validate appstream file', appstream_util,\n",
-                f"    args: ['validate', appstream_file]\n",
-                f"  )\n",
-                f"endif\n",
-                f"\n",
-                f"install_data('{data['project_id']}.gschema.xml',\n",
-                f"  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n",
-                f")\n",
-                f"\n",
-                f"compile_schemas = find_program('glib-compile-schemas', required: false)\n",
-                f"if compile_schemas.found()\n",
-                f"  test('Validate schema file', compile_schemas,\n",
-                f"    args: ['--strict', '--dry-run', meson.current_source_dir()]\n",
-                f"  )\n",
-                f"endif\n",
-                f"\n",)
+        text = (
+            f"desktop_file = i18n.merge_file(\n",
+            f"  input: '{data['project_id']}.desktop.in',\n",
+            f"  output: '{data['project_id']}.desktop',\n",
+            f"  type: 'desktop',\n",
+            f"  po_dir: '../po',\n",
+            f"  install: true,\n",
+            f"  install_dir: join_paths(get_option('datadir'), 'applications')\n",
+            f")\n",
+            f"\n",
+            f"desktop_utils = find_program('desktop-file-validate', required: false)\n",
+            f"if desktop_utils.found()\n",
+            f"  test('Validate desktop file', desktop_utils,\n",
+            f"    args: [desktop_file]\n",
+            f"  )\n",
+            f"endif\n",
+            f"\n",
+            f"appstream_file = i18n.merge_file(\n",
+            f"  input: '{data['project_id']}.appdata.xml.in',\n",
+            f"  output: '{data['project_id']}.appdata.xml',\n",
+            f"  po_dir: '../po',\n",
+            f"  install: true,\n",
+            f"  install_dir: join_paths(get_option('datadir'), '{constants['METADATA_FOLDER']}')\n",
+            f")\n",
+            f"\n",
+            f"appstream_util = find_program('appstream-util', required: false)\n",
+            f"if appstream_util.found()\n",
+            f"  test('Validate appstream file', appstream_util,\n",
+            f"    args: ['validate', appstream_file]\n",
+            f"  )\n",
+            f"endif\n",
+            f"\n",
+            f"install_data('{data['project_id']}.gschema.xml',\n",
+            f"  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')\n",
+            f")\n",
+            f"\n",
+            f"compile_schemas = find_program('glib-compile-schemas', required: false)\n",
+            f"if compile_schemas.found()\n",
+            f"  test('Validate schema file', compile_schemas,\n",
+            f"    args: ['--strict', '--dry-run', meson.current_source_dir()]\n",
+            f"  )\n",
+            f"endif\n",
+            f"\n",
+        )
 
         f = File(path, 'meson.build', text)
         return f
 
     def create_appdata_file(self, path, data):
-        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""<component type="desktop">\n""",
-                f"""  <id>{data['project_id']}.desktop</id>\n""",
-                f"""  <metadata_license>CC0-1.0</metadata_license>\n""",)
+        text = (
+            f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+            f"""<component type="desktop">\n""",
+            f"""  <id>{data['project_id']}.desktop</id>\n""",
+            f"""  <metadata_license>CC0-1.0</metadata_license>\n""",
+        )
 
         if data['project_license'] == "GPL 3":
             text += (f"""  <project_license>GPL-3.0-or-later</project_license>\n""",)
@@ -303,12 +319,14 @@ class Template:
         elif data['project_license'] == "MIT/X11":
             text += (f"""  <project_license>MIT</project_license>\n""",)
 
-        text += (f"""  <description>\n""",
-                f"""    <p>\n""",
-                f"""    </p>\n""",
-                f"""  </description>\n""",
-                f"""</component>\n""",
-                f"""\n""",)
+        text += (
+            f"""  <description>\n""",
+            f"""    <p>\n""",
+            f"""    </p>\n""",
+            f"""  </description>\n""",
+            f"""</component>\n""",
+            f"""\n""",
+        )
 
         f = File(path, data['project_id'] + '.appdata.xml.in', text)
         return f
@@ -349,36 +367,40 @@ class Template:
     ################# /src/ dir ###################
 
     def create_window_ui_file(self, path, data):
-        text = (f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
-                f"""<interface>\n""",
-                f"""  <requires lib="gtk+" version="3.24"/>\n""",
-                f"""    <template class="{data['window_name']}Window" parent="GtkApplicationWindow">\n""",
-                f"""      <property name="default-width">600</property>\n""",
-                f"""    <property name="default-height">300</property>\n""",
-                f"""    <child type="titlebar">\n""",)
+        text = (
+            f"""<?xml version="1.0" encoding="UTF-8"?>\n""",
+            f"""<interface>\n""",
+            f"""  <requires lib="gtk+" version="3.24"/>\n""",
+            f"""    <template class="{data['window_name']}Window" parent="GtkApplicationWindow">\n""",
+            f"""      <property name="default-width">600</property>\n""",
+            f"""    <property name="default-height">300</property>\n""",
+            f"""    <child type="titlebar">\n""",
+        )
         
         if data['lang'] == 'js':
             text += (f"""      <object class="GtkHeaderBar" id="headerBar">\n""",)
         else:
             text += (f"""      <object class="GtkHeaderBar" id="header_bar">\n""",)
 
-        text += (f"""        <property name="visible">True</property>\n""",
-                f"""        <property name="show-close-button">True</property>\n""",
-                f"""        <property name="title">Hello, World!</property>\n""",
-                f"""      </object>\n""",
-                f"""    </child>\n""",
-                f"""    <child>\n""",
-                f"""      <object class="GtkLabel" id="label">\n""",
-                f"""        <property name="label">Hello, World!</property>\n""",
-                f"""        <property name="visible">True</property>\n""",
-                f"""        <attributes>\n""",
-                f"""          <attribute name="weight" value="bold"/>\n""",
-                f"""          <attribute name="scale" value="2"/>\n""",
-                f"""        </attributes>\n""",
-                f"""      </object>\n""",
-                f"""    </child>\n""",
-                f"""    </template>\n""",
-                f"""  </interface>\n""",)
+        text += (
+            f"""        <property name="visible">True</property>\n""",
+            f"""        <property name="show-close-button">True</property>\n""",
+            f"""        <property name="title">Hello, World!</property>\n""",
+            f"""      </object>\n""",
+            f"""    </child>\n""",
+            f"""    <child>\n""",
+            f"""      <object class="GtkLabel" id="label">\n""",
+            f"""        <property name="label">Hello, World!</property>\n""",
+            f"""        <property name="visible">True</property>\n""",
+            f"""        <attributes>\n""",
+            f"""          <attribute name="weight" value="bold"/>\n""",
+            f"""          <attribute name="scale" value="2"/>\n""",
+            f"""        </attributes>\n""",
+            f"""      </object>\n""",
+            f"""    </child>\n""",
+            f"""    </template>\n""",
+            f"""  </interface>\n""",
+        )
 
         if data['lang'] == 'c':
             f = File(path, data['ui_filename'], text)
