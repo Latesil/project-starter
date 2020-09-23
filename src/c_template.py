@@ -38,13 +38,14 @@ class CTemplate(Template):
         #####################################################
 
         self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
+        self.data['project_name_unserscore'] = self.data['project_name'].replace('-','_').lower()
         self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
-        self.data['ui_filename'] = self.data['project_id_underscore'] + '-window.ui'
+        self.data['ui_filename'] = self.data['project_name_unserscore'] + '-window.ui'
 
-        self.data['po_files'] = [self.data['project_id_underscore'] + '-window.ui', 
+        self.data['po_files'] = [self.data['project_name_unserscore'] + '-window.ui', 
                         'main.c', 
-                        self.data['project_id_underscore'] + '-window.c']
-        self.data['gresource_files'] = [self.data['project_id_underscore'] + '-window.ui']
+                        self.data['project_name_unserscore'] + '-window.c']
+        self.data['gresource_files'] = [self.data['project_name_unserscore'] + '-window.ui']
 
         #####################################################
 
@@ -94,7 +95,7 @@ class CTemplate(Template):
             f"config_h.set_quoted('GETTEXT_PACKAGE', '{data['project_name']}')\n",
             f"config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))\n",
             f"configure_file(\n",
-            f"  output: '{data['project_id_underscore']}-config.h',\n",
+            f"  output: '{data['project_name_unserscore']}-config.h',\n",
             f"  configuration: config_h,\n",
             f")\n",
             f"\n",
@@ -153,8 +154,8 @@ class CTemplate(Template):
                 f"\n",
                 f"#include <glib/gi18n.h>\n",
                 f"\n",
-                f"#include \"{data['project_id_underscore']}-config.h\"\n",
-                f"#include \"{data['project_id_underscore']}-window.h\"\n",
+                f"#include \"{data['project_name_unserscore']}-config.h\"\n",
+                f"#include \"{data['project_name_unserscore']}-window.h\"\n",
                 f"\n",
                 f"static void\n",
                 f"on_activate (GtkApplication *app)\n",
@@ -171,7 +172,7 @@ class CTemplate(Template):
                 f"	/* Get the current window or create one if necessary. */\n",
                 f"	window = gtk_application_get_active_window (app);\n",
                 f"	if (window == NULL)\n",
-                f"		window = g_object_new ({data['project_id_underscore'].upper()}_TYPE_WINDOW,\n",
+                f"		window = g_object_new ({data['project_name_unserscore'].upper()}_TYPE_WINDOW,\n",
                 f"		                       \"application\", app,\n",
                 f"		                       \"default-width\", 600,\n",
                 f"		                       \"default-height\", 300,\n",
@@ -235,7 +236,7 @@ class CTemplate(Template):
                 f"{self.get_gpl(data['lang'])}",
                 f" */\n",
                 f"\n",
-                f"#include \"{data['project_id_underscore']}-config.h\"\n",
+                f"#include \"{data['project_name_unserscore']}-config.h\"\n",
                 f"\n",
                 f"#include <glib.h>\n",
                 f"#include <stdlib.h>\n",
@@ -275,17 +276,17 @@ class CTemplate(Template):
         self.files.append(main_c_file)
         
         text_meson = (
-            f"{data['project_id_underscore']}_sources = [\n",
+            f"{data['project_name_unserscore']}_sources = [\n",
             f"  'main.c',\n",
         )
 
         if data['is_gui']:
-            text_meson += (f"  '{data['project_id_underscore']}-window.c',\n",)
+            text_meson += (f"  '{data['project_name_unserscore']}-window.c',\n",)
 
         text_meson += (
             f"]\n",
             f"\n",
-            f"{data['project_id_underscore']}_deps = [\n",
+            f"{data['project_name_unserscore']}_deps = [\n",
             f"  dependency('gio-2.0', version: '>= 2.50'),\n",
         )
 
@@ -297,13 +298,13 @@ class CTemplate(Template):
             f"\n",
             f"gnome = import('gnome')\n",
             f"\n",
-            f"{data['project_id_underscore']}_sources += gnome.compile_resources('{data['project_id_underscore']}-resources',\n",
-            f"  '{data['project_id_underscore']}.gresource.xml',\n",
-            f"  c_name: '{data['project_id_underscore']}'\n",
+            f"{data['project_name_unserscore']}_sources += gnome.compile_resources('{data['project_name_unserscore']}-resources',\n",
+            f"  '{data['project_name_unserscore']}.gresource.xml',\n",
+            f"  c_name: '{data['project_name_unserscore']}'\n",
             f")\n",
             f"\n",
-            f"executable('{data['project_name']}', {data['project_name'].replace('-', '_')}_sources,\n",
-            f"  dependencies: {data['project_id_underscore']}_deps,\n",
+            f"executable('{data['project_name']}', {data['project_name_unserscore']}_sources,\n",
+            f"  dependencies: {data['project_name_unserscore']}_deps,\n",
             f"  install: true,\n",
             f")\n",
             f"\n",
@@ -324,8 +325,8 @@ class CTemplate(Template):
                 f"{self.get_gpl(data['lang'])}",
                 f" */\n",
                 f"\n",
-                f"#include \"{data['project_id_underscore']}-config.h\"\n",
-                f"#include \"{data['project_id_underscore']}-window.h\"\n",
+                f"#include \"{data['project_name_unserscore']}-config.h\"\n",
+                f"#include \"{data['project_name_unserscore']}-window.h\"\n",
                 f"\n",
                 f"struct _{data['window_name']}Window\n", #CGuiExample
                 f"{{\n",
@@ -336,26 +337,26 @@ class CTemplate(Template):
                 f"  GtkLabel            *label;\n",
                 f"}};\n",
                 f"\n",
-                f"G_DEFINE_TYPE ({data['window_name']}Window, {data['project_id_underscore']}_window, GTK_TYPE_APPLICATION_WINDOW)\n",
+                f"G_DEFINE_TYPE ({data['window_name']}Window, {data['project_name_unserscore']}_window, GTK_TYPE_APPLICATION_WINDOW)\n",
                 f"\n",
                 f"static void\n",
-                f"{data['project_id_underscore']}_window_class_init ({data['window_name']}WindowClass *klass)\n",
+                f"{data['project_name_unserscore']}_window_class_init ({data['window_name']}WindowClass *klass)\n",
                 f"{{\n",
                 f"  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);\n",
                 f"\n",
-                f"  gtk_widget_class_set_template_from_resource (widget_class, \"/{data['project_id'].replace('.', '/')}/{data['project_id_underscore']}-window.ui\");\n",
+                f"  gtk_widget_class_set_template_from_resource (widget_class, \"/{data['project_id'].replace('.', '/')}/{data['project_name_unserscore']}-window.ui\");\n",
                 f"  gtk_widget_class_bind_template_child (widget_class, {data['window_name']}Window, header_bar);\n",
                 f"  gtk_widget_class_bind_template_child (widget_class, {data['window_name']}Window, label);\n",
                 f"}}\n",
                 f"\n",
                 f"static void\n",
-                f"{data['project_id_underscore']}_window_init ({data['window_name']}Window *self)\n",
+                f"{data['project_name_unserscore']}_window_init ({data['window_name']}Window *self)\n",
                 f"{{\n",
                 f"  gtk_widget_init_template (GTK_WIDGET (self));\n",
                 f"}}\n",
             )
             
-            window_file = File(path, data['project_id_underscore'] + '-window.c', text_window)
+            window_file = File(path, data['project_name_unserscore'] + '-window.c', text_window)
             self.files.append(window_file)
 
             window_ui_file = self.create_window_ui_file(path, data)
@@ -374,12 +375,12 @@ class CTemplate(Template):
                 f"\n",
                 f"G_BEGIN_DECLS\n",
                 f"\n",
-                f"#define {data['project_id_underscore'].upper()}_TYPE_WINDOW ({data['project_id_underscore']}_window_get_type())\n",
+                f"#define {data['project_name_unserscore'].upper()}_TYPE_WINDOW ({data['project_name_unserscore']}_window_get_type())\n",
                 f"\n",
-                f"G_DECLARE_FINAL_TYPE ({data['window_name']}Window, {data['project_id_underscore']}_window, {data['project_id_underscore'].upper()}, WINDOW, GtkApplicationWindow)\n",
+                f"G_DECLARE_FINAL_TYPE ({data['window_name']}Window, {data['project_name_unserscore']}_window, {data['project_name_unserscore'].upper()}, WINDOW, GtkApplicationWindow)\n",
                 f"\n",
                 f"G_END_DECLS\n",
             )
 
-            window_h_file = File(path, data['project_id_underscore'] + '-window.h', text_window_h)
+            window_h_file = File(path, data['project_name_unserscore'] + '-window.h', text_window_h)
             self.files.append(window_h_file)

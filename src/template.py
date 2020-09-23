@@ -35,17 +35,17 @@ class Template:
             comment = '*'
 
         gpl = f""" {comment} This program is free software: you can redistribute it and/or modify
- {comment} it under the terms of the GNU General Public License as published by
- {comment} the Free Software Foundation, either version 3 of the License, or
- {comment} (at your option) any later version.
- {comment}
- {comment} This program is distributed in the hope that it will be useful,
- {comment} but WITHOUT ANY WARRANTY; without even the implied warranty of
- {comment} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- {comment} GNU General Public License for more details.
- {comment}
- {comment} You should have received a copy of the GNU General Public License
- {comment} along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{comment} it under the terms of the GNU General Public License as published by
+{comment} the Free Software Foundation, either version 3 of the License, or
+{comment} (at your option) any later version.
+{comment}
+{comment} This program is distributed in the hope that it will be useful,
+{comment} but WITHOUT ANY WARRANTY; without even the implied warranty of
+{comment} MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+{comment} GNU General Public License for more details.
+{comment}
+{comment} You should have received a copy of the GNU General Public License
+{comment} along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
         return gpl
 
@@ -221,7 +221,7 @@ class Template:
     def create_desktop_file(self, path, data, gui=True):
         text = (f"[Desktop Entry]\n",)
 
-        if data['lang'] == 'rust':
+        if data['lang'] == 'rust' or data['lang'] == 'python':
             text += (f"Name={data['project_name']}\n",
                     f"Exec={data['project_name']}\n",)
         else:
@@ -357,10 +357,10 @@ class Template:
         if prefix:
             f = File(path, data['project_id'] + '.' + prefix + '.gresource.xml', text)
         else:
-            if data['lang'] == 'rust' or data['lang'] == 'python':
-                f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
-            else:
+            if data['lang'] == 'js':
                 f = File(path, data['project_id'] + '.gresource.xml', text)
+            else:
+                f = File(path, data['project_name'].replace('-', '_') + '.gresource.xml', text)
 
         return f
 

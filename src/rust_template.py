@@ -295,7 +295,6 @@ class RustTemplate(Template):
                 f"  'main.rs',\n",
                 f"  'window.rs',\n",
             )
-
         else:
             text_meson += (
                 f"  'main.rs',\n",
