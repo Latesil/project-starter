@@ -23,6 +23,7 @@ from os import path
 from locale import gettext as _
 from .about_window import AboutWindow
 from .keyboard_shortcuts import KeyboardShortcutsWindow
+from .project_starter_constants import constants
 
 
 @Gtk.Template(resource_path='/com/github/Latesil/project-starter/window.ui')
@@ -132,7 +133,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
                 from .gnome_extension_template import GnomeExtensionTemplate
                 self.complete_template = GnomeExtensionTemplate(self.ext_name, self.ext_uuid, self.ext_description,
                                                                 self.is_git)
-                self.project_full_path = GLib.get_home_dir() + '/.local/share/gnome-shell/extensions/' + self.ext_uuid
+                self.project_full_path = GLib.get_home_dir() + constants['GNOME_EXTENSION_PATH'] + self.ext_uuid
             else:
                 from .js_template import JsTemplate
                 self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,

@@ -29,7 +29,7 @@ class GnomeExtensionTemplate(Template):
         self.data['ext_uuid'] = ext_uuid
         self.data['ext_description'] = ext_description
         self.data['is_git'] = is_git
-        self.data['root'] = GLib.get_home_dir() + '/.local/share/gnome-shell/extensions/' + self.data['ext_uuid']
+        self.data['root'] = GLib.get_home_dir() + constants['GNOME_EXTENSION_PATH'] + self.data['ext_uuid']
         self.files = []
 
     def start(self):
