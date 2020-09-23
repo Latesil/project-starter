@@ -257,7 +257,7 @@ class RustTemplate(Template):
                 f"gnome = import('gnome')\n",
                 f"\n",
                 f"gnome.compile_resources('{data['project_name']}',\n",
-                f"  '{data['project_name_underscore']}.gresource.xml',\n",
+                f"  '{data['project_name'].replace('-','_')}.gresource.xml',\n",
                 f"  gresource_bundle: true,\n",
                 f"  install: true,\n",
                 f"  install_dir: pkgdatadir,\n",

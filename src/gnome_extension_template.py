@@ -89,9 +89,9 @@ class GnomeExtensionTemplate(Template):
 
         file_metadata_json_text = (
             f"{{\n",
-            f"  \"name\": \"{data['e_name']}\",\n",
-            f"  \"description\": \"{data['e_descr']}\",\n",
-            f"  \"uuid\": \"{data['e_uuid']}\",\n",
+            f"  \"name\": \"{data['ext_name']}\",\n",
+            f"  \"description\": \"{data['ext_description']}\",\n",
+            f"  \"uuid\": \"{data['ext_uuid']}\",\n",
             f"  \"shell-version\": [\n",
             f"    \"{constants['SHELL_VERSION']}\"\n",
             f"  ]\n",

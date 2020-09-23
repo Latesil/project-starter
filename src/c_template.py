@@ -74,8 +74,9 @@ class CTemplate(Template):
         copying_file = self.create_copying_file(data['root'], data)
         self.files.append(copying_file)
 
-        post_install_file = self.create_meson_postinstall_file(path)
-        self.files.append(post_install_file)
+        if self.data['is_gui']:
+            post_install_file = self.create_meson_postinstall_file(path)
+            self.files.append(post_install_file)
 
         text = (
             f"project('{data['project_name']}', 'c',\n",
