@@ -66,7 +66,7 @@ class RustTemplate(Template):
         self.create_files(self.files, executable='cargo.sh')
 
     def populate_root_dir(self, data):
-        path = data['root'] + '/build-aux/meson'
+        path = os.path.join(data['root'], '/build-aux/meson')
 
         sdk_extension = (
             f"sdk-extensions:\n",
@@ -164,7 +164,9 @@ class RustTemplate(Template):
             f"""fi\n""",
             f"""\n""",
         )
-        cargo_file = File(data['root'] + 'build-aux/', 'cargo.sh', text_cargo)
+
+        cargo_file_path = os.path.join(data['root'], 'build-aux')
+        cargo_file = File(cargo_file_path, 'cargo.sh', text_cargo)
         self.files.append(cargo_file)
 
         text_cargo_toml = (
@@ -197,7 +199,7 @@ class RustTemplate(Template):
         self.files.append(cargo_toml_file)
 
     def populate_src_dir(self, data):
-        path = data['root'] + 'src/'
+        path = os.path.join(data['root'], 'src')
 
         if data['is_gui']:
             text_config = (

@@ -101,18 +101,14 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_switch_btn_clicked(self, w):
-        self.main_path = self.path_entry.props.text
-        if self.main_path[:-1] == '/':
-            self.main_path = self.main_path[:-1]
-        if self.main_path[0] == '~':
-            self.main_path = GLib.get_home_dir() + self.main_path[1:] + '/'
-        else:
-            self.main_path = self.main_path + '/'
+        self.main_path = os.path.expanduser(self.path_entry.props.text)
+
         if not os.path.exists(self.main_path):
             os.makedirs(self.main_path)
 
         is_gui = self.check_gui(self.template)
-        self.project_full_path = self.main_path + self.project_name + '/'
+        self.project_full_path = os.path.join(self.main_path, self.project_name)
+
 
         # Create template class on main button click and call start() function
 
@@ -133,7 +129,7 @@ class ProjectStarterWindow(Gtk.ApplicationWindow):
                 from .gnome_extension_template import GnomeExtensionTemplate
                 self.complete_template = GnomeExtensionTemplate(self.ext_name, self.ext_uuid, self.ext_description,
                                                                 self.is_git)
-                self.project_full_path = GLib.get_home_dir() + constants['GNOME_EXTENSION_PATH'] + self.ext_uuid
+                self.project_full_path = os.path.join(GLib.get_home_dir(), constants['GNOME_EXTENSION_PATH'], self.ext_uuid)
             else:
                 from .js_template import JsTemplate
                 self.complete_template = JsTemplate(is_gui, self.project_id, self.project_name,

@@ -65,7 +65,7 @@ class JsTemplate(Template):
 
     def populate_root_dir(self, data):
         path = data['root']
-        path_meson_postinstall = data['root'] + 'build-aux/meson/'
+        path_meson_postinstall = os.path.join(data['root'], 'build-aux/meson')
 
         copying_file = self.create_copying_file(path, data)
         self.files.append(copying_file)
@@ -98,7 +98,7 @@ class JsTemplate(Template):
         self.files.append(main_meson_file)
 
     def populate_src_dir(self, data):
-        path = data['root'] + 'src/'
+        path = os.path.join(data['root'], 'src')
 
         text_main = (
             f"/* main.js\n",

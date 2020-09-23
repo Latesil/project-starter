@@ -37,7 +37,6 @@ class CTemplate(Template):
 
         #####################################################
 
-        self.data['project_id_underscore'] = self.data['project_id'].replace('.', '_').lower()
         self.data['project_name_unserscore'] = self.data['project_name'].replace('-','_').lower()
         self.data['window_name'] = "".join(w.capitalize() for w in self.data['project_name'].split('-'))
         self.data['ui_filename'] = self.data['project_name_unserscore'] + '-window.ui'
@@ -70,7 +69,7 @@ class CTemplate(Template):
         self.create_files(self.files, executable=self.data['project_name'] + '.in')
 
     def populate_root_dir(self, data):
-        path = data['root'] + 'build-aux/meson/'
+        path = os.path.join(data['root'], 'build-aux/meson')
 
         copying_file = self.create_copying_file(data['root'], data)
         self.files.append(copying_file)
@@ -126,7 +125,7 @@ class CTemplate(Template):
             self.files.append(manifest_file)
 
     def populate_data_dir(self, data):
-        path = data['root'] + 'data/'
+        path = os.path.join(data['root'], 'data')
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)
@@ -141,7 +140,7 @@ class CTemplate(Template):
         self.files.append(gschema_file)
 
     def populate_src_dir(self, data):
-        path = data['root'] + 'src/'
+        path = os.path.join(data['root'], 'src')
 
         if data['is_gui']:
             text_main = (

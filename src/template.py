@@ -63,7 +63,7 @@ class Template:
             final_folders = self.cli_folders + additional_folders
 
         for folder in final_folders:
-            directory = root + '/' + folder + '/'
+            directory = os.path.join(root, folder)
             if not os.path.exists(directory):
                 os.makedirs(directory)
             else:
@@ -426,7 +426,7 @@ class Template:
 
 
     def populate_po_dir(self, data):
-        path = data['root'] + 'po/'
+        path = os.path.join(data['root'], 'po')
 
         linguas_file = self.create_po_linguas_file(path)
         self.files.append(linguas_file)
@@ -441,7 +441,7 @@ class Template:
         self.files = []
 
     def populate_data_dir(self, data):
-        path = data['root'] + 'data/'
+        path = os.path.join(data['root'], 'data')
 
         meson_data_file = self.create_data_meson_file(path, data)
         self.files.append(meson_data_file)

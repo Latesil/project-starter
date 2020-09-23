@@ -63,7 +63,7 @@ class PythonTemplate(Template):
             self.create_files(self.files, executable=self.data['project_name'] + '.in')
 
     def populate_root_dir(self, data):
-        path = data['root'] + 'build-aux/meson/'
+        path = os.path.join(data['root'], 'build-aux/meson')
 
         copying_file = self.create_copying_file(data['root'], data)
         self.files.append(copying_file)
@@ -96,7 +96,7 @@ class PythonTemplate(Template):
         self.files.append(main_meson_file)
 
     def populate_src_dir(self, data):
-        path = data['root'] + 'src/'
+        path = os.path.join(data['root'], 'src')
 
         text = ()
         init_src_file = File(path, '__init__.py', text)
