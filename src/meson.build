@@ -27,6 +27,7 @@ configure_file(
 
 project_starter_sources = [
   '__init__.py',
+  'licenses/__init__.py',
   'main.py',
   'window.py',
   'python_template.py',
@@ -36,7 +37,7 @@ project_starter_sources = [
   'gnome_extension_template.py',
   'keyboard_shortcuts.py',
   'about_window.py',
-  'gpl.py',
+  'licenses/gpl.py',
   'mit.py',
   'apache.py',
   'lgpl.py',

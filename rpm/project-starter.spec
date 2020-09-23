@@ -1,7 +1,7 @@
 %global uuid    com.github.Latesil.%{name}
 
 Name:           project-starter
-Version:        0.1.4
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        Simple program for starting new projects with various templates and with various languages.
 
@@ -54,6 +54,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Wed Sep 23 2020 Latesil <vihilantes@gmail.com> - 0.1.5-1
+- Refactor some code
+
 * Thu Jul 30 2020 Latesil <vihilantes@gmail.com> - 0.1.4-1
 - Initial package
 
