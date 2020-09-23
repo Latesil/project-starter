@@ -66,7 +66,7 @@ class RustTemplate(Template):
         self.create_files(self.files, executable='cargo.sh')
 
     def populate_root_dir(self, data):
-        #path = data['root'] + '/build-aux/meson' if data['is_gui'] else data['root'] + '/build-aux'
+        path = data['root'] + '/build-aux/meson'
 
         sdk_extension = (
             f"sdk-extensions:\n",
@@ -283,55 +283,46 @@ class RustTemplate(Template):
                 f")\n",
                 f"\n",
                 f"sources = files(\n",
-                f"  'config.rs',\n",
-                f"  'main.rs',\n",
-                f"  'window.rs',\n",
-                f")\n",
-                f"\n",
-                f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
-                f"cargo_release = custom_target(\n",
-                f"  'cargo-build',\n",
-                f"  build_by_default: true,\n",
-                f"  input: sources,\n",
-                f"  output: meson.project_name(),\n",
-                f"  console: true,\n",
-                f"  install: true,\n",
-                f"  install_dir: get_option('bindir'),\n",
-                f"  command: [\n",
-                f"    cargo_script,\n",
-                f"    meson.build_root(),\n",
-                f"    meson.source_root(),\n",
-                f"    '@OUTPUT@',\n",
-                f"    get_option('buildtype'),\n",
-                f"    meson.project_name(),\n",
-                f" ]\n",
-                f")\n",
             )
         else:
             text_meson = (
                 f"sources = files(\n",
-                f"  'main.rs',\n",
-                f")\n",
-                f"\n",
-                f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
-                f"cargo_release = custom_target(\n",
-                f"  'cargo-build',\n",
-                f"  build_by_default: true,\n",
-                f"  input: sources,\n",
-                f"  output: meson.project_name(),\n",
-                f"  console: true,\n",
-                f"  install: true,\n",
-                f"  install_dir: get_option('bindir'),\n",
-                f"  command: [\n",
-                f"    cargo_script,\n",
-                f"    meson.build_root(),\n",
-                f"    meson.source_root(),\n",
-                f"    '@OUTPUT@',\n",
-                f"    get_option('buildtype'),\n",
-                f"    meson.project_name(),\n",
-                f" ]\n",
-                f")\n",
             )
+            
+        if data['is_gui']:
+            text_meson += (
+                f"  'config.rs',\n",
+                f"  'main.rs',\n",
+                f"  'window.rs',\n",
+            )
+
+        else:
+            text_meson += (
+                f"  'main.rs',\n",
+            )
+
+        text_meson += (
+            f")\n",
+            f"\n",
+            f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
+            f"cargo_release = custom_target(\n",
+            f"  'cargo-build',\n",
+            f"  build_by_default: true,\n",
+            f"  input: sources,\n",
+            f"  output: meson.project_name(),\n",
+            f"  console: true,\n",
+            f"  install: true,\n",
+            f"  install_dir: get_option('bindir'),\n",
+            f"  command: [\n",
+            f"    cargo_script,\n",
+            f"    meson.build_root(),\n",
+            f"    meson.source_root(),\n",
+            f"    '@OUTPUT@',\n",
+            f"    get_option('buildtype'),\n",
+            f"    meson.project_name(),\n",
+            f" ]\n",
+            f")\n",
+        )
         meson_src_file = File(path, 'meson.build', text_meson)
         self.files.append(meson_src_file)
 
