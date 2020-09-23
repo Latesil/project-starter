@@ -49,7 +49,7 @@ class RustTemplate(Template):
         if self.data['is_gui']:
             self.create_folders(self.data['root'])
         else:
-            self.create_folders(self.data['root'], gui=False)
+            self.create_folders(self.data['root'], gui=False, additional_folders=['build-aux'])
 
         self.populate_root_dir(self.data)
 
@@ -66,7 +66,7 @@ class RustTemplate(Template):
         self.create_files(self.files, executable='cargo.sh')
 
     def populate_root_dir(self, data):
-        path = data['root'] + '/build-aux/meson' if data['is_gui'] else data['root'] + '/build-aux'
+        #path = data['root'] + '/build-aux/meson' if data['is_gui'] else data['root'] + '/build-aux'
 
         sdk_extension = (
             f"sdk-extensions:\n",
@@ -164,7 +164,7 @@ class RustTemplate(Template):
             f"""fi\n""",
             f"""\n""",
         )
-        cargo_file = File(data['root'] + '/build-aux/', 'cargo.sh', text_cargo)
+        cargo_file = File(data['root'] + 'build-aux/', 'cargo.sh', text_cargo)
         self.files.append(cargo_file)
 
         text_cargo_toml = (
