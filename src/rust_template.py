@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from .project_starter_constants import constants
+
 from .file import File
+from .project_starter_constants import constants
 from .template import Template
+
 
 class RustTemplate(Template):
 
@@ -66,8 +68,8 @@ class RustTemplate(Template):
         self.create_files(self.files, executable='cargo.sh')
 
     def populate_root_dir(self, data):
-        path = os.path.join(data['root'], '/build-aux/meson')
-
+        path = os.path.join(data['root'], 'build-aux/meson')
+        
         sdk_extension = (
             f"sdk-extensions:\n",
             f"  - org.freedesktop.Sdk.Extension.rust-stable\n",
