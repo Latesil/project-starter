@@ -86,7 +86,7 @@ msgstr "Ander pad kiezen"
 
 #: ../src/window.ui:352
 msgid "Version Control"
-msgstr "Versiebeheer"
+msgstr "Versiebeheersysteem"
 
 #: ../src/window.ui:362
 msgid "Git"
