@@ -1,0 +1,246 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-07 21:37+0300\n"
+"PO-Revision-Date: 2021-02-18 19:20+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: nl\n"
+
+#: ../data/com.github.Latesil.project-starter.desktop.in:3
+msgid "project-starter"
+msgstr "project-starter"
+
+#: ../src/window.ui:29
+msgid "Keyboard Shortcuts"
+msgstr "Sneltoetsen"
+
+#: ../src/window.ui:43
+msgid "About"
+msgstr "Over"
+
+#: ../src/window.ui:114
+msgid "Project Name"
+msgstr "Projectnaam"
+
+#: ../src/window.ui:139
+msgid ""
+"Unique name that is user to your project's folder and other technical "
+"resources."
+msgstr ""
+"Een unieke naam die wordt toegekend aan je projectmap en andere technische "
+"items."
+
+#: ../src/window.ui:140
+msgid "Should be in lower case without spaces and may not start with a number."
+msgstr ""
+"Deze naam mag alleen kleine letters en geen spaties bevatten, en niet "
+"beginnen met een getal."
+
+#: ../src/window.ui:196
+msgid "Project ID"
+msgstr "Project-id"
+
+#: ../src/window.ui:221
+msgid ""
+"The Project ID is a reverse domain-name identifier \n"
+"used to uniquely identify your application"
+msgstr ""
+"De project-id is een domeinnaamidentificatie die wordt gebruikt\n"
+"als unieke id van je toepassing"
+
+#: ../src/window.ui:279
+msgid "Path"
+msgstr "Pad"
+
+#: ../src/window.ui:302
+msgid "Project path"
+msgstr "Projectpad"
+
+#: ../src/window.ui:303
+msgid "~/Projects"
+msgstr "~/Projecten"
+
+#: ../src/window.ui:304
+msgid "project path"
+msgstr "projectpad"
+
+#: ../src/window.ui:314
+msgid "Browse"
+msgstr "Bladeren"
+
+#: ../src/window.ui:318
+msgid "Change path"
+msgstr "Ander pad kiezen"
+
+#: ../src/window.ui:352
+msgid "Version Control"
+msgstr "Versiebeheersysteem"
+
+#: ../src/window.ui:362
+msgid "Git"
+msgstr "Git"
+
+#: ../src/window.ui:397 ../src/window.ui:449
+msgid "Python"
+msgstr "Python"
+
+#: ../src/window.ui:401
+msgid "Change language"
+msgstr "Taal wijzigen"
+
+#: ../src/window.ui:412 ../src/window.ui:634
+msgid "GTK GUI Application"
+msgstr "GTK-gui-toepassing"
+
+#: ../src/window.ui:416
+msgid "Change template"
+msgstr "Ander sjabloon kiezen"
+
+#: ../src/window.ui:465
+msgid "Rust"
+msgstr "Rust"
+
+#: ../src/window.ui:481
+msgid "C"
+msgstr "C"
+
+#: ../src/window.ui:498
+msgid "JS"
+msgstr "JS"
+
+#: ../src/window.ui:534
+msgid "Create Project"
+msgstr "Project maken"
+
+#: ../src/window.ui:538
+msgid "Create project"
+msgstr "Project maken"
+
+#: ../src/window.ui:571
+msgid "Sorry, that folder is already exists"
+msgstr "Deze map bestaat al"
+
+#: ../src/window.ui:650
+msgid "GTK CLI Application"
+msgstr "GTK-cli-toepassing"
+
+#: ../src/window.ui:666
+msgid "GNOME Extension"
+msgstr "GNOME-uitbreiding"
+
+#: ../src/window.ui:709
+msgid "License"
+msgstr "Licentie"
+
+#: ../src/window.ui:726
+msgid "GPL 3"
+msgstr "GPL 3"
+
+#: ../src/window.ui:727
+msgid "AGPL 3"
+msgstr "AGPL 3"
+
+#: ../src/window.ui:728
+msgid "Apache 2"
+msgstr "Apache 2"
+
+#: ../src/window.ui:729
+msgid "LGPL 3"
+msgstr "LGPL 3"
+
+#: ../src/window.ui:730
+msgid "GPL 2"
+msgstr "GPL 2"
+
+#: ../src/window.ui:731
+msgid "LGPL 2"
+msgstr "LGPL 2"
+
+#: ../src/window.ui:780
+msgid "GNOME Extension name"
+msgstr "Naam van GNOME-uitbreiding"
+
+#: ../src/window.ui:792
+msgid ""
+"Name should be a very short (ideally descriptive) string.\n"
+"Examples are: “Click To Focus”, “Adblock”, “Shell Window Shrinker”"
+msgstr ""
+"De naam dient kort en bondig te zijn (bij voorkeur beschrijvend).\n"
+"Voorbeelden: 'Klik om te focussen', 'Advertentieblokkering', 'Shell-"
+"vensterverkleining'"
+
+#: ../src/window.ui:820
+msgid "Description"
+msgstr "Beschrijving"
+
+#: ../src/window.ui:832
+msgid ""
+"Description is a single-sentence explanation of what your extension does.\n"
+"Examples are: “Make windows visible on click”, “Block advertisement popups”, "
+"“Animate windows shrinking on minimize”"
+msgstr ""
+"De beschrijving is een uitleg in één zin van wat je uitbreiding doet.\n"
+"Voorbeelden: 'Toon venster na aanklikken', 'Blokkeer reclamevensters', "
+"'Minimaliseer vensters met een effect'"
+
+#: ../src/window.ui:860
+msgid "UUID"
+msgstr "UUID"
+
+#: ../src/window.ui:872
+msgid ""
+"UUID is a globally-unique identifier for your extension.\n"
+"This should be in the format of an email address (clicktofocus@janedoe."
+"example.com)"
+msgstr ""
+"De uuid is een globale, unieke identificatie van je uitbreiding.\n"
+"Deze dient een e-mailadresopmaak te hebben (bijv. klikomtefocussen@janjansen."
+"voorbeeld.nl)"
+
+#: ../src/window.ui:874
+msgid "clicktofocus@janedoe.example.com"
+msgstr "klikomtefocussen@janjansen.voorbeeld.nl"
+
+#: ../src/window.ui:903
+msgid "page0"
+msgstr "pagina0"
+
+#: ../src/window.ui:918
+msgid "Done!"
+msgstr "Klaar!"
+
+#: ../src/window.ui:934
+msgid ""
+"Now you can open that folder\n"
+"in a prefered application."
+msgstr ""
+"Nu kun je de map openen in de\n"
+"door jou gewenste toepassing."
+
+#: ../src/window.ui:946
+msgid "Open Folder"
+msgstr "Map openen"
+
+#: ../src/window.ui:962
+msgid "page1"
+msgstr "pagina1"
+
+#: ../src/window.ui:976
+msgid "Project Starter"
+msgstr "Projectstarter"
+
+#: ../src/window.py:150
+msgid "Choose a folder"
+msgstr "Kies een map"
