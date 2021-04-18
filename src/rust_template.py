@@ -114,10 +114,10 @@ class RustTemplate(Template):
 
         text_meson += (f"\n",
                        f"\n",
-                       f"cargo_sources = files(",
-                       f"'Cargo.toml',",
-                       f"'Cargo.lock',",
-                       f")",
+                       f"cargo_sources = files(\n",
+                       f"'Cargo.toml',\n",
+                       f"'Cargo.lock',\n",
+                       f")\n",
                        f"\n",)
 
         if data['is_gui']:
@@ -150,7 +150,7 @@ class RustTemplate(Template):
             f"""export MESON_BUILD_ROOT="$1"\n""",
             f"""export MESON_SOURCE_ROOT="$2"\n""",
             f"""export CARGO_TARGET_DIR="$MESON_BUILD_ROOT"/target\n""",
-            f"""export CARGO_HOME="MESON_BUILD_ROOT"/cargo-home\n""",
+            f"""export CARGO_HOME="$MESON_BUILD_ROOT"/cargo-home\n""",
             f"""export OUTPUT="$3"\n""",
             f"""export BUILDTYPE="$4"\n""",
             f"""export APP_BIN="$5"\n""",
@@ -311,7 +311,7 @@ class RustTemplate(Template):
         text_meson += (
             f")\n",
             f"\n",
-            f"sources = [cargo_sources, rust_sources]",
+            f"sources = [cargo_sources, rust_sources]\n",
             f"\n",
             f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
             f"cargo_release = custom_target(\n",
