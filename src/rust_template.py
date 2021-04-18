@@ -81,9 +81,8 @@ class RustTemplate(Template):
             f"    build-args:\n",
             f"      - --share=network\n",
             f"    env:\n",
-            f"      - CARGO_HOME: /run/build/rust-example/cargo\n",
-            f"        RUST_BACKTRACE: 1\n",
-            f"        RUST_LOG: rust-example=debug\n",
+            f"      - RUST_BACKTRACE: 1\n",
+            f"        RUST_LOG: {data['project_name']}=debug\n",
         )
 
         copying_file = self.create_copying_file(data['root'], data)
@@ -114,6 +113,11 @@ class RustTemplate(Template):
             )
 
         text_meson += (f"\n",
+                       f"\n",
+                       f"cargo_sources = files(",
+                       f"'Cargo.toml',",
+                       f"'Cargo.lock',",
+                       f")",
                        f"\n",)
 
         if data['is_gui']:
@@ -146,7 +150,7 @@ class RustTemplate(Template):
             f"""export MESON_BUILD_ROOT="$1"\n""",
             f"""export MESON_SOURCE_ROOT="$2"\n""",
             f"""export CARGO_TARGET_DIR="$MESON_BUILD_ROOT"/target\n""",
-            f"""export CARGO_HOME="$CARGO_TARGET_DIR"/cargo-home\n""",
+            f"""export CARGO_HOME="MESON_BUILD_ROOT"/cargo-home\n""",
             f"""export OUTPUT="$3"\n""",
             f"""export BUILDTYPE="$4"\n""",
             f"""export APP_BIN="$5"\n""",
@@ -161,7 +165,7 @@ class RustTemplate(Template):
             f"""else\n""",
             f"""    echo "DEBUG MODE"\n""",
             f"""    cargo build --manifest-path \\\n""",
-            f"""        "$MESON_SOURCE_ROOT"/Cargo.toml --verbose && \\\n""",
+            f"""        "$MESON_SOURCE_ROOT"/Cargo.toml && \\\n""",
             f"""        cp "$CARGO_TARGET_DIR"/debug/"$APP_BIN" "$OUTPUT"\n""",
             f"""fi\n""",
             f"""\n""",
@@ -173,7 +177,7 @@ class RustTemplate(Template):
 
         text_cargo_toml = (
             f"[package]\n",
-            f"name = \"rust-example\"\n",
+            f"name = \"{data['project_name']}\"\n",
             f"version = \"0.1.0\"\n",
             f"edition = \"2018\"\n",
             f"\n",
@@ -286,11 +290,11 @@ class RustTemplate(Template):
                 f"  check: true\n",
                 f")\n",
                 f"\n",
-                f"sources = files(\n",
+                f"rust_sources = files(\n",
             )
         else:
             text_meson = (
-                f"sources = files(\n",
+                f"rust_sources = files(\n",
             )
             
         if data['is_gui']:
@@ -306,6 +310,8 @@ class RustTemplate(Template):
 
         text_meson += (
             f")\n",
+            f"\n",
+            f"sources = [cargo_sources, rust_sources]",
             f"\n",
             f"cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))\n",
             f"cargo_release = custom_target(\n",
